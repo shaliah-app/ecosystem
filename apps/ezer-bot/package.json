@@ -1,0 +1,26 @@
+{
+  "name": "ezer-bot",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "tsx watch src/bot.ts",
+    "build": "tsc",
+    "start": "node dist/bot.js",
+    "lint": "eslint src/**/*.ts",
+    "lint:fix": "eslint src/**/*.ts --fix"
+  },
+  "dependencies": {
+    "grammy": "^1.21.0",
+    "@grammyjs/runner": "^2.0.3",
+    "@grammyjs/menu": "^1.2.1",
+    "@supabase/supabase-js": "^2.39.0",
+    "dotenv": "^16.3.0"
+  },
+  "devDependencies": {
+    "eslint-config-custom": "workspace:*",
+    "typescript-config": "workspace:*",
+    "@types/node": "^20.0.0",
+    "tsx": "^4.0.0",
+    "typescript": "^5.9.2"
+  }
+}

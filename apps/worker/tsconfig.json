@@ -1,0 +1,15 @@
+{
+  "extends": "../../packages/typescript-config/tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "module": "CommonJS",
+    "target": "ES2022",
+    "moduleResolution": "node",
+    "lib": ["ES2022", "DOM"],
+    "types": ["node"]
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}
