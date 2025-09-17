@@ -1,4 +1,7 @@
-// Database schema definitions will go here
-// This file will be populated with your entities later
+import { pgTable, serial, text, varchar } from "drizzle-orm/pg-core";
 
-export {};
+export const users = pgTable('users', {
+  id: serial('id').primaryKey(),
+  fullName: text('full_name'),
+  phone: varchar('phone', { length: 256 }),
+});
