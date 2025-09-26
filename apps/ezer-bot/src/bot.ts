@@ -4,6 +4,7 @@ import { createClient } from '@supabase/supabase-js'
 import { config } from 'dotenv'
 import type { Context, SessionData } from './types/context.js'
 import welcomeComposer from './modules/welcome.js'
+import { logger } from './logger.js'
 
 // Load environment variables
 config()
@@ -35,13 +36,17 @@ bot.use(welcomeComposer)
 
 // Global error handler
 bot.catch((err: any) => {
-  console.error('Bot error:', err)
+  logger.captureException(err.error, {
+    update: err.ctx?.update,
+    chatId: err.ctx?.chat?.id,
+    userId: err.ctx?.from?.id,
+  })
   // In production, you might want to send this to a logging service
 })
 
 // Start the bot with the high-performance runner
-console.log('🤖 Starting Ezer Bot...')
+logger.info('🤖 Starting Ezer Bot...')
 
 run(bot)
 
-console.log('✅ Ezer Bot is running!')
+logger.info('✅ Ezer Bot is running!')

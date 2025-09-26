@@ -1,5 +1,6 @@
 import { boss, stopBoss } from './boss.js'
 import { processNewRecord } from './handlers/processNewRecord.js'
+import { logger } from './logger.js'
 
 // Job handler registry - maps job names to handler functions
 const jobHandlers = {
@@ -14,48 +15,48 @@ type JobName = keyof typeof jobHandlers
 
 async function startWorker() {
   try {
-    console.log('🚀 Starting Yesod Worker...')
+    logger.info('🚀 Starting Yesod Worker...')
 
     // Start pg-boss
     await boss.start()
-    console.log('✅ Connected to database and started job queue')
+    logger.info('✅ Connected to database and started job queue')
 
     // Register all job handlers
     for (const [jobName, handler] of Object.entries(jobHandlers)) {
       await boss.work(jobName as JobName, handler)
-      console.log(`📋 Registered handler for job: ${jobName}`)
+      logger.info(`📋 Registered handler for job: ${jobName}`)
     }
 
-    console.log('🎯 Worker is ready and listening for jobs!')
-    console.log('Press Ctrl+C to stop the worker gracefully')
+    logger.info('🎯 Worker is ready and listening for jobs!')
+    logger.info('Press Ctrl+C to stop the worker gracefully')
 
   } catch (error) {
-    console.error('❌ Failed to start worker:', error)
+    logger.captureException(error as Error, { operation: 'startWorker' })
     process.exit(1)
   }
 }
 
 // Graceful shutdown handlers
 async function gracefulShutdown(signal: string) {
-  console.log(`\n🛑 Received ${signal}, initiating graceful shutdown...`)
+  logger.info(`🛑 Received ${signal}, initiating graceful shutdown...`)
 
   try {
     // Stop accepting new jobs
     await boss.stop({ graceful: true })
-    console.log('✅ Worker stopped accepting new jobs')
+    logger.info('✅ Worker stopped accepting new jobs')
 
     // Give running jobs time to complete (configurable)
     const gracePeriodMs = 10000 // 10 seconds
-    console.log(`⏳ Waiting up to ${gracePeriodMs / 1000}s for running jobs to complete...`)
+    logger.info(`⏳ Waiting up to ${gracePeriodMs / 1000}s for running jobs to complete...`)
 
     // Wait for running jobs to complete
     await new Promise(resolve => setTimeout(resolve, gracePeriodMs))
 
-    console.log('✅ Graceful shutdown completed')
+    logger.info('✅ Graceful shutdown completed')
     process.exit(0)
 
   } catch (error) {
-    console.error('❌ Error during graceful shutdown:', error)
+    logger.captureException(error as Error, { operation: 'gracefulShutdown' })
     process.exit(1)
   }
 }
@@ -66,12 +67,16 @@ process.on('SIGTERM', () => gracefulShutdown('SIGTERM'))
 
 // Handle uncaught exceptions
 process.on('uncaughtException', (error) => {
-  console.error('💥 Uncaught Exception:', error)
+  logger.captureException(error, { type: 'uncaughtException' })
   process.exit(1)
 })
 
 process.on('unhandledRejection', (reason, promise) => {
-  console.error('💥 Unhandled Rejection at:', promise, 'reason:', reason)
+  logger.captureException(new Error(`Unhandled Rejection: ${reason}`), {
+    type: 'unhandledRejection',
+    promise: promise.toString(),
+    reason
+  })
   process.exit(1)
 })
 

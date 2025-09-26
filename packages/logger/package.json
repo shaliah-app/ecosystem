@@ -4,7 +4,6 @@
   "description": "Shared logger package for Yesod ecosystem with Pino and Sentry integration",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "type": "module",
   "scripts": {
     "build": "tsc",
     "test": "vitest",
