@@ -24,6 +24,13 @@ For business-critical and error-prone parts of the system, a Test-Driven Develop
 - **Scope:** This applies primarily to the ETL data parser, asynchronous job handlers in the worker, and core authentication/permissions logic.
 - **Process:** A failing test must be written to define a new feature. Code is then written to make the test pass, and finally, the code is refactored for quality.
 
+### VII. TypeScript-First Monorepo
+
+All packages and applications in the Yesod monorepo MUST use TypeScript as the authoritative source language. This means:
+- New packages are authored in TypeScript and provide type declarations.
+- Applications should consume packages with TypeScript typings and prefer workspace references.
+- Any deviation from TypeScript-first must be explicitly approved in a constitution amendment.
+
 ## Technology Stack & Architecture
 
 This section defines the non-negotiable technology stack for the ecosystem. Any deviation requires an amendment to this constitution.

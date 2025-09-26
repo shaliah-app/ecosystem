@@ -1,10 +1,17 @@
 import { serve } from '@hono/node-server'
 import app from './index.js'
 import { env } from './config/env.js'
+import { createLogger } from '@yesod/logger'
+
+const logger = createLogger({
+  serviceName: 'yesod-api',
+  environment: env.NODE_ENV,
+  sentryDsn: env.SENTRY_DSN,
+})
 
 const port = parseInt(env.PORT)
 
-console.log(`🚀 Server is running on http://localhost:${port}`)
+logger.info('Server starting', { port })
 
 serve({
   fetch: app.fetch,

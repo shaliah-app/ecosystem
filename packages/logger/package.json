@@ -1,0 +1,35 @@
+{
+  "name": "@yesod/logger",
+  "version": "0.0.0",
+  "description": "Shared logger package for Yesod ecosystem with Pino and Sentry integration",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest",
+    "lint": "eslint src --ext .ts",
+    "prepare": ""
+  },
+  "keywords": [
+    "logger",
+    "pino",
+    "sentry",
+    "yesod"
+  ],
+  "author": "Yesod Team",
+  "license": "MIT",
+  "dependencies": {
+    "@sentry/node": "^10.15.0",
+    "pino": "^9.11.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@vitest/coverage-v8": "^3.2.0",
+    "eslint": "^8.0.0",
+    "eslint-config-custom": "workspace:*",
+    "tsx": "^4.0.0",
+    "typescript": "^5.0.0",
+    "vitest": "^3.2.0"
+  }
+}
