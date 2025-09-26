@@ -1,7 +1,6 @@
 import pino from 'pino';
 import * as Sentry from '@sentry/node';
 import { LoggerConfig, validateConfig } from './types';
-import { safeSerialize } from './serializers';
 
 export interface Logger {
   info(message: string, context?: object): void;

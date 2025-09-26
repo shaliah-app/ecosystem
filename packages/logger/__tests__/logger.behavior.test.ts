@@ -25,7 +25,7 @@ describe('logger behavior', () => {
     const mockLogger = { info: vi.fn(), warn: vi.fn(), error: vi.fn() };
     pinoMock.mockReturnValue(mockLogger);
 
-    const logger = createLogger({ serviceName: 'test', prettyPrint: false });
+    const logger = createLogger({ serviceName: 'test' });
     logger.info('test message', { key: 'value' });
     expect(mockLogger.info).toHaveBeenCalledWith({ key: 'value' }, 'test message');
   });

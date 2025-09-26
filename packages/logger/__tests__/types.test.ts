@@ -7,7 +7,6 @@ describe('validateConfig', () => {
     expect(cfg.serviceName).toBe('test');
     expect(cfg.level).toBe('info');
     expect(cfg.environment).toBe('test'); // vitest sets NODE_ENV to 'test'
-    expect(cfg.prettyPrint).toBe(true);
   });
 
   it('should throw if serviceName is missing', () => {
@@ -20,10 +19,5 @@ describe('validateConfig', () => {
 
   it('should throw if sampleRate is out of range', () => {
     expect(() => validateConfig({ serviceName: 'test', sampleRate: 1.5 })).toThrow('sampleRate must be between 0 and 1');
-  });
-
-  it('should set prettyPrint to false in production', () => {
-    const cfg = validateConfig({ serviceName: 'test', environment: 'production' });
-    expect(cfg.prettyPrint).toBe(false);
   });
 });

@@ -5,7 +5,6 @@ export interface LoggerConfig {
   sentryDsn?: string | undefined;
   sentryEnvironment?: string | undefined;
   sampleRate?: number | undefined;
-  prettyPrint?: boolean;
 }
 
 export interface LogEntry {
@@ -36,6 +35,5 @@ export function validateConfig(cfg: Partial<LoggerConfig>): LoggerConfig {
     sentryDsn: cfg.sentryDsn,
     sentryEnvironment: cfg.sentryEnvironment,
     sampleRate: cfg.sampleRate,
-    prettyPrint: cfg.prettyPrint ?? (cfg.environment !== 'production'),
   };
 }
