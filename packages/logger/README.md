@@ -1,6 +1,6 @@
 # @yesod/logger
 
-Shared logger package for the Yesod ecosystem, providing structured logging with Pino and error tracking with Sentry.
+Shared logger package for the Yesod ecosystem, providing structured logging with Pino.
 
 ## Installation
 
@@ -16,19 +16,18 @@ import { createLogger } from '@yesod/logger'
 const logger = createLogger({
   serviceName: 'my-service',
   environment: process.env.NODE_ENV,
-  sentryDsn: process.env.SENTRY_DSN, // Optional
 })
 
 logger.info('Service started', { port: 3000 })
-logger.captureException(new Error('Something went wrong'))
+logger.error('Something went wrong', { userId: 123 })
+logger.captureException(new Error('Database connection failed'))
 ```
 
 ## Environment Variables
 
-- `SENTRY_DSN`: Sentry Data Source Name (optional)
-- `LOG_LEVEL`: Log level (debug, info, warn, error)
-- `SERVICE_NAME`: Service identifier
-- `NODE_ENV`: Environment (development, production)
+- `LOG_LEVEL`: Log level (debug, info, warn, error) - defaults to 'info'
+- `SERVICE_NAME`: Service identifier - defaults to 'default'
+- `NODE_ENV`: Environment (development, production) - used for log context
 
 ## API
 
@@ -36,4 +35,14 @@ logger.captureException(new Error('Something went wrong'))
 - `logger.info(message: string, context?: object)`
 - `logger.warn(message: string, context?: object)`
 - `logger.error(error: Error | string, context?: object)`
-- `logger.captureException(error: Error, context?: object)`
+- `logger.captureException(error: Error, context?: object)` - Currently logs the error; Sentry integration planned for future
+
+## LoggerConfig
+
+```ts
+interface LoggerConfig {
+  serviceName?: string;
+  environment?: string;
+  level?: string;
+}
+```

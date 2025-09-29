@@ -1,5 +1,4 @@
 import pino from 'pino';
-import * as Sentry from '@sentry/node';
 import { LoggerConfig, validateConfig } from './types';
 
 export interface Logger {
@@ -9,20 +8,8 @@ export interface Logger {
   captureException(error: Error, context?: object): Promise<void>;
 }
 
-let sentryInitialized = false;
-
 export function createLogger(config?: Partial<LoggerConfig>): Logger {
   const cfg = validateConfig(config || { serviceName: 'default' });
-
-  // Initialize Sentry if DSN provided and not already done
-  if (cfg.sentryDsn && !sentryInitialized) {
-    Sentry.init({
-      dsn: cfg.sentryDsn,
-      environment: cfg.sentryEnvironment || cfg.environment || 'development',
-      sampleRate: cfg.sampleRate || 1.0,
-    });
-    sentryInitialized = true;
-  }
 
   // Create Pino logger
   const pinoLogger = pino({
@@ -46,9 +33,7 @@ export function createLogger(config?: Partial<LoggerConfig>): Logger {
     },
     captureException: async (error: Error, context?: object) => {
       pinoLogger.error({ err: error, ...context }, error.message);
-      if (cfg.sentryDsn) {
-        Sentry.captureException(error, { extra: context as any });
-      }
+      // TODO: Integrate with Sentry when available
     },
   };
 

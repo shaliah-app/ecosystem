@@ -1,6 +1,7 @@
 {
   "name": "@yesod/logger",
   "version": "0.0.0",
+  "type": "module",
   "description": "Shared logger package for Yesod ecosystem with Pino and Sentry integration",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -19,7 +20,6 @@
   "author": "Yesod Team",
   "license": "MIT",
   "dependencies": {
-    "@sentry/node": "^10.15.0",
     "pino": "^9.11.0"
   },
   "devDependencies": {
