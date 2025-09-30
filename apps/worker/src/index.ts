@@ -1,10 +1,12 @@
 import { boss, stopBoss } from './boss.js'
 import { processNewRecord } from './handlers/processNewRecord.js'
+import { cleanupAuthTokens } from './handlers/cleanupAuthTokens.js'
 import { logger } from './logger.js'
 
 // Job handler registry - maps job names to handler functions
 const jobHandlers = {
   'process_new_record': processNewRecord,
+  'cleanup_auth_tokens': cleanupAuthTokens,
   // Add more job handlers here as needed:
   // 'process_audio_fingerprint': processAudioFingerprint,
   // 'separate_audio_stems': separateAudioStems,
@@ -26,6 +28,10 @@ async function startWorker() {
       await boss.work(jobName as JobName, handler)
       logger.info(`📋 Registered handler for job: ${jobName}`)
     }
+
+    // Schedule recurring jobs
+    await boss.schedule('cleanup_auth_tokens', '* * * * *') // Every minute for testing; adjust to e.g., '0 */6 * * *' for every 6 hours
+    logger.info('📅 Scheduled recurring job: cleanup_auth_tokens')
 
     logger.info('🎯 Worker is ready and listening for jobs!')
     logger.info('Press Ctrl+C to stop the worker gracefully')
