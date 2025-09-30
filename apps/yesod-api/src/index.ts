@@ -2,6 +2,9 @@ import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { logger } from 'hono/logger'
 import { prettyJSON } from 'hono/pretty-json'
+import authRoutes from './routes/auth.js'
+import profileRoutes from './routes/profile.js'
+import { authMiddleware } from './middleware/auth.js'
 
 const app = new Hono()
 
@@ -19,6 +22,14 @@ app.get('/health', (c) => {
 app.get('/api/v1', (c) => {
   return c.json({ message: 'Yesod API v1' })
 })
+
+// Auth routes (protected)
+app.use('/api/v1/auth/*', authMiddleware)
+app.route('/api/v1/auth', authRoutes)
+
+// Profile routes (protected)
+app.use('/api/v1/profile/*', authMiddleware)
+app.route('/api/v1/profile', profileRoutes)
 
 // 404 handler
 app.notFound((c) => {
