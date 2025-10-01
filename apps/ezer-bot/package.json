@@ -10,20 +10,21 @@
     "lint:fix": "eslint src/**/*.ts --fix"
   },
   "dependencies": {
+    "@grammyjs/i18n": "^1.1.2",
+    "@grammyjs/menu": "^1.2.1",
+    "@grammyjs/runner": "^2.0.3",
     "@sentry/node": "^8.40.0",
     "@sentry/profiling-node": "^8.40.0",
-    "@yesod/logger": "workspace:*",
-    "grammy": "^1.21.0",
-    "@grammyjs/runner": "^2.0.3",
-    "@grammyjs/menu": "^1.2.1",
     "@supabase/supabase-js": "^2.39.0",
-    "dotenv": "^16.3.0"
+    "@yesod/logger": "workspace:*",
+    "dotenv": "^16.3.0",
+    "grammy": "^1.21.0"
   },
   "devDependencies": {
-    "eslint-config-custom": "workspace:*",
-    "typescript-config": "workspace:*",
     "@types/node": "^20.0.0",
+    "eslint-config-custom": "workspace:*",
     "tsx": "^4.0.0",
-    "typescript": "^5.9.2"
+    "typescript": "^5.9.2",
+    "typescript-config": "workspace:*"
   }
 }

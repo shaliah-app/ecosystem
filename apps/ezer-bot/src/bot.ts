@@ -2,6 +2,7 @@ import { Bot, session } from 'grammy'
 import { run, sequentialize } from '@grammyjs/runner'
 import { createClient } from '@supabase/supabase-js'
 import { config } from 'dotenv'
+import { I18n } from '@grammyjs/i18n'
 import type { Context, SessionData } from './types/context.js'
 import welcomeComposer from './modules/welcome.js'
 import { logger } from './logger.js'
@@ -27,6 +28,19 @@ bot.use(
     })
   })
 )
+
+// Configure internationalization
+const i18n = new I18n<Context>({
+  defaultLocale: 'en',
+  directory: 'src/locales', // relative to the bot.ts file
+  globalTranslationContext(ctx) {
+    return {
+      first_name: ctx.from?.first_name ?? 'there',
+    }
+  },
+})
+
+bot.use(i18n)
 
 // Sequentialize middleware to ensure updates from the same chat are processed in order
 bot.use(sequentialize((ctx) => ctx.chat?.id.toString()))
