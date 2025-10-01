@@ -1,0 +1,25 @@
+{
+  "HomePage": {
+    "title": "Shaliah Next",
+    "welcome": "Welcome to Shaliah Next with Supabase integration"
+  },
+  "AuthForm": {
+    "signIn": "Sign In",
+    "signUp": "Create Account",
+    "email": "Email",
+    "password": "Password",
+    "emailPlaceholder": "Enter your email",
+    "passwordPlaceholder": "Enter your password",
+    "signInButton": "Sign In",
+    "signUpButton": "Sign Up",
+    "loading": "Loading...",
+    "switchToSignUp": "Don't have an account? Sign up",
+    "switchToSignIn": "Already have an account? Sign in",
+    "unexpectedError": "An unexpected error occurred"
+  },
+  "UserProfile": {
+    "welcome": "Welcome",
+    "signOut": "Sign Out",
+    "loading": "Loading..."
+  }
+}
