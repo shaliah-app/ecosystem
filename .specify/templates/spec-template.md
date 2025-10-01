@@ -100,6 +100,14 @@ When creating this spec from a user prompt:
 - [ ] Scope is clearly bounded
 - [ ] Dependencies and assumptions identified
 
+### Constitution Alignment
+- [ ] **Principle I (DDD)**: Requirements expressed in domain language, not technical jargon
+- [ ] **Principle II (MVP-First)**: Scope is limited to MVP; advanced features marked for future roadmap
+- [ ] **Principle III (Testing)**: Acceptance scenarios are testable and measurable
+- [ ] **Principle IV (API-First)**: If multi-app feature, client apps are consumers of central API
+- [ ] **Principle V (Async)**: Long-running operations identified for background processing
+- [ ] **Principle IX (i18n)**: User-facing text identified for translation (pt-BR, en as primary)
+
 ---
 
 ## Execution Status

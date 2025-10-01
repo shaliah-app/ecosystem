@@ -47,11 +47,15 @@
 ## Constitution Check
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-- **Principle III: Comprehensive Testing**: Does the plan account for the correct testing framework for the target application (Jest/RTL for web UI, Vitest for backend)?
-- **Principle VI: TypeScript-First**: Is all new code planned to be written in TypeScript?
-- **Principle VII: Supabase-First**: If the feature requires a database, auth, or storage, does it use Supabase?
-- **Principle VIII: MCP-Driven Development**: Does the development workflow consider using MCP servers for debugging and testing?
-- **Principle IX: Internationalization (i18n)**: If the feature is user-facing, does it include plans for translation and localization?
+- **Principle I: Domain-Driven Design (DDD)**: Does the design reflect business domain concepts rather than technical concerns? Are bounded contexts, domain entities, and ubiquitous language clearly defined?
+- **Principle II: Pragmatic, MVP-First Development**: Is the feature scoped as an MVP? Are complex features or optimizations deferred to a clear roadmap rather than built all at once?
+- **Principle III: Comprehensive Testing**: Does the plan account for the correct testing framework for the target application (Jest/RTL for web UI, Vitest for backend)? Is TDD applied to business-critical logic?
+- **Principle IV: API-First Design**: Do client applications consume the Yesod API as the single source of truth? Is business logic centralized in the API rather than in clients?
+- **Principle V: Decoupled, Asynchronous Processing**: Are time-consuming tasks offloaded to the background worker via job queue rather than executed in the API request-response cycle?
+- **Principle VI: TypeScript-First Monorepo**: Is all new code planned to be written in TypeScript within the monorepo structure? Are shared packages and workspace references properly utilized?
+- **Principle VII: Supabase-First Integration**: If the feature requires a database, auth, or storage, does it use Supabase as the primary backend service?
+- **Principle VIII: MCP-Driven Development & Debugging**: Does the development workflow consider using MCP servers (Chrome DevTools, Supabase) for debugging and testing?
+- **Principle IX: Internationalization (i18n)**: If the feature is user-facing (shaliah-next or ezer-bot), does it include plans for translation and localization using the appropriate tooling (next-intl or @grammyjs/i18n)?
 
 ## Project Structure
 

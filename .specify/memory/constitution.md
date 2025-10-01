@@ -6,9 +6,9 @@ Sync Impact Report:
     - Principle IX: "Internationalization (i18n) for User-Facing Applications"
 - Removed sections: None
 - Templates requiring updates:
-    - .specify/templates/plan-template.md (⚠ pending)
-    - .specify/templates/spec-template.md (⚠ pending)
-    - .specify/templates/tasks-template.md (⚠ pending)
+    - .specify/templates/plan-template.md (✅ updated - all 9 principles included in Constitution Check)
+    - .specify/templates/spec-template.md (✅ updated - Constitution Alignment section added to Review Checklist)
+    - .specify/templates/tasks-template.md (✅ updated - Validation Checklist expanded with all 9 principles)
 - Follow-up TODOs: None
 -->
 # The Yesod Ecosystem Constitution
