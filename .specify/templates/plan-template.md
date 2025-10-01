@@ -47,7 +47,10 @@
 ## Constitution Check
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+- **Principle III: Comprehensive Testing**: Does the plan account for the correct testing framework for the target application (Jest/RTL for web UI, Vitest for backend)?
+- **Principle VI: TypeScript-First**: Is all new code planned to be written in TypeScript?
+- **Principle VII: Supabase-First**: If the feature requires a database, auth, or storage, does it use Supabase?
+- **Principle VIII: MCP-Driven Development**: Does the development workflow consider using MCP servers for debugging and testing?
 
 ## Project Structure
 
@@ -63,46 +66,23 @@ specs/[###-feature]/
 ```
 
 ### Source Code (repository root)
-<!--
-  ACTION REQUIRED: Replace the placeholder tree below with the concrete layout
-  for this feature. Delete unused options and expand the chosen structure with
-  real paths (e.g., apps/admin, packages/something). The delivered plan must
-  not include Option labels.
--->
 ```
-# [REMOVE IF UNUSED] Option 1: Single project (DEFAULT)
-src/
-├── models/
-├── services/
-├── cli/
-└── lib/
-
-tests/
-├── contract/
-├── integration/
-└── unit/
-
-# [REMOVE IF UNUSED] Option 2: Web application (when "frontend" + "backend" detected)
-backend/
-├── src/
-│   ├── models/
-│   ├── services/
-│   └── api/
-└── tests/
-
-frontend/
-├── src/
-│   ├── components/
-│   ├── pages/
-│   └── services/
-└── tests/
-
-# [REMOVE IF UNUSED] Option 3: Mobile + API (when "iOS/Android" detected)
-api/
-└── [same as backend above]
-
-ios/ or android/
-└── [platform-specific structure: feature modules, UI flows, platform tests]
+apps/
+├── yesod-api/
+│   ├── src/
+│   └── tests/
+├── shaliah-next/
+│   ├── src/
+│   └── __tests__/
+├── ezer-bot/
+│   ├── src/
+│   └── __tests__/
+└── worker/
+    ├── src/
+    └── __tests__/
+packages/
+├── logger/
+└── ...
 ```
 
 **Structure Decision**: [Document the selected structure and reference the real
@@ -216,4 +196,4 @@ directories captured above]
 - [ ] Complexity deviations documented
 
 ---
-*Based on Constitution v2.1.1 - See `/memory/constitution.md`*
+*Based on Constitution v2.0.0 - See `.specify/memory/constitution.md`*
