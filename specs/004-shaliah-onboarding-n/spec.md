@@ -1,4 +1,12 @@
-# Feature Specification: Shaliah Unified Onboarding & Authentication
+# Feature Specification: Shaliah Unified Onboarding & ## User Scenarios & Testing *(mandatory)*
+
+### Primary User Story
+As a new or returning user, I can authenticate to Shaliah in a single step by continuing with Email (magic link) or Google. The system decides whether to create or reuse my account based on the verified email identity. If my profile is complete (e.g., from Google), I'm taken directly to my profile dashboard; otherwise, I'm prompted once to provide the minimal info (full name). My session works for Shaliah app, and will extend to the Ezer bot.
+
+### Acceptance Scenarios
+**Note**: Detailed acceptance scenarios and manual test procedures are documented in [`quickstart.md`](./quickstart.md). This section provides summary references.
+
+**Summary of Key Scenarios** (see quickstart.md for full details):tication
 
 **Feature Branch**: `004-shaliah-onboarding-n`  
 **Created**: 2025-10-01  
@@ -129,12 +137,13 @@ As a new or returning user, I can authenticate to Shaliah in a single step by co
 - **FR-001 (Unified entry point)**: Provide a single authentication UI labeled "Continue with" options (Email, Google) instead of separate Sign in/Sign up.
 - **FR-002 (Implicit account handling)**: Determine account existence by verified email identity; create a new account only when none exists; otherwise sign in the existing account.
 - **FR-003 (Email magic link)**: Allow users to request a magic link for email authentication. The link must be valid for 15 minutes.
-- **FR-004 (Magic link cooldown)**: Enforce a 60-second cooldown per email (global) after sending a magic link. Show a countdown until resend is available.
-- **FR-004a (Magic link rate limit)**: Limit magic-link sends to 10 per email in a rolling 1-hour window with a clear error and retry-after indication when exceeded.
+- **FR-004 (Magic link rate limiting)**: Enforce rate limits to prevent abuse:
+  - **(a) Cooldown**: 60-second cooldown per email (global) after sending a magic link. Show a countdown until resend is available.
+  - **(b) Hourly cap**: Limit magic-link sends to 10 per email in a rolling 1-hour window with a clear error and retry-after indication when exceeded.
 - **FR-005 (Post-request UI state)**: After requesting a link, show: a friendly confirmation message, the email in a disabled input, a visible cooldown timer, and a Back button to return to the provider selection.
 - **FR-006 (Google auth and prefill)**: On Google auth, prefill profile fields (full_name, avatar_url) when available.
 - **FR-007 (Account linking same email)**: If Google returns the same verified email as an existing account, link the identity to the same account (no duplicate creation).
-- **FR-008 (Different email behavior)**: If Google returns a different verified email, create a separate account. [Note: future enhancement allows linking up to 3 verified emails per account.]
+- **FR-008 (Different email behavior)**: If Google returns a different verified email, create a separate account. **MVP limitation**: Each email creates a distinct account. **Future roadmap**: Multi-email linking (up to 3 verified emails per account) will be added post-MVP.
 - **FR-009 (Language inference)**: Infer language automatically (e.g., browser or prior setting) and store on the profile without an explicit onboarding step.
 - **FR-010 (Conditional onboarding)**: Only show onboarding if required profile data is missing. At minimum, require full_name if not already present. Skip onboarding otherwise and route to profile dashboard.
 - **FR-010a (Avatar optional)**: Avatar editing is optional during onboarding; if no avatar is provided or available from Google, use a default placeholder image.
@@ -143,14 +152,21 @@ As a new or returning user, I can authenticate to Shaliah in a single step by co
    - Clarified: Logout is app-local; logging out in one app does not force logout across other apps.
 - **FR-013 (Storage restrictions UX)**: If cookies/local storage are blocked and session cannot be saved, display a prominent, non-dismissible error explaining the issue and remediation.
 - **FR-014 (Error/expired link UX)**: Expired or reused magic links must show clear errors and offer a flow to request a fresh link (respecting cooldown).
-- **FR-015 (Security and audit)**: Log authentication attempts and critical events (link send, link consume, identity link) for security monitoring.
+- **FR-015 (Security and audit)**: Log authentication attempts and critical events for security monitoring. Required events:
+  - `auth.magic_link.sent` (INFO): email (hashed), timestamp, IP address, success/failure
+  - `auth.magic_link.consumed` (INFO): email (hashed), timestamp, success/failure, user_id if successful
+  - `auth.oauth.google.success` (INFO): email (hashed), timestamp, user_id, account_action (created/linked)
+  - `auth.rate_limit.cooldown` (WARN): email (hashed), timestamp, retry_after_seconds
+  - `auth.rate_limit.exceeded` (WARN): email (hashed), timestamp, retry_after_seconds
+  - `auth.error` (ERROR): error_type, message, email (hashed if available), timestamp
+  Use structured logging via packages/logger. IP addresses retained for abuse detection only, nullified after 24 hours per GDPR compliance.
 - **FR-016 (Naming)**: Use neutral, single-step language such as "Continue with" in UI copy instead of "Sign in/Sign up".
 
 ### Non-Functional and Policy Requirements
 - **NFR-001 (Data retention)**: Account deletion follows Soft Delete with 30-day grace period before permanent removal.
 - **NFR-002 (Accessibility)**: Authentication and onboarding screens meet baseline accessibility (keyboard, screen reader labels, sufficient contrast).
 - **NFR-003 (Localization)**: All UI strings support English and Brazilian Portuguese at a minimum.
-- **NFR-004 (Performance)**: Authentication UI loads within 2s on a 3G Fast network baseline.
+- **NFR-004 (Performance)**: Authentication UI Time to Interactive (TTI) ≤ 2 seconds on 3G Fast network (measured via Chrome DevTools Lighthouse throttling). Metric includes: HTML parsed, JS executed, main thread idle, user can interact with auth form.
 - **NFR-005 (Session duration)**: Session absolute lifetime is 30 days with a 7-day idle timeout; after either threshold is reached, re-authentication is required.
 
 ### Key Entities *(include if feature involves data)*
