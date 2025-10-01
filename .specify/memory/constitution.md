@@ -1,12 +1,9 @@
 <!--
 Sync Impact Report:
-- Version change: 1.3.0 → 2.0.0
-- Modified Principles:
-    - "Reliability Through Test-Driven Development (TDD)" → "Reliability Through Comprehensive Testing"
-    - "Technology Stack & Architecture" section updated.
+- Version change: 2.0.0 → 2.1.0
+- Modified Principles: None
 - Added Sections:
-    - Principle VII: "Supabase-First Integration"
-    - Principle VIII: "MCP-Driven Development & Debugging"
+    - Principle IX: "Internationalization (i18n) for User-Facing Applications"
 - Removed sections: None
 - Templates requiring updates:
     - .specify/templates/plan-template.md (⚠ pending)
@@ -63,6 +60,15 @@ The use of Model-Context-Protocol (MCP) servers is strongly encouraged during de
     - **Supabase MCP:** For a read-only interface to the database, enabling data inspection and query analysis.
 - **Rationale:** MCP servers provide a standardized, tool-agnostic way to interact with and control development services, improving debugging efficiency and enabling advanced automation workflows.
 
+### IX. Internationalization (i18n) for User-Facing Applications
+All user-facing applications must be internationalized to support a global user base.
+- **Target Applications:** This principle applies to `shaliah-next` and `ezer-bot`.
+- **Supported Languages:** The applications will support Brazilian Portuguese (pt-BR), English (en-US), Spanish (es), French (fr), German (de), Ukrainian (uk), and Russian (ru).
+- **Key Languages:** Brazilian Portuguese and English are the primary languages and must always be fully supported and up-to-date.
+- **Tooling:**
+    - `shaliah-next` MUST use `next-intl`.
+    - `ezer-bot` MUST use the `@grammyjs/i18n` plugin. Any questions regarding its implementation should refer to the official documentation at `https://grammy.dev/plugins/i18n`.
+
 ## Technology Stack & Architecture
 
 This section defines the non-negotiable technology stack for the ecosystem. Any deviation requires an amendment to this constitution.
@@ -76,6 +82,9 @@ This section defines the non-negotiable technology stack for the ecosystem. Any 
 - **Testing:**
     - **Web UI:** `Jest` + `React Testing Library`
     - **Backend/API:** `Vitest`
+- **Internationalization:**
+    - **`shaliah-next`:** `next-intl`
+    - **`ezer-bot`:** `@grammyjs/i18n`
 - **Observability:**
     - **Structured Logging:** `Pino` (via a shared `packages/logger` module).
     - **Error Tracking:** `Sentry`.
@@ -101,4 +110,4 @@ This constitution is the supreme source of truth for the project's architecture 
 - All Pull Requests and code reviews must verify compliance with the principles and constraints outlined in this document.
 - Any proposal to amend this constitution must be documented, reviewed, and approved. A clear migration plan must be provided if the change affects existing architecture.
 
-**Version**: 2.0.0 | **Ratified**: 2025-09-25 | **Last Amended**: 2025-10-01
+**Version**: 2.1.0 | **Ratified**: 2025-09-25 | **Last Amended**: 2025-10-01

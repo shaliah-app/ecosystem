@@ -51,6 +51,7 @@
 - **Principle VI: TypeScript-First**: Is all new code planned to be written in TypeScript?
 - **Principle VII: Supabase-First**: If the feature requires a database, auth, or storage, does it use Supabase?
 - **Principle VIII: MCP-Driven Development**: Does the development workflow consider using MCP servers for debugging and testing?
+- **Principle IX: Internationalization (i18n)**: If the feature is user-facing, does it include plans for translation and localization?
 
 ## Project Structure
 
@@ -196,4 +197,4 @@ directories captured above]
 - [ ] Complexity deviations documented
 
 ---
-*Based on Constitution v2.0.0 - See `.specify/memory/constitution.md`*
+*Based on Constitution v2.1.0 - See `.specify/memory/constitution.md`*
