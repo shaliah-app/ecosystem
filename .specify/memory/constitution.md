@@ -1,15 +1,18 @@
 <!--
 Sync Impact Report:
-- Version change: 2.0.0 → 2.1.0
+- Version change: 2.1.0 → 2.2.0
 - Modified Principles: None
-- Added Sections:
-    - Principle IX: "Internationalization (i18n) for User-Facing Applications"
+- Added Sections: None
 - Removed sections: None
+- Expanded Sections:
+    - Development Workflow: Completely restructured and expanded to include specific workflows for all 9 principles
+    - Added 10 workflow subsections: DDD, MVP-First Planning, TDD, API Contract, Async Task, TypeScript Monorepo, Supabase Integration, MCP-Assisted Development, i18n, Code Quality & Observability, Deployment & Release
 - Templates requiring updates:
-    - .specify/templates/plan-template.md (✅ updated - all 9 principles included in Constitution Check)
-    - .specify/templates/spec-template.md (✅ updated - Constitution Alignment section added to Review Checklist)
-    - .specify/templates/tasks-template.md (✅ updated - Validation Checklist expanded with all 9 principles)
-- Follow-up TODOs: None
+    - .specify/templates/plan-template.md (✅ updated - version reference updated to v2.2.0)
+    - .specify/templates/spec-template.md (✅ updated - version reference added as v2.2.0)
+    - .specify/templates/tasks-template.md (✅ updated - version reference updated to v2.2.0)
+- Follow-up TODOs:
+    - Create docs/architecture/bounded-contexts.md (referenced in DDD workflow)
 -->
 # The Yesod Ecosystem Constitution
 
@@ -97,12 +100,108 @@ This section defines the non-negotiable technology stack for the ecosystem. Any 
 
 ## Development Workflow
 
-- **Spec-Driven Development:** All significant features must begin with a planning document (e.g., PRD, User Journey canvas) that is approved before implementation begins.
-- **Standardized Logging:** All application services **must** use the shared `packages/logger` module for all logging and exception reporting. Direct use of `console.log` is forbidden. While each application must initialize its own Sentry SDK (for proper context capture), all error reporting should go through the logger module to ensure consistency and maintainability.
-- **Code Quality:** All packages must use the shared ESLint and Prettier configurations defined in the `packages` directory to ensure consistent code style.
-- **Database Changes:** All schema changes must be managed through Drizzle ORM migration files. Direct changes to the production database schema are strictly forbidden.
-- **Secrets Management:** All sensitive credentials (API keys, bot tokens, database URLs) **must** be managed through environment variables (`.env`) and must never be committed to version control. A `.env.example` file should be maintained.
-- **Deployment:** The `yesod-api`, `ezer-bot`, and `worker` are deployed as separate, independent services.
+This section defines mandatory workflows that enforce the Core Principles in day-to-day development. Each workflow maps directly to one or more constitutional principles.
+
+### Domain-Driven Design Workflow (Principle I)
+
+- **Code Organization:** All code MUST be organized by domain concepts, not technical layers. Create directories like `domains/worship/`, `domains/scheduling/` rather than `controllers/`, `services/`.
+- **Ubiquitous Language:** Code reviews MUST verify that class names, function names, and variable names use domain terminology (e.g., `ServiceSchedule`, `WorshipLeader`) not generic technical terms (e.g., `DataManager`, `Handler`).
+- **Bounded Context Boundaries:** When introducing a new functional area, explicitly document its bounded context in `docs/architecture/bounded-contexts.md` before implementation begins.
+- **Domain-First Implementation:** Business logic MUST reside in domain entities and services. Infrastructure concerns (HTTP, database, queue) MUST be isolated in separate layers that depend on the domain, never the reverse.
+
+### MVP-First Planning Workflow (Principle II)
+
+- **Spec-Driven Development:** All significant features MUST begin with a specification document (using `.specify/templates/spec-template.md`) that defines the MVP scope and defers non-essential features to a roadmap.
+- **Feature Scoping:** During planning, explicitly categorize requirements as "MVP" vs "Future Enhancement". Only MVP items proceed to implementation.
+- **Iterative Delivery:** Features MUST be merged and deployed in their MVP form first. Enhancements are treated as separate, subsequent features.
+- **Roadmap Maintenance:** All deferred enhancements MUST be documented in a feature `roadmap.md` file within the spec directory.
+
+### Test-Driven Development Workflow (Principle III)
+
+- **Red-Green-Refactor Cycle:** For business-critical code (authentication, data parsing, job handlers), developers MUST:
+  1. Write a failing test that describes the expected behavior
+  2. Write the minimal code to make the test pass
+  3. Refactor while keeping tests green
+- **Test-First Commitment:** Tests MUST be written and committed before implementation code. PRs that introduce business logic without corresponding tests MUST be rejected.
+- **Framework Compliance:** 
+  - Web UI tests (`shaliah-next`) MUST use Jest + React Testing Library
+  - Backend/API tests (`yesod-api`, `ezer-bot`, `worker`) MUST use Vitest
+- **Coverage Quality Gates:** PRs MUST NOT reduce test coverage. Critical paths (auth, data integrity) MUST have 100% branch coverage.
+
+### API Contract Workflow (Principle IV)
+
+- **Contract-First Design:** Before implementing any API endpoint:
+  1. Define the contract (request/response schemas) in `specs/[feature]/contracts/`
+  2. Write contract tests that validate the schema
+  3. Get contract review/approval
+  4. Implement the endpoint to satisfy the contract
+- **Client Validation:** Code reviews MUST verify that client applications (`shaliah-next`, `ezer-bot`) do NOT contain business logic. All business rules MUST be centralized in `yesod-api`.
+- **Single Source of Truth:** Database access, data validation, and business rules MUST only exist in `yesod-api`. Clients are thin consumers that call the API and render results.
+
+### Asynchronous Task Workflow (Principle V)
+
+- **Task Identification:** During feature planning, identify any operation that:
+  - Takes >1 second to complete
+  - Processes large files (>1MB)
+  - Makes external API calls
+  - Performs CPU-intensive work (audio processing, ML inference)
+- **Job Queue Pattern:** These tasks MUST be:
+  1. Defined as job handlers in `apps/worker/src/handlers/`
+  2. Queued via `pg-boss` from the API endpoint
+  3. Processed asynchronously by the worker
+  4. Return a job ID to the client for status polling
+- **Never Block the API:** Code reviews MUST reject any PR that performs long-running work in an API request handler.
+
+### TypeScript Monorepo Workflow (Principle VI)
+
+- **TypeScript-Only Rule:** All new code MUST be written in TypeScript. JavaScript files are only permitted for configuration (e.g., `.eslintrc.js`).
+- **Shared Code Extraction:** When code is duplicated across apps, it MUST be extracted to a shared package in `packages/` with proper TypeScript declarations.
+- **Workspace References:** Apps MUST reference shared packages using workspace protocol (`"workspace:*"`) in `package.json`, not by publishing to npm.
+- **Type Safety:** TypeScript strict mode MUST remain enabled. PRs that introduce `any` types or `@ts-ignore` comments MUST provide explicit justification.
+
+### Supabase Integration Workflow (Principle VII)
+
+- **Database Schema Changes:** All schema modifications MUST:
+  1. Be authored as Drizzle ORM migration files in TypeScript
+  2. Be tested locally against a Supabase dev branch (via MCP)
+  3. Be reviewed before merging
+  4. Never be applied directly to production database
+- **Authentication Flow:** All user authentication MUST flow through Supabase Auth. Custom auth logic is forbidden.
+- **RLS Policies:** Database tables MUST have Row-Level Security policies defined. Code reviews MUST verify RLS is enabled for new tables.
+
+### MCP-Assisted Development Workflow (Principle VIII)
+
+- **MCP Setup Requirement:** All developers MUST have MCP servers configured:
+  - Chrome DevTools MCP for frontend debugging
+  - Supabase MCP for database inspection
+- **Debugging Best Practice:** When debugging, developers SHOULD:
+  1. Use Supabase MCP to inspect database state (read-only)
+  2. Use Chrome DevTools MCP to automate browser testing
+  3. Document findings in PR descriptions or bug reports
+- **Research Workflow:** When researching unknowns during planning phase, utilize MCP servers to gather live data and validate assumptions.
+
+### Internationalization Workflow (Principle IX)
+
+- **Translation Key Management:**
+  - User-facing strings MUST NEVER be hardcoded. All text MUST use translation keys.
+  - For `shaliah-next`: Define keys in `messages/en.json` and `messages/pt-BR.json`
+  - For `ezer-bot`: Define keys in `src/locales/en.ftl` and `src/locales/pt-BR.ftl`
+- **Primary Language Parity:** Brazilian Portuguese (pt-BR) and English (en) MUST be updated together. PRs that add English strings without pt-BR equivalents MUST be rejected.
+- **Translation Review:** All new translation keys MUST be reviewed by a native speaker before release.
+- **Fallback Languages:** Spanish (es), French (fr), German (de), Ukrainian (uk), and Russian (ru) translations MAY lag behind primary languages but MUST be updated before major releases.
+
+### Code Quality & Observability Workflow
+
+- **Linting & Formatting:** All code MUST pass ESLint and Prettier checks before commit. Use shared configs from `packages/eslint-config-custom`.
+- **Structured Logging:** All logging MUST use `packages/logger` module. Direct use of `console.log`, `console.error`, etc. is strictly forbidden.
+- **Error Tracking:** Each application MUST initialize its environment-specific Sentry SDK. All errors MUST be reported through the logger module for consistent context capture.
+- **Secrets Management:** Sensitive credentials MUST be managed via environment variables (`.env`). A `.env.example` file with dummy values MUST be maintained. Secrets MUST NEVER be committed to version control.
+
+### Deployment & Release Workflow
+
+- **Independent Deployment:** The `yesod-api`, `ezer-bot`, `worker`, and `shaliah-next` MUST be deployed as independent services with separate release cycles.
+- **Database Migration Safety:** Migrations MUST be backwards-compatible. Breaking schema changes MUST be deployed in phases (add new column → migrate data → remove old column).
+- **Release Validation:** Before deploying to production, validate in staging environment with production-like data volume and load.
 
 ## Governance
 
@@ -110,4 +209,4 @@ This constitution is the supreme source of truth for the project's architecture 
 - All Pull Requests and code reviews must verify compliance with the principles and constraints outlined in this document.
 - Any proposal to amend this constitution must be documented, reviewed, and approved. A clear migration plan must be provided if the change affects existing architecture.
 
-**Version**: 2.1.0 | **Ratified**: 2025-09-25 | **Last Amended**: 2025-10-01
+**Version**: 2.2.0 | **Ratified**: 2025-09-25 | **Last Amended**: 2025-10-01
