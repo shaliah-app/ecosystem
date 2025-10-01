@@ -5,7 +5,7 @@ import { config } from 'dotenv'
 import { I18n } from '@grammyjs/i18n'
 import type { Context, SessionData } from './types/context.js'
 import welcomeComposer from './modules/welcome.js'
-import { logger } from './logger.js'
+import { logger, logBotError } from './logger.js'
 
 // Load environment variables
 config()
@@ -49,14 +49,7 @@ bot.use(sequentialize((ctx) => ctx.chat?.id.toString()))
 bot.use(welcomeComposer)
 
 // Global error handler
-bot.catch((err: any) => {
-  logger.captureException(err.error, {
-    update: err.ctx?.update,
-    chatId: err.ctx?.chat?.id,
-    userId: err.ctx?.from?.id,
-  })
-  // In production, you might want to send this to a logging service
-})
+bot.catch(logBotError)
 
 // Start the bot with the high-performance runner
 logger.info('🤖 Starting Ezer Bot...')
