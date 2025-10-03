@@ -1,34 +1,24 @@
 <!--
 Sync Impact Report:
-- Version change: 3.0.0 → 3.1.0 (MINOR: shaliah-next architecture addition)
-- Added Sections:
-    - **Application-Specific Architecture Patterns**: Added comprehensive shaliah-next (Next.js 15 App Router) architecture
-      * DDD-inspired module structure with domain/ports/adapters/use-cases/ui layering
-      * Manual DI via lib/di.ts composition root
-      * Zustand for client-side ephemeral state (minimal global stores)
-      * Server components for data fetching, client components for interactivity, server actions for mutations
-      * Supabase separation: server-side client with service keys, browser client for realtime/uploads
-    - **Development Workflow - Architecture & Code Organization**: Added shaliah-next organization patterns
-      * Module-based structure with DDD-inspired layering
-      * Composition root wiring and server action patterns
-      * State management guidelines (Zustand scoping)
-      * Reference to next-intl setup documentation
-    - **Project Structure**: Expanded shaliah-next directory structure in plan-template.md with detailed module layout
-    - **Tasks Template**: Added shaliah-next-specific implementation tasks in Phase 3.3
+- Version change: 3.1.0 → 3.1.1 (PATCH: shaliah-next env.ts configuration addition)
 - Modified Sections:
-    - Reordered Application-Specific Architecture Patterns: yesod-api → shaliah-next → ezer-bot (alphabetical by concern: backend → frontend → bot)
+    - **Application-Specific Architecture Patterns - shaliah-next**: Added Configuration subsection
+      * Environment variables in src/lib/env.ts with Zod validation (consistent with yesod-api pattern)
+      * Module-specific constants in modules/{feature}/config.ts for UI limits, timeouts, formats
+    - **Development Workflow - Architecture & Code Organization - shaliah-next**: Added configuration management
+      * Environment variables centralized in lib/env.ts with Zod validation
+      * Module constants per feature in modules/{feature}/config.ts
 - Rationale:
-    - Provides explicit architectural guidance for shaliah-next matching yesod-api and ezer-bot patterns
-    - DDD-inspired frontend architecture maintains consistency with backend patterns
-    - Clear separation of concerns: domain, ports/adapters, use-cases, UI
-    - Zustand guidelines prevent state management anti-patterns
-    - Next.js 15 App Router best practices with server/client component separation
+    - Ensures consistent configuration management pattern across yesod-api and shaliah-next
+    - Zod validation for environment variables provides type safety and runtime validation
+    - Clear separation: env.ts for infrastructure config, config.ts for domain constants
+    - Completes shaliah-next architecture documentation (no semantic change to principles)
 - Templates synchronized:
-    - .specify/templates/plan-template.md (✅ v3.1.0 - Expanded shaliah-next project structure with modules/)
-    - .specify/templates/tasks-template.md (✅ v3.1.0 - Added shaliah-next implementation tasks in Phase 3.3, renumbered subsequent phases)
+    - .specify/templates/plan-template.md (⚠️ No changes needed - structure already shows lib/ directory)
     - .specify/templates/spec-template.md (⚠️ No changes needed - spec is app-agnostic)
+    - .specify/templates/tasks-template.md (⚠️ No changes needed - tasks already cover configuration setup)
 - Follow-up TODOs:
-    - None - all relevant templates synchronized with shaliah-next architecture
+    - None - templates implicitly cover configuration through existing setup tasks
 -->
 
 # The Yesod Ecosystem Constitution
@@ -137,6 +127,7 @@ This section defines the non-negotiable technology stack for the ecosystem. Any 
   - `stores/`: Zustand stores (scoped to module)
   - `config.ts`: Module-specific constants
 - **Dependency Injection:** Manual DI via `lib/di.ts` composition root; wire adapters into use-cases in server actions
+- **Environment variables:** in `src/lib/env.ts` with Zod validation (see `apps/shaliah-next/src/lib/env.ts`)
 - **State Management:** Zustand for client-side ephemeral/interactive state (minimal global stores in `src/stores/`); server state via server components/props
 - **Server vs Client:** Server components fetch data and orchestrate use-cases; client components handle interactivity; server actions for mutations
 - **Supabase:** Server-side client (`lib/supabase-client.ts`) with service keys; browser client only for realtime/uploads
@@ -171,6 +162,8 @@ This section defines practical workflows grouped by development concerns, not ma
 - Server actions (`ui/server/actions.ts`) inject adapters into use-cases for mutations
 - Server components orchestrate use-cases for data fetching; client components handle interactivity
 - Zustand stores (`stores/`) for client-side ephemeral state only; keep global stores minimal
+- Environment variables: centralized in `lib/env.ts` with Zod validation
+- Module constants: per feature in `modules/{feature}/config.ts` (e.g., UI limits, timeouts)
 - Reference: App Router structure at `apps/shaliah-next/src/` and [next-intl setup](https://next-intl.dev/docs/getting-started/app-router)
 
 **ezer-bot:**
@@ -265,4 +258,4 @@ This constitution is the supreme source of truth for the project's architecture 
 - All Pull Requests and code reviews must verify compliance with the principles and constraints outlined in this document.
 - Any proposal to amend this constitution must be documented, reviewed, and approved. A clear migration plan must be provided if the change affects existing architecture.
 
-**Version**: 3.1.0 | **Ratified**: 2025-01-15 | **Last Amended**: 2025-10-03
+**Version**: 3.1.1 | **Ratified**: 2025-01-15 | **Last Amended**: 2025-10-03
