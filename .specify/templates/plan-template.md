@@ -106,14 +106,14 @@ apps/
 │   │   ├── types/          # TypeScript types (context.ts)
 │   │   ├── lib/            # Shared utilities
 │   │   ├── bot.ts          # Bot composition (middleware + composers)
-│   │   └── logger.ts       # Pino logger instance
+│   │   └── logger.ts       # Logger package instance
 │   └── __tests__/          
 └── worker/                 # Background job processor (pg-boss)
     ├── src/
     │   ├── handlers/       # Job handlers (cleanupAuthTokens.ts, etc.)
     │   ├── boss.ts         # pg-boss client
     │   ├── index.ts        # Worker entry point
-    │   └── logger.ts       # Pino logger instance
+    │   └── logger.ts       # Logger package instance
     └── __tests__/          
 packages/
 ├── logger/

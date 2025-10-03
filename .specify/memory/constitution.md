@@ -100,7 +100,7 @@ This section defines the non-negotiable technology stack for the ecosystem. Any 
     - **`shaliah-next`:** `next-intl`
     - **`ezer-bot`:** `@grammyjs/i18n`
 - **Observability:**
-    - **Structured Logging:** `Pino` (via a shared `packages/logger` module).
+    - **Structured Logging:** shared `packages/logger` module.
     - **Error Tracking:** `Sentry`.
     - **Sentry SDK Requirement:** Each application (`yesod-api`, `ezer-bot`, `worker`, `shaliah-next`) **must** include and initialize its own environment-specific Sentry SDK (e.g., `@sentry/node`, `@sentry/nextjs`) to ensure proper context is captured for all error reports.
 - **Authentication:** Supabase Auth, supporting Google OAuth and Email Magic Links.
@@ -208,7 +208,7 @@ This section defines practical workflows grouped by development concerns, not ma
 ### Code Quality & Observability
 
 - ESLint + Prettier: shared configs from `packages/eslint-config-custom`
-- Logging: use `packages/logger` (Pino); no `console.log`
+- Logging: use `packages/logger`; no `console.log`
 - Error tracking: initialize Sentry SDK per-app
 - TypeScript strict mode: no `any` without justification
 - Secrets: env vars only; maintain `.env.example`
