@@ -49,12 +49,11 @@
 
 - **Principle I: Domain-Centric Architecture**: Is code organized by business domain/features rather than technical layers? Does business logic remain independent of infrastructure? For yesod-api: Does the design use DDD layering with proper dependency direction? For ezer-bot: Does the design use feature-based composer modules?
 - **Principle II: Pragmatic, MVP-First Development**: Is the feature scoped as an MVP? Are complex features or optimizations deferred to a clear roadmap rather than built all at once?
-- **Principle III: Comprehensive Testing**: Does the plan account for the correct testing framework for the target application (Jest/RTL for web UI, Vitest for backend)? Is TDD applied to business-critical logic? Are tests included for all new business logic (no PR may merge without tests)?
+- **Principle III: Comprehensive Testing**: Does the plan account for the correct testing framework for the target application (Jest/RTL for web UI, Vitest for backend)? Is TDD applied to business-critical logic? Are tests included for all new business logic (no PR may merge without tests)? Does the plan incorporate MCP servers (Chrome DevTools, Supabase, Shadcn) for testing, debugging, and development workflows?
 - **Principle IV: Supabase-First Integration**: Does the feature leverage Supabase's built-in capabilities (auth, database, storage, realtime) as the primary backend? Is the Yesod API used only for complex business logic, custom integrations, or when Supabase cannot handle the requirement?
 - **Principle V: Decoupled, Asynchronous Processing**: Are time-consuming tasks offloaded to the background worker via job queue rather than executed in the API request-response cycle?
 - **Principle VI: TypeScript-First Monorepo**: Is all new code planned to be written in TypeScript within the monorepo structure? Are shared packages and workspace references properly utilized?
-- **Principle VII: MCP-Driven Development & Debugging**: Does the development workflow consider using MCP servers (Chrome DevTools, Supabase) for debugging and testing?
-- **Principle VIII (i18n)**: If the feature is user-facing (shaliah-next or ezer-bot), does it include plans for translation in both mandatory languages (pt-BR and en-US) using the appropriate tooling (next-intl or @grammyjs/i18n)? Are additional languages properly deferred to roadmap.md?
+- **Principle VII (i18n)**: If the feature is user-facing (shaliah-next or ezer-bot), does it include plans for translation in both mandatory languages (pt-BR and en-US) using the appropriate tooling (next-intl or @grammyjs/i18n)? Are additional languages properly deferred to roadmap.md?
 
 ## Project Structure
 
@@ -231,4 +230,4 @@ directories captured above]
 - [ ] Complexity deviations documented
 
 ---
-*Based on Constitution v2.7.0 - See `.specify/memory/constitution.md`*
+*Based on Constitution v3.0.0 - See `.specify/memory/constitution.md`*

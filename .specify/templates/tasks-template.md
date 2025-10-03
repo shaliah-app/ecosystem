@@ -152,9 +152,10 @@ Task: "Integration test auth in tests/integration/test_auth.py"
 - [ ] No task modifies same file as another [P] task
 - [ ] Supabase usage validated for auth/db/storage where applicable
 - [ ] i18n coverage for pt-BR and en-US (mandatory pair); additional languages deferred to roadmap.md
+- [ ] MCP servers (Chrome DevTools, Supabase, Shadcn) configured and used in testing workflows
 - [ ] Observability wired (logger + Sentry) in every app touched
 - [ ] Long-running work queued via pg-boss (no blocking API requests)
 
 ---
 
-*Based on Constitution v2.7.0 — see `.specify/memory/constitution.md`*
+*Based on Constitution v3.0.0 — see `.specify/memory/constitution.md`*

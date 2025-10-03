@@ -1,24 +1,28 @@
 <!--
 Sync Impact Report:
-- Version change: 2.6.0 → 2.7.0 (MINOR: Principle refinement - i18n workflow enforcement)
+- Version change: 2.7.0 → 3.0.0 (MAJOR: Principle consolidation - MCP made mandatory)
 - Modified Principles:
-    - **Principle IV (Supabase-First)**: Condensed for consistency (semantic content unchanged)
-    - **Principle VIII (i18n)**: Refined translation workflow and requirements
-      * Clarified mandatory language pair: pt-BR and en-US MUST be updated together
-      * Established deferral pattern: remaining languages deferred to roadmap.md
-      * Condensed presentation to match other principle sizes
+    - **Principle III (Testing)**: Merged MCP requirements into testing principle
+      * MCP servers now MANDATORY (was "encouraged" in former Principle VII)
+      * Added MCP-Driven Testing & Debugging as core testing requirement
+    - **Principle VII**: Former "MCP-Driven Development" removed, content merged into Principle III
+    - **Principle VIII → VII**: Renumbered (i18n moved from VIII to VII)
+- Added Sections:
+    - Technology Stack: Added "Model Context Protocol (MCP) Servers" section with Shadcn MCP
+    - Development Workflow: Added "MCP Integration" subsection under Testing Strategy
+- Removed Sections:
+    - Former Principle VII (MCP-Driven Development & Debugging) - merged into Principle III
 - Rationale:
-    - Enforces translation discipline to prevent incomplete localizations
-    - Reduces cognitive load by focusing on 2 primary languages during feature development
-    - Provides clear deferral mechanism for additional languages via roadmap
-    - Aligns with MVP-first principle (Principle II) by limiting initial scope
-    - Improves constitution readability through consistent principle formatting
+    - MCP is fundamental to testing workflow, not separate concern
+    - Mandatory MCP usage improves debugging efficiency and test quality
+    - Consolidation reduces principle count from 8 to 7, improving clarity
+    - Shadcn MCP addition supports component-driven development in shaliah-next
 - Templates synchronized:
-    - .specify/templates/plan-template.md (✅ v2.7.0 - Updated Constitution Check, i18n workflow)
-    - .specify/templates/spec-template.md (✅ v2.7.0 - Updated Constitution Alignment checklist)
-    - .specify/templates/tasks-template.md (✅ v2.7.0 - Updated Phase 3.5 i18n tasks)
+    - .specify/templates/plan-template.md (✅ v3.0.0 - Updated Constitution Check, removed Principle VII, renumbered VIII→VII)
+    - .specify/templates/spec-template.md (✅ v3.0.0 - Updated Constitution Alignment, renumbered principles)
+    - .specify/templates/tasks-template.md (✅ v3.0.0 - Updated validation checklist, MCP integration in testing tasks)
 - Follow-up TODOs:
-    - None - all templates synchronized with refined i18n principle
+    - None - all templates synchronized with consolidated MCP principle
 -->
 
 # The Yesod Ecosystem Constitution
@@ -43,11 +47,14 @@ All applications MUST organize code by business domain or feature concerns, not 
 Features should be planned and developed in phases. The primary goal is to ship a valuable Minimum Viable Product (MVP) quickly. More complex features or optimizations should be placed on a clear roadmap and built upon a solid foundation, rather than attempting to build everything at once. This principle prioritizes delivering value to users over premature optimization.
 
 ### III. Reliability Through Comprehensive Testing
+
 All applications MUST be accompanied by a robust testing suite to ensure correctness and reliability. Testing frameworks are standardized by application type:
 - **Web Interface (`shaliah-next`):** Jest + React Testing Library
 - **Backend APIs (`yesod-api`, `ezer-bot`, `worker`):** Vitest
 
 **Test-Driven Development (TDD):** For business-critical code (ETL parsers, async job handlers, auth logic), tests MUST precede implementation to ensure resilience. No PR may merge without tests for new business logic.
+
+**MCP-Driven Testing & Debugging:** Model Context Protocol (MCP) servers MUST be used during development and testing to enable introspection, debugging, and automated testing workflows. See Technology Stack & Architecture section for required MCP servers and Development Workflow for testing integration patterns.
 
 ### IV. Supabase-First Integration
 
@@ -65,14 +72,7 @@ All packages and applications in the Yesod ecosystem MUST use TypeScript as the 
 - **Monorepo Structure:** All code resides in a single `pnpm` + `Turborepo` monorepo composed of independent `apps` (e.g., `yesod-api`, `ezer-bot`, `worker`) and shared `packages` (e.g., `logger`, `db-types`). This structure promotes code sharing, consistency, and simplified dependency management.
 - **Amendment Requirement:** Any deviation from TypeScript-first must be explicitly approved in a constitution amendment.
 
-### VII. MCP-Driven Development & Debugging
-The use of Model-Context-Protocol (MCP) servers is strongly encouraged during development, debugging, and research to enhance productivity and introspection capabilities.
-- **Standard MCP Servers:** The following MCP servers should be configured and available during development:
-    - **Chrome DevTools MCP:** For frontend testing, debugging, and browser automation.
-    - **Supabase MCP:** For a read-only interface to the database, enabling data inspection and query analysis.
-- **Rationale:** MCP servers provide a standardized, tool-agnostic way to interact with and control development services, improving debugging efficiency and enabling advanced automation workflows.
-
-### VIII. Internationalization (i18n) for User-Facing Applications
+### VII. Internationalization (i18n) for User-Facing Applications
 
 All user-facing applications (`shaliah-next`, `ezer-bot`) MUST support internationalization with strict translation discipline. Brazilian Portuguese (pt-BR) and US English (en-US) are the mandatory language pair and MUST be updated together in every feature PR—never merge with only one translated. Additional languages MUST be deferred to `specs/[###-feature]/roadmap.md`. Use `next-intl` for web apps and `@grammyjs/i18n` for bots.
 
@@ -94,6 +94,10 @@ This section defines the non-negotiable technology stack for the ecosystem. Any 
 - **Internationalization:**
     - **`shaliah-next`:** `next-intl`
     - **`ezer-bot`:** `@grammyjs/i18n`
+- **Model Context Protocol (MCP) Servers:**
+    - **Chrome DevTools MCP:** Frontend testing, debugging, and browser automation
+    - **Supabase MCP:** Database introspection, data inspection, and query analysis
+    - **Shadcn MCP:** Component scaffolding and shadcn/ui management for `shaliah-next`
 - **Observability:**
     - **Structured Logging:** shared `packages/logger` module.
     - **Error Tracking:** `Sentry`.
@@ -169,6 +173,12 @@ This section defines practical workflows grouped by development concerns, not ma
 - grammY Bot: Mock context pattern (see `apps/ezer-bot/__tests__/welcome.test.ts`)
 - See Principle III for framework requirements per application
 
+**MCP Integration:**
+- Chrome DevTools MCP: Automate browser interactions, capture screenshots, debug frontend
+- Supabase MCP: Inspect database state, validate data migrations, debug queries
+- Shadcn MCP: Scaffold components, validate shadcn/ui integration in `shaliah-next`
+- Use MCP servers to reproduce bugs, validate fixes, and create regression tests
+
 ### Async Work & Background Jobs
 
 **Identification:**
@@ -223,4 +233,4 @@ This constitution is the supreme source of truth for the project's architecture 
 - All Pull Requests and code reviews must verify compliance with the principles and constraints outlined in this document.
 - Any proposal to amend this constitution must be documented, reviewed, and approved. A clear migration plan must be provided if the change affects existing architecture.
 
-**Version**: 2.7.0 | **Ratified**: 2025-01-15 | **Last Amended**: 2025-10-03
+**Version**: 3.0.0 | **Ratified**: 2025-01-15 | **Last Amended**: 2025-10-03

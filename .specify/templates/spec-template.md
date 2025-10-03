@@ -103,10 +103,10 @@ When creating this spec from a user prompt:
 ### Constitution Alignment
 - [ ] **Principle I (Domain-Centric Architecture)**: Requirements expressed in domain/business language, not technical jargon or implementation details
 - [ ] **Principle II (MVP-First)**: Scope is limited to MVP; advanced features marked for future roadmap
-- [ ] **Principle III (Testing)**: Acceptance scenarios are testable and measurable
+- [ ] **Principle III (Testing & MCP)**: Acceptance scenarios are testable and measurable; MCP servers (Chrome DevTools, Supabase, Shadcn) identified for testing/debugging workflows
 - [ ] **Principle IV (Supabase-First)**: If feature requires database, auth, storage, or realtime capabilities, it leverages Supabase's built-in features; Yesod API used only for complex business logic or custom integrations
 - [ ] **Principle V (Async)**: Long-running operations identified for background processing
-- [ ] **Principle VIII (i18n)**: User-facing text identified for translation in both mandatory languages (pt-BR and en-US); additional languages deferred to roadmap.md
+- [ ] **Principle VII (i18n)**: User-facing text identified for translation in both mandatory languages (pt-BR and en-US); additional languages deferred to roadmap.md
 
 ---
 
@@ -123,7 +123,7 @@ When creating this spec from a user prompt:
 
 ---
 
-*Based on Constitution v2.7.0 - See `.specify/memory/constitution.md`*
+*Based on Constitution v3.0.0 - See `.specify/memory/constitution.md`*
 
 ````
 
