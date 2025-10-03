@@ -452,17 +452,17 @@
   **Reference**: Constitution v2.5.1 § Architecture Patterns, [Hono middleware docs](https://hono.dev/guides/middleware)
 
 ### Frontend: Shared Hooks & Utils
-- [ ] **T047** [P] Create `useAuth` hook  
+- [x] **T047** [P] Create `useAuth` hook  
   **Path**: `apps/shaliah-next/src/hooks/useAuth.ts`  
   **Description**: Wrap Supabase auth methods (signInWithOtp, signInWithOAuth, signOut, getUser). Manage auth state. Detect storage blocked errors by testing `localStorage.setItem('test', '1')` in try/catch.  
   **Reference**: research.md § 1, § 8, spec.md FR-013
 
-- [ ] **T048** [P] Create `useCooldownTimer` hook  
+- [x] **T048** [P] Create `useCooldownTimer` hook  
   **Path**: `apps/shaliah-next/src/hooks/useCooldownTimer.ts`  
   **Description**: Manage cooldown state (localStorage persistence), countdown timer (useEffect + setInterval), return { secondsRemaining, canResend }. Use `MAGIC_LINK_COOLDOWN_SECONDS` constant.  
   **Reference**: research.md § 2, spec.md FR-004
 
-- [ ] **T049** [P] Create language inference utility  
+- [x] **T049** [P] Create language inference utility  
   **Path**: `apps/shaliah-next/src/lib/infer-language.ts`  
   **Description**: Read Accept-Language header (server-side), parse top preference, fallback to 'pt-BR'. Export inferLanguage(headers) function.  
   **Reference**: research.md § 3
