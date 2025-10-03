@@ -242,53 +242,53 @@
   **Reference**: T033 (validation implementation)
 
 ### Integration Tests (End-to-End Scenarios)
-- [ ] **T021** [P] Integration test: Magic link happy path (Scenario 1)  
+- [x] **T021** [P] Integration test: Magic link happy path (Scenario 1)  
   **Path**: `apps/shaliah-next/__tests__/integration/auth-magic-link.test.tsx`  
   **Description**: Test full flow: request magic link → UI state (email shown, cooldown timer) → mock link click → auth success → redirect logic (onboarding vs dashboard). Use Jest + RTL + MSW.  
   **Reference**: quickstart.md Scenario 1
 
-- [ ] **T022** [P] Integration test: Cooldown enforcement (Scenario 2)  
+- [x] **T022** [P] Integration test: Cooldown enforcement (Scenario 2)  
   **Path**: `apps/shaliah-next/__tests__/integration/auth-cooldown.test.tsx`  
   **Description**: Test cooldown timer countdown, resend button disabled/enabled cycle. Use Jest + RTL + mock timers.  
   **Reference**: quickstart.md Scenario 2
 
-- [ ] **T023** [P] Integration test: Rate limit (Scenario 3)  
+- [x] **T023** [P] Integration test: Rate limit (Scenario 3)  
   **Path**: `apps/yesod-api/__tests__/integration/rate-limit.test.ts`  
   **Description**: Test 10 sends succeed, 11th fails with 429. Verify different email bypasses limit. Use Vitest + supertest + time mocking for efficiency.  
   **Reference**: quickstart.md Scenario 3
 
-- [ ] **T024** [P] Integration test: Google OAuth signup (Scenario 4)  
+- [x] **T024** [P] Integration test: Google OAuth signup (Scenario 4)  
   **Path**: `apps/shaliah-next/__tests__/integration/auth-google-signup.test.tsx`  
   **Description**: Test Google OAuth flow (mock), account creation, profile pre-fill, onboarding skip. Use Jest + RTL + MSW.  
   **Reference**: quickstart.md Scenario 4
 
-- [ ] **T025** [P] Integration test: Google OAuth account linking (Scenario 5)  
+- [x] **T025** [P] Integration test: Google OAuth account linking (Scenario 5)  
   **Path**: `apps/shaliah-next/__tests__/integration/auth-google-linking.test.tsx`  
   **Description**: Test existing magic-link account + Google OAuth with same email → no duplicate, identity linked. Use Jest + RTL + MSW.  
   **Reference**: quickstart.md Scenario 5
 
-- [ ] **T026** [P] Integration test: Different Google email creates distinct account (FR-008)  
+- [x] **T026** [P] Integration test: Different Google email creates distinct account (FR-008)  
   **Path**: `apps/shaliah-next/__tests__/integration/auth-google-separate-account.test.tsx`  
   **Description**: Test existing account for emailA@example.com. Authenticate via Google with emailB@example.com → new account created (distinct user_profiles row), no linking. Assert two separate accounts exist. Use Jest + RTL + MSW.  
   **Reference**: spec.md FR-008
 
-- [ ] **T027** [P] Integration test: Conditional onboarding (Scenario 7)  
+- [x] **T027** [P] Integration test: Conditional onboarding (Scenario 7)  
   **Path**: `apps/shaliah-next/__tests__/integration/onboarding-conditional.test.tsx`  
   **Description**: Test onboarding shown when full_name missing, skipped when present. Use Jest + RTL.  
   **Reference**: quickstart.md Scenario 7
 
-- [ ] **T028** [P] Integration test: Language change (Scenario 7)  
+- [x] **T028** [P] Integration test: Language change (Scenario 7)  
   **Path**: `apps/shaliah-next/__tests__/integration/profile-language-change.test.tsx`  
   **Description**: Test language dropdown change, profile update, locale cookie set, UI re-renders in new language. Use Jest + RTL.  
   **Reference**: quickstart.md Scenario 7
 
-- [ ] **T029** [P] Integration test: Session expiry (Scenario 10)  
+- [x] **T029** [P] Integration test: Session expiry (Scenario 10)  
   **Path**: `apps/shaliah-next/__tests__/integration/session-expiry.test.tsx`  
   **Description**: Test expired session detection (mock Supabase token verification with expired JWT), redirect to `/auth` page with `?expired=true` query param. Assert error message shown. Use Jest + RTL + MSW.  
   **Acceptance Criteria**: 1) Session expires after 30d absolute or 7d idle (mocked). 2) User redirected to `/auth?expired=true`. 3) Expired session error message displayed to user.  
   **Reference**: quickstart.md Scenario 10
 
-- [ ] **T030** [P] Integration test: Storage blocked error (Scenario 9)  
+- [x] **T030** [P] Integration test: Storage blocked error (Scenario 9)  
   **Path**: `apps/shaliah-next/__tests__/integration/storage-blocked.test.tsx`  
   **Description**: Test localStorage.setItem() failure → error overlay shown. Use Jest + RTL.  
   **Reference**: quickstart.md Scenario 9
