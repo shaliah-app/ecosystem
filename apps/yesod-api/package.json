@@ -12,7 +12,7 @@
     "db:studio": "drizzle-kit studio",
     "db:check": "drizzle-kit check:pg",
     "db:introspect": "drizzle-kit introspect:pg",
-    "test": "vitest"
+    "test": "vitest run"
   },
   "dependencies": {
     "@hono/node-server": "^1.8.0",
