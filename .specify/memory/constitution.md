@@ -1,23 +1,20 @@
 <!--
 Sync Impact Report:
-- Version change: 2.5.1 (all templates synchronized with constitution)
+- Version change: 2.5.1 → 2.6.0 (MINOR: Principle replacement - architectural shift)
 - Modified Principles:
-    - **Principle I**: "Domain-Centric Architecture" with concrete, testable rules
-    - **Principle III**: Condensed with "no PR without tests" enforcement
-- Clarified Sections:
-    - **Development Workflow / i18n**: All 7 languages before merge, pt-BR+en-US in every PR
-    - **Governance dates**: Fixed ratification date consistency
+    - **Principle IV**: Replaced "API-First Design" with "Supabase-First Integration"
+    - Rationale: Architectural shift to leverage Supabase's built-in capabilities (auth, realtime, storage, database) as primary backend, with Yesod API handling only what Supabase cannot or should not handle
+- Removed Sections:
+    - Former Principle IV (API-First Design) - superseded by Supabase-First approach
+    - Principle VII (Supabase-First Integration) - promoted to Principle IV position
+- Added Sections:
+    - Expanded Principle IV with clear guidance on when to use Supabase vs Yesod API
 - Templates synchronized:
-    - .specify/templates/plan-template.md (✅ v2.5.1 - Updated Principle I, accurate folder structures for all apps)
-    - .specify/templates/spec-template.md (✅ v2.5.1 - Updated Principle I, i18n clarification)
-    - .specify/templates/tasks-template.md (✅ v2.5.1 - Already correct, version synced)
-- All folder structures validated against actual codebase:
-    - yesod-api: Current routes/ + Future contexts/ DDD structure documented
-    - ezer-bot: modules/ + locales/ structure accurate
-    - worker: handlers/ structure accurate
-    - shaliah-next: app/ + components/ + lib/ structure accurate
+    - .specify/templates/plan-template.md (✅ v2.6.0 - Updated Constitution Check section)
+    - .specify/templates/spec-template.md (✅ v2.6.0 - Updated Constitution Alignment checklist)
+    - .specify/templates/tasks-template.md (✅ v2.6.0 - Already references Supabase throughout)
 - Follow-up TODOs:
-    - None - all templates and structures synchronized
+    - None - all templates synchronized with new Supabase-First principle
 -->
 
 # The Yesod Ecosystem Constitution
@@ -48,8 +45,23 @@ All applications MUST be accompanied by a robust testing suite to ensure correct
 
 **Test-Driven Development (TDD):** For business-critical code (ETL parsers, async job handlers, auth logic), tests MUST precede implementation to ensure resilience. No PR may merge without tests for new business logic.
 
-### IV. API-First Design
-All client applications (Shaliah, Ezer) are consumers of the central **Yesod API**. The API is the single source of truth and the sole gateway to the database and business logic. Clients should not contain business logic that can be centralized in the API. The API layer serves as the application service that orchestrates domain logic, while core business rules remain in domain entities and services as per DDD principles.
+### IV. Supabase-First Integration
+
+All backend functionality MUST leverage Supabase's built-in capabilities as the primary backend service before considering custom implementation. Supabase provides comprehensive, production-ready features that should be utilized maximally.
+
+**Key Rules:**
+- **Authentication & Authorization:** Use Supabase Auth exclusively for user identity, sessions, OAuth providers, and magic links. Never implement custom auth logic.
+- **Database Operations:** Direct database access through Supabase clients with Row-Level Security (RLS) policies. Use Supabase's realtime subscriptions for live data.
+- **Storage:** Use Supabase Storage for file uploads, images, and media with built-in CDN and access policies.
+- **Realtime Features:** Leverage Supabase Realtime for live updates, presence, and broadcast features.
+
+**Yesod API Scope:** The Yesod API serves ONLY for:
+- Complex business logic that requires orchestration across multiple domains
+- Custom integrations with external services not supported by Supabase
+- Computational tasks requiring specialized processing
+- Intermediation layer when Supabase cannot directly handle a specific requirement
+
+**Rationale:** Supabase provides battle-tested, scalable infrastructure for common backend needs. By maximizing its use, we reduce custom code maintenance, improve security through established patterns, and accelerate development. The Yesod API focuses on domain-specific business logic rather than reinventing infrastructure.
 
 ### V. Decoupled, Asynchronous Processing
 Time-consuming and resource-intensive tasks (e.g., audio fingerprinting, stem separation, transcription) are **never** executed in the main API request-response cycle. They are offloaded to a persistent background **worker** via a robust job queue, ensuring the API remains fast and responsive.
@@ -61,20 +73,14 @@ All packages and applications in the Yesod ecosystem MUST use TypeScript as the 
 - **Monorepo Structure:** All code resides in a single `pnpm` + `Turborepo` monorepo composed of independent `apps` (e.g., `yesod-api`, `ezer-bot`, `worker`) and shared `packages` (e.g., `logger`, `db-types`). This structure promotes code sharing, consistency, and simplified dependency management.
 - **Amendment Requirement:** Any deviation from TypeScript-first must be explicitly approved in a constitution amendment.
 
-### VII. Supabase-First Integration
-All applications that require database access, authentication, or storage MUST integrate with Supabase as the primary backend service. This ensures a unified data source and consistent authentication flow across the ecosystem.
-- **Database Interaction:** Direct database access is managed through Supabase clients.
-- **Authentication:** User identity and access control are handled by Supabase Auth.
-- **Rationale:** Centralizing on Supabase simplifies infrastructure, reduces redundant logic, and provides a consistent data access layer for all parts of the system.
-
-### VIII. MCP-Driven Development & Debugging
+### VII. MCP-Driven Development & Debugging
 The use of Model-Context-Protocol (MCP) servers is strongly encouraged during development, debugging, and research to enhance productivity and introspection capabilities.
 - **Standard MCP Servers:** The following MCP servers should be configured and available during development:
     - **Chrome DevTools MCP:** For frontend testing, debugging, and browser automation.
     - **Supabase MCP:** For a read-only interface to the database, enabling data inspection and query analysis.
 - **Rationale:** MCP servers provide a standardized, tool-agnostic way to interact with and control development services, improving debugging efficiency and enabling advanced automation workflows.
 
-### IX. Internationalization (i18n) for User-Facing Applications
+### VIII. Internationalization (i18n) for User-Facing Applications
 All user-facing applications must be internationalized to support a global user base.
 - **Target Applications:** This principle applies to `shaliah-next` and `ezer-bot`.
 - **Supported Languages:** The applications will support Brazilian Portuguese (pt-BR), English (en-US), Spanish (es), French (fr), German (de), Ukrainian (uk), and Russian (ru).
@@ -226,4 +232,4 @@ This constitution is the supreme source of truth for the project's architecture 
 - All Pull Requests and code reviews must verify compliance with the principles and constraints outlined in this document.
 - Any proposal to amend this constitution must be documented, reviewed, and approved. A clear migration plan must be provided if the change affects existing architecture.
 
-**Version**: 2.5.1 | **Ratified**: 2025-01-15 | **Last Amended**: 2025-10-02
+**Version**: 2.6.0 | **Ratified**: 2025-01-15 | **Last Amended**: 2025-10-03

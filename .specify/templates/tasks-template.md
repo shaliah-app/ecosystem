@@ -157,4 +157,4 @@ Task: "Integration test auth in tests/integration/test_auth.py"
 
 ---
 
-*Based on Constitution v2.5.1 — see `.specify/memory/constitution.md`*
+*Based on Constitution v2.6.0 — see `.specify/memory/constitution.md`*

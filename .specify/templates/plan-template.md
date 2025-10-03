@@ -50,12 +50,11 @@
 - **Principle I: Domain-Centric Architecture**: Is code organized by business domain/features rather than technical layers? Does business logic remain independent of infrastructure? For yesod-api: Does the design use DDD layering with proper dependency direction? For ezer-bot: Does the design use feature-based composer modules?
 - **Principle II: Pragmatic, MVP-First Development**: Is the feature scoped as an MVP? Are complex features or optimizations deferred to a clear roadmap rather than built all at once?
 - **Principle III: Comprehensive Testing**: Does the plan account for the correct testing framework for the target application (Jest/RTL for web UI, Vitest for backend)? Is TDD applied to business-critical logic? Are tests included for all new business logic (no PR may merge without tests)?
-- **Principle IV: API-First Design**: Do client applications consume the Yesod API as the single source of truth? Is business logic centralized in the API rather than in clients?
+- **Principle IV: Supabase-First Integration**: Does the feature leverage Supabase's built-in capabilities (auth, database, storage, realtime) as the primary backend? Is the Yesod API used only for complex business logic, custom integrations, or when Supabase cannot handle the requirement?
 - **Principle V: Decoupled, Asynchronous Processing**: Are time-consuming tasks offloaded to the background worker via job queue rather than executed in the API request-response cycle?
 - **Principle VI: TypeScript-First Monorepo**: Is all new code planned to be written in TypeScript within the monorepo structure? Are shared packages and workspace references properly utilized?
-- **Principle VII: Supabase-First Integration**: If the feature requires a database, auth, or storage, does it use Supabase as the primary backend service?
-- **Principle VIII: MCP-Driven Development & Debugging**: Does the development workflow consider using MCP servers (Chrome DevTools, Supabase) for debugging and testing?
-- **Principle IX: Internationalization (i18n)**: If the feature is user-facing (shaliah-next or ezer-bot), does it include plans for translation and localization in all 7 supported languages (pt-BR, en-US as primary) using the appropriate tooling (next-intl or @grammyjs/i18n)?
+- **Principle VII: MCP-Driven Development & Debugging**: Does the development workflow consider using MCP servers (Chrome DevTools, Supabase) for debugging and testing?
+- **Principle VIII: Internationalization (i18n)**: If the feature is user-facing (shaliah-next or ezer-bot), does it include plans for translation and localization in all 7 supported languages (pt-BR, en-US as primary) using the appropriate tooling (next-intl or @grammyjs/i18n)?
 
 ## Project Structure
 
@@ -232,4 +231,4 @@ directories captured above]
 - [ ] Complexity deviations documented
 
 ---
-*Based on Constitution v2.4.0 - See `.specify/memory/constitution.md`*
+*Based on Constitution v2.6.0 - See `.specify/memory/constitution.md`*
