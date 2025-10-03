@@ -68,6 +68,31 @@ FOR SELECT USING (
 - File size limit: 5MB
 - Allowed MIME types: image/jpeg, image/png, image/webp
 
+## Database RLS Policies
+
+### user_profiles Table
+Enable RLS and create the following policies:
+
+```sql
+-- Enable RLS
+ALTER TABLE public.user_profiles ENABLE ROW LEVEL SECURITY;
+
+-- Allow users to create their own profile
+CREATE POLICY "Users can create their own profile" ON public.user_profiles
+FOR INSERT WITH CHECK (auth.uid() = id);
+
+-- Allow users to view their own profile
+CREATE POLICY "Users can view their own profile" ON public.user_profiles
+FOR SELECT USING (auth.uid() = id);
+
+-- Allow users to update their own profile
+CREATE POLICY "Users can update their own profile" ON public.user_profiles
+FOR UPDATE USING (auth.uid() = id);
+```
+
+### magic_link_attempts Table
+No RLS policies needed (server-side only, not exposed to client).
+
 ## Verification
 
 After configuration:
@@ -75,3 +100,4 @@ After configuration:
 2. Test Google OAuth flow
 3. Verify JWT expiry behavior
 4. Test avatar upload/download
+5. Verify RLS policies work correctly

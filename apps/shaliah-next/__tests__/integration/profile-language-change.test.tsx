@@ -20,30 +20,26 @@ jest.mock('next-intl', () => ({
 }));
 
 describe('Profile Language Change (Scenario 7)', () => {
+  beforeEach(() => {
+    // Mock fetch globally
+    global.fetch = jest.fn() as jest.MockedFunction<typeof fetch>;
+  });
+
   it('updates language and re-renders UI in new language', async () => {
-    // Mock initial profile load
-    global.fetch = jest.fn()
+    // Mock the profile update API call
+    (global.fetch as jest.MockedFunction<typeof fetch>)
       .mockResolvedValueOnce({
         ok: true,
         json: () => Promise.resolve({
-          profile: {
-            id: 'user-123',
-            full_name: 'Paulo Santos',
-            language: 'pt-BR',
-          },
+          id: 'user-123',
+          full_name: 'Paulo Santos',
+          language: 'en-US',
+          active_space_id: null,
+          telegram_user_id: null,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
         }),
-      })
-      .mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve({
-          success: true,
-          profile: {
-            id: 'user-123',
-            full_name: 'Paulo Santos',
-            language: 'en-US', // Updated language
-          },
-        }),
-      }) as jest.Mock;
+      } as Response);
 
     render(<ProfileLanguageChangeTest />);
 
@@ -51,12 +47,16 @@ describe('Profile Language Change (Scenario 7)', () => {
     await waitFor(() => {
       expect(screen.getByText('Paulo Santos')).toBeInTheDocument();
     });
-    expect(screen.getByDisplayValue('pt-BR')).toBeInTheDocument();
+    // Check that Portuguese is selected in the language dropdown
+    const selectButton = screen.getByRole('combobox');
+    expect(selectButton).toHaveTextContent('Português');
 
-    // Change language to English
-    const languageSelect = screen.getByLabelText('Language');
-    fireEvent.change(languageSelect, { target: { value: 'en-US' } });
-    fireEvent.click(screen.getByText('Save'));
+    // Change language to English (this auto-submits)
+    const languageSelect = screen.getByRole('combobox');
+    fireEvent.click(languageSelect);
+    // Select English option from the dropdown
+    const englishOption = screen.getAllByText('English')[1]; // The dropdown option
+    fireEvent.click(englishOption);
 
     // Verify API call made
     await waitFor(() => {
@@ -67,11 +67,10 @@ describe('Profile Language Change (Scenario 7)', () => {
       });
     });
 
-    // Verify locale cookie set
-    // This would check document.cookie contains NEXT_LOCALE=en-US
-
-    // Verify UI re-renders in new language
-    // Mock next-intl to return English translations
-    // expect(screen.getByText('Save')).toBeInTheDocument(); // Assuming 'Save' is English key
+    // Verify the profile was updated (language should now be English)
+    await waitFor(() => {
+      const selectButtonAfter = screen.getByRole('combobox');
+      expect(selectButtonAfter).toHaveTextContent('English');
+    });
   });
 });

@@ -12,14 +12,17 @@ jest.mock('next-intl', () => ({
       storageBlockedStep2: '2. Allow cookies and site data',
       storageBlockedStep3: '3. Refresh the page',
       retry: 'Retry',
+      retrying: 'Retrying...',
     }
     return translations[key] || key
   }),
 }))
 
 describe('StorageBlockedError', () => {
+  const mockOnRetry = jest.fn()
+
   it('renders non-dismissible overlay', () => {
-    render(<StorageBlockedError />)
+    render(<StorageBlockedError onRetry={mockOnRetry} />)
 
     // Should render as a modal/overlay
     const overlay = screen.getByRole('dialog')
@@ -27,19 +30,19 @@ describe('StorageBlockedError', () => {
   })
 
   it('displays error title', () => {
-    render(<StorageBlockedError />)
+    render(<StorageBlockedError onRetry={mockOnRetry} />)
 
     expect(screen.getByText('Storage Access Required')).toBeInTheDocument()
   })
 
   it('displays error message', () => {
-    render(<StorageBlockedError />)
+    render(<StorageBlockedError onRetry={mockOnRetry} />)
 
     expect(screen.getByText(/requires access to local storage/i)).toBeInTheDocument()
   })
 
   it('displays instructions', () => {
-    render(<StorageBlockedError />)
+    render(<StorageBlockedError onRetry={mockOnRetry} />)
 
     expect(screen.getByText('To enable storage access:')).toBeInTheDocument()
     expect(screen.getByText(/Click the lock icon/)).toBeInTheDocument()
@@ -48,7 +51,7 @@ describe('StorageBlockedError', () => {
   })
 
   it('renders retry button', () => {
-    render(<StorageBlockedError />)
+    render(<StorageBlockedError onRetry={mockOnRetry} />)
 
     const retryButton = screen.getByRole('button', { name: /retry/i })
     expect(retryButton).toBeInTheDocument()
@@ -65,7 +68,7 @@ describe('StorageBlockedError', () => {
   })
 
   it('is not dismissible by clicking outside', () => {
-    render(<StorageBlockedError />)
+    render(<StorageBlockedError onRetry={mockOnRetry} />)
 
     // The overlay should not have a close button or ESC handler
     // This is hard to test directly, but we can check there's no close button
@@ -74,7 +77,7 @@ describe('StorageBlockedError', () => {
   })
 
   it('covers the entire screen', () => {
-    render(<StorageBlockedError />)
+    render(<StorageBlockedError onRetry={mockOnRetry} />)
 
     const overlay = screen.getByRole('dialog')
     // Check for full screen overlay styles (this might vary by implementation)

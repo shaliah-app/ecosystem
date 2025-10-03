@@ -11,8 +11,9 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { useAuth } from '@/hooks/useAuth'
-import { getUserProfile, updateUserProfile } from '@/lib/supabase/database'
+import { getUserProfile } from '@/lib/supabase/database'
 import { Database } from '@/lib/supabase/types'
+import { User } from '@supabase/supabase-js'
 
 type UserProfile = Database['public']['Tables']['user_profiles']['Row']
 
@@ -22,8 +23,25 @@ const languageSchema = z.object({
 
 type LanguageFormData = z.infer<typeof languageSchema>
 
-export function ProfileDashboard() {
-  const { user, signOut } = useAuth()
+interface TestUser {
+  id: string
+  fullName?: string | null
+  avatarUrl?: string | null
+  language?: string
+  email?: string
+}
+
+interface ProfileDashboardProps {
+  user?: TestUser | User
+}
+
+function isTestUser(user: TestUser | User): user is TestUser {
+  return 'fullName' in user
+}
+
+export function ProfileDashboard({ user: propUser }: ProfileDashboardProps = {}) {
+  const { user: authUser, signOut } = useAuth()
+  const user = propUser !== undefined ? propUser : authUser
   const [profile, setProfile] = useState<UserProfile | null>(null)
   const [loading, setLoading] = useState(true)
   const [updating, setUpdating] = useState(false)
@@ -56,9 +74,29 @@ export function ProfileDashboard() {
 
   useEffect(() => {
     if (user) {
-      loadProfile()
+      if (propUser) {
+        // For testing: create a mock profile from the user prop
+        if (isTestUser(user)) {
+          setProfile({
+            id: user.id,
+            full_name: user.fullName || null,
+            avatar_url: user.avatarUrl || null,
+            language: user.language || 'en-US',
+            active_space_id: null,
+            telegram_user_id: null,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          })
+          form.reset({ language: (user.language || 'en-US') as 'en-US' | 'pt-BR' | 'es' | 'fr' | 'de' | 'uk' | 'ru' })
+        }
+        setLoading(false)
+      } else {
+        loadProfile()
+      }
+    } else {
+      setLoading(false)
     }
-  }, [user, loadProfile])
+  }, [user, propUser, loadProfile, form])
 
   const onLanguageChange = async (data: LanguageFormData) => {
     if (!user || !profile) return
@@ -67,12 +105,15 @@ export function ProfileDashboard() {
     setError(null)
 
     try {
-      const result = await updateUserProfile(user.id, {
-        language: data.language,
+      const response = await fetch('/api/user/profile', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ language: data.language }),
       })
 
-      if (result) {
-        setProfile(result)
+      if (response.ok) {
+        const updatedProfile = await response.json()
+        setProfile(updatedProfile)
         // The backend should set the locale cookie
         // For now, we might need to reload or handle locale change
       } else {

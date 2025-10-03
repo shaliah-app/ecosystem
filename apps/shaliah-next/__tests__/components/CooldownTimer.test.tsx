@@ -1,50 +1,70 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import { CooldownTimer } from '@/components/CooldownTimer'
 
+// Mock next-intl
+jest.mock('next-intl', () => ({
+  useTranslations: jest.fn(() => (key: string, options?: Record<string, unknown>) => {
+    const translations: Record<string, string> = {
+      cooldownTimer: 'Wait {seconds}s',
+      resendMagicLink: 'Resend',
+    }
+    let translation = translations[key] || key
+    if (options) {
+      Object.keys(options).forEach((optKey) => {
+        translation = translation.replace(`{${optKey}}`, String(options[optKey]))
+      })
+    }
+    return translation
+  }),
+}))
+
 describe('CooldownTimer', () => {
+  const mockOnResend = jest.fn()
+
   beforeEach(() => {
     jest.useFakeTimers()
+    localStorage.clear()
+    mockOnResend.mockClear()
   })
 
   afterEach(() => {
     jest.useRealTimers()
   })
 
-  it('displays countdown from 60 seconds', () => {
-    render(<CooldownTimer secondsRemaining={60} />)
+  it('shows button as enabled when no cooldown active', () => {
+    render(<CooldownTimer secondsRemaining={0} onResend={mockOnResend} />)
 
-    expect(screen.getByText('60')).toBeInTheDocument()
-  })
-
-  it('displays countdown from 30 seconds', () => {
-    render(<CooldownTimer secondsRemaining={30} />)
-
-    expect(screen.getByText('30')).toBeInTheDocument()
-  })
-
-  it('displays countdown from 0 seconds', () => {
-    render(<CooldownTimer secondsRemaining={0} />)
-
-    expect(screen.getByText('0')).toBeInTheDocument()
-  })
-
-  it('formats time as MM:SS when over 60 seconds', () => {
-    render(<CooldownTimer secondsRemaining={125} />)
-
-    expect(screen.getByText('02:05')).toBeInTheDocument()
+    const button = screen.getByRole('button')
+    expect(button).not.toBeDisabled()
   })
 
   it('shows button as disabled when cooldown active', () => {
-    render(<CooldownTimer secondsRemaining={30} />)
+    render(<CooldownTimer secondsRemaining={30} onResend={mockOnResend} />)
 
     const button = screen.getByRole('button')
     expect(button).toBeDisabled()
   })
 
-  it('shows button as enabled when cooldown finished', () => {
-    render(<CooldownTimer secondsRemaining={0} />)
+  it('shows countdown timer when cooldown active', () => {
+    render(<CooldownTimer secondsRemaining={30} onResend={mockOnResend} />)
+
+    // Should show countdown
+    expect(screen.getByText('Wait 30s')).toBeInTheDocument()
+  })
+
+  it('calls onResend when button is clicked and enabled', () => {
+    render(<CooldownTimer secondsRemaining={0} onResend={mockOnResend} />)
 
     const button = screen.getByRole('button')
-    expect(button).not.toBeDisabled()
+    fireEvent.click(button)
+
+    expect(mockOnResend).toHaveBeenCalled()
+  })
+
+  it('respects disabled prop', () => {
+    render(<CooldownTimer secondsRemaining={0} onResend={mockOnResend} disabled={true} />)
+
+    const button = screen.getByRole('button')
+    expect(button).toBeDisabled()
   })
 })

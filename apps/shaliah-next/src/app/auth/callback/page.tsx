@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { getUserProfile } from '@/lib/supabase/database'
+import { getUserProfile, createUserProfile } from '@/lib/supabase/database'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -16,11 +16,15 @@ export default function AuthCallbackPage() {
   const t = useTranslations('auth')
 
   const handleAuthError = useCallback((error: { message?: string }) => {
-    // Handle specific auth errors
-    if (error.message?.includes('expired') || error.message?.includes('token')) {
+    // Handle specific auth errors for magic links
+    const message = error.message?.toLowerCase() || ''
+    
+    if (message.includes('expired') || message.includes('token has expired')) {
       setError(t('linkExpired'))
-    } else if (error.message?.includes('used') || error.message?.includes('consumed')) {
+    } else if (message.includes('used') || message.includes('already used') || message.includes('consumed')) {
       setError(t('linkUsed'))
+    } else if (message.includes('invalid') || message.includes('malformed')) {
+      setError(t('linkInvalid'))
     } else {
       setError(t('linkInvalid'))
     }
@@ -31,7 +35,7 @@ export default function AuthCallbackPage() {
     try {
       const supabase = createClient()
 
-      // Handle the auth callback
+      // Handle the auth callback - Supabase automatically processes the URL hash
       const { data, error } = await supabase.auth.getSession()
 
       if (error) {
@@ -41,18 +45,36 @@ export default function AuthCallbackPage() {
       }
 
       if (!data.session) {
-        setError('No session found')
+        setError(t('linkInvalid'))
         setLoading(false)
         return
       }
 
-      // Fetch user profile to check onboarding status
-      const profile = await getUserProfile(data.session.user.id)
+      const user = data.session.user
+
+      // Check if profile exists (trigger should have created it)
+      let profile = await getUserProfile(user.id)
 
       if (!profile) {
-        setError('Failed to load profile')
-        setLoading(false)
-        return
+        console.warn('Profile not found for user, creating one:', user.id)
+        // Create profile if it doesn't exist (fallback for when trigger fails)
+        const userMetadata = user.user_metadata || {}
+        
+        const profileData = {
+          id: user.id,
+          full_name: userMetadata.full_name || null,
+          avatar_url: userMetadata.avatar_url || null,
+          language: 'pt-BR', // Default language
+        }
+
+        profile = await createUserProfile(profileData)
+        
+        if (!profile) {
+          console.error('Failed to create profile for user:', user.id)
+          setError('Account setup incomplete. Please contact support or try signing in again.')
+          setLoading(false)
+          return
+        }
       }
 
       // Redirect logic: if full_name is null, go to onboarding, else profile
@@ -67,7 +89,11 @@ export default function AuthCallbackPage() {
       setError('An unexpected error occurred')
       setLoading(false)
     }
-  }, [router, handleAuthError])
+  }, [router, handleAuthError, t])
+
+  useEffect(() => {
+    handleCallback()
+  }, [handleCallback])
 
   const handleRequestNewLink = () => {
     router.push('/auth')

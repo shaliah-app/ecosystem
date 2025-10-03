@@ -20,11 +20,25 @@ export function AuthForm() {
   const [error, setError] = useState<string | null>(null)
 
   const { signInWithOtp, signInWithOAuth, loading, storageBlocked } = useAuth()
-  const { secondsRemaining, canResend, startCooldown } = useCooldownTimer(email)
+  const { canResend, startCooldown, secondsRemaining } = useCooldownTimer(email)
   const t = useTranslations('auth')
 
-  const handleResend = () => {
-    handleMagicLinkRequest({} as React.FormEvent)
+  const handleResend = async () => {
+    if (!canResend) {
+      setError(t('cooldownMessage'))
+      return
+    }
+
+    setError(null)
+
+    const { error } = await signInWithOtp(email)
+
+    if (error) {
+      setError(error.message)
+    } else {
+      setMagicLinkSent(true)
+      startCooldown()
+    }
   }
 
   const handleRetryStorage = () => {
@@ -150,7 +164,7 @@ export function AuthForm() {
           <div className="space-y-4">
             <Alert>
               <AlertDescription>
-                {t('magicLinkSent', { email })}
+                {t('magicLinkSent')}
               </AlertDescription>
             </Alert>
 
@@ -165,7 +179,7 @@ export function AuthForm() {
             </div>
 
             <CooldownTimer
-              email={email}
+              secondsRemaining={secondsRemaining}
               onResend={handleResend}
               disabled={loading}
             />

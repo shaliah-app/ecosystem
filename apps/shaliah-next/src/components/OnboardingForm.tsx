@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -31,7 +30,6 @@ export function OnboardingForm({ initialLanguage }: OnboardingFormProps) {
   const [error, setError] = useState<string | null>(null)
   const { user } = useAuth()
   const router = useRouter()
-  const t = useTranslations('onboarding')
 
   const form = useForm<OnboardingFormData>({
     resolver: zodResolver(onboardingSchema),
@@ -80,7 +78,7 @@ export function OnboardingForm({ initialLanguage }: OnboardingFormProps) {
   return (
     <Card className="w-full max-w-md mx-auto">
       <CardHeader>
-        <CardTitle className="text-center">{t('enterFullName')}</CardTitle>
+        <CardTitle className="text-center">Welcome! Let&apos;s set up your profile</CardTitle>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -96,6 +94,7 @@ export function OnboardingForm({ initialLanguage }: OnboardingFormProps) {
                       {...field}
                       placeholder="Enter your full name"
                       disabled={loading}
+                      required
                     />
                   </FormControl>
                   <FormMessage />
@@ -135,7 +134,7 @@ export function OnboardingForm({ initialLanguage }: OnboardingFormProps) {
             )}
 
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? 'Saving...' : 'Complete Setup'}
+              {loading ? 'Saving...' : 'Continue'}
             </Button>
           </form>
         </Form>

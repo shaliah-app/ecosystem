@@ -1,9 +1,7 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { AuthForm } from '@/components/AuthForm'
-
-// Mock next-intl
 jest.mock('next-intl', () => ({
-  useTranslations: jest.fn(() => (key: string, params?: any) => {
+  useTranslations: jest.fn(() => (key: string, params?: Record<string, string | number>) => {
     const translations: Record<string, string> = {
       continueWith: 'Continue with',
       continueWithEmail: 'Continue with Email',
@@ -13,45 +11,40 @@ jest.mock('next-intl', () => ({
       sendMagicLink: 'Send Magic Link',
       loading: 'Loading...',
       back: 'Back',
-      magicLinkSent: 'Magic link sent to {email}',
+      magicLinkSent: 'Check your email for a magic link',
       cooldownMessage: 'Resend available in {seconds} seconds',
-      resendMagicLink: 'Resend Magic Link',
+      cooldownTimer: 'Wait {time}',
+      resendMagicLink: 'Resend',
       cooldownActive: 'Please wait before requesting another link',
       unexpectedError: 'An unexpected error occurred',
     }
     let result = translations[key] || key
     if (params) {
       Object.keys(params).forEach(param => {
-        result = result.replace(`{${param}}`, params[param])
+        result = result.replace(`{${param}}`, String(params[param]))
       })
     }
     return result
   }),
 }))
 
-// Mock the auth store
-const mockSignInWithMagicLink = jest.fn()
-const mockSignInWithGoogle = jest.fn()
+// Mock useAuth
+const mockSignInWithOtp = jest.fn()
+const mockSignInWithOAuth = jest.fn()
 
-jest.mock('@/lib/auth/store', () => ({
+jest.mock('@/hooks/useAuth', () => ({
   useAuth: () => ({
-    signInWithMagicLink: mockSignInWithMagicLink,
-    signInWithGoogle: mockSignInWithGoogle,
+    signInWithOtp: mockSignInWithOtp,
+    signInWithOAuth: mockSignInWithOAuth,
+    loading: false,
+    storageBlocked: false,
   }),
 }))
 
 describe('AuthForm', () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    // Mock localStorage
-    Object.defineProperty(window, 'localStorage', {
-      value: {
-        getItem: jest.fn(),
-        setItem: jest.fn(),
-        removeItem: jest.fn(),
-      },
-      writable: true,
-    })
+    localStorage.clear()
   })
 
   it('renders Continue with Email and Continue with Google buttons', () => {
@@ -72,7 +65,7 @@ describe('AuthForm', () => {
   })
 
   it('validates email input and sends magic link', async () => {
-    mockSignInWithMagicLink.mockResolvedValue({ error: null })
+    mockSignInWithOtp.mockResolvedValue({ error: null })
 
     render(<AuthForm />)
 
@@ -88,12 +81,12 @@ describe('AuthForm', () => {
     fireEvent.click(submitButton)
 
     await waitFor(() => {
-      expect(mockSignInWithMagicLink).toHaveBeenCalledWith('test@example.com')
+      expect(mockSignInWithOtp).toHaveBeenCalledWith('test@example.com')
     })
   })
 
   it('shows confirmation state after sending magic link', async () => {
-    mockSignInWithMagicLink.mockResolvedValue({ error: null })
+    mockSignInWithOtp.mockResolvedValue({ error: null })
 
     render(<AuthForm />)
 
@@ -108,14 +101,14 @@ describe('AuthForm', () => {
     fireEvent.click(submitButton)
 
     await waitFor(() => {
-      expect(screen.getByText('Magic link sent to test@example.com')).toBeInTheDocument()
+      expect(screen.getByText('Check your email for a magic link')).toBeInTheDocument()
       expect(screen.getByDisplayValue('test@example.com')).toBeInTheDocument()
       expect(screen.getByRole('button', { name: 'Back' })).toBeInTheDocument()
     })
   })
 
   it('handles Google OAuth click', async () => {
-    mockSignInWithGoogle.mockResolvedValue({ error: null, url: null })
+    mockSignInWithOAuth.mockResolvedValue({ error: null })
 
     render(<AuthForm />)
 
@@ -123,12 +116,12 @@ describe('AuthForm', () => {
     fireEvent.click(googleButton)
 
     await waitFor(() => {
-      expect(mockSignInWithGoogle).toHaveBeenCalled()
+      expect(mockSignInWithOAuth).toHaveBeenCalledWith('google')
     })
   })
 
   it('shows cooldown timer after sending magic link', async () => {
-    mockSignInWithMagicLink.mockResolvedValue({ error: null })
+    mockSignInWithOtp.mockResolvedValue({ error: null })
 
     render(<AuthForm />)
 
@@ -142,8 +135,18 @@ describe('AuthForm', () => {
     fireEvent.change(emailInput, { target: { value: 'test@example.com' } })
     fireEvent.click(submitButton)
 
+    // Wait for magic link sent state
     await waitFor(() => {
-      expect(screen.getByText(/Resend available in \d+ seconds/)).toBeInTheDocument()
+      expect(screen.getByText('Check your email for a magic link')).toBeInTheDocument()
+    })
+
+    // Simulate cooldown in localStorage
+    const storageKey = 'magicLinkCooldown_test@example.com'
+    localStorage.setItem(storageKey, (Date.now() - 30000).toString()) // 30 seconds ago
+
+    // Force re-render by triggering state change or wait for cooldown display
+    await waitFor(() => {
+      expect(screen.getByText(/Wait/)).toBeInTheDocument()
     })
   })
 })

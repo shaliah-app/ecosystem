@@ -27,11 +27,25 @@ jest.mock('next-intl', () => ({
   }),
 }))
 
+// Mock next/navigation
+jest.mock('next/navigation', () => ({
+  useRouter: jest.fn(() => ({
+    push: jest.fn(),
+    replace: jest.fn(),
+    refresh: jest.fn(),
+    back: jest.fn(),
+    forward: jest.fn(),
+    prefetch: jest.fn(),
+  })),
+  useSearchParams: jest.fn(() => new URLSearchParams()),
+  usePathname: jest.fn(() => '/'),
+}))
+
 describe('OnboardingForm', () => {
   it('renders full name input as required', () => {
     render(<OnboardingForm />)
 
-    const fullNameInput = screen.getByLabelText(/full name/i)
+    const fullNameInput = screen.getByLabelText('Full Name')
     expect(fullNameInput).toBeRequired()
   })
 })

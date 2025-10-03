@@ -8,7 +8,12 @@
     "cooldownMessage": "Aguarde antes de solicitar outro link.",
     "linkExpired": "Este link mágico expirou. Solicite um novo.",
     "linkInvalid": "Este link mágico é inválido. Solicite um novo.",
-    "linkUsed": "Este link mágico já foi usado. Faça login novamente."
+    "linkUsed": "Este link mágico já foi usado. Faça login novamente.",
+    "sendMagicLink": "Enviar Link Mágico",
+    "email": "Email",
+    "emailPlaceholder": "Digite seu email",
+    "loading": "Carregando...",
+    "back": "Voltar"
   },
   "onboarding": {
     "enterFullName": "Digite seu nome completo"
