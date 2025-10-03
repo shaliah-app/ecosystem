@@ -59,13 +59,28 @@
 - [ ] T010 [P] Bot command behavior test in apps/ezer-bot/__tests__/commands/start.test.ts (Vitest)
 
 ## Phase 3.3: Core Implementation (ONLY after tests are failing)
-- [ ] T011 [P] User model in apps/yesod-api/src/db/models/user.ts
-- [ ] T012 [P] UserService CRUD in apps/yesod-api/src/services/user-service.ts
-- [ ] T013 [P] CLI command in apps/worker/src/cli/user.ts (if applicable)
-- [ ] T014 POST /api/users endpoint in apps/yesod-api/src/routes/users.ts
-- [ ] T015 GET /api/users/{id} endpoint in apps/yesod-api/src/routes/users.ts
-- [ ] T016 Input validation with zod or validators
-- [ ] T017 Error handling and logging via packages/logger
+**IMPORTANT: Follow architecture pattern for target app**
+
+**For yesod-api (DDD layered):**
+- [ ] T011 [P] Domain entities in apps/yesod-api/src/contexts/{context}/domain/entities.ts
+- [ ] T012 [P] Domain interfaces in apps/yesod-api/src/contexts/{context}/domain/interfaces.ts
+- [ ] T013 [P] Application use cases in apps/yesod-api/src/contexts/{context}/application/useCases.ts
+- [ ] T014 [P] Infrastructure repositories in apps/yesod-api/src/contexts/{context}/infra/repositories/
+- [ ] T015 Context factory in apps/yesod-api/src/contexts/{context}/factory.ts (if complex wiring needed)
+- [ ] T016 [P] API routes (Hono sub-app) in apps/yesod-api/src/contexts/{context}/api/routes.ts
+- [ ] T017 Wire context in apps/yesod-api/src/server.ts using app.route()
+
+**For ezer-bot (composer-based):**
+- [ ] T011 [P] Feature composer in apps/ezer-bot/src/modules/{feature}.ts
+- [ ] T012 [P] i18n keys in apps/ezer-bot/src/locales/*.ftl (pt-BR and en required)
+- [ ] T013 Install sequentialize before session if using state
+- [ ] T014 Install auto-retry plugin: bot.api.config.use(autoRetry())
+- [ ] T015 Mount composer in apps/ezer-bot/src/bot.ts
+- [ ] T016 Setup graceful shutdown (SIGTERM/SIGINT handlers)
+
+**Common to all:**
+- [ ] T018 Input validation with zod in API/bot layer
+- [ ] T019 Error handling and logging via packages/logger
 
 ## Phase 3.4: Integration
 - [ ] T018 Connect services to Supabase/DB (Drizzle schema + migrations)
@@ -142,4 +157,4 @@ Task: "Integration test auth in tests/integration/test_auth.py"
 
 ---
 
-*Based on Constitution v2.2.0 — see `.specify/memory/constitution.md`*
+*Based on Constitution v2.5.1 — see `.specify/memory/constitution.md`*

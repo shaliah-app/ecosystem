@@ -101,12 +101,12 @@ When creating this spec from a user prompt:
 - [ ] Dependencies and assumptions identified
 
 ### Constitution Alignment
-- [ ] **Principle I (DDD)**: Requirements expressed in domain language, not technical jargon
+- [ ] **Principle I (Domain-Centric Architecture)**: Requirements expressed in domain/business language, not technical jargon or implementation details
 - [ ] **Principle II (MVP-First)**: Scope is limited to MVP; advanced features marked for future roadmap
 - [ ] **Principle III (Testing)**: Acceptance scenarios are testable and measurable
 - [ ] **Principle IV (API-First)**: If multi-app feature, client apps are consumers of central API
 - [ ] **Principle V (Async)**: Long-running operations identified for background processing
-- [ ] **Principle IX (i18n)**: User-facing text identified for translation (pt-BR, en as primary)
+- [ ] **Principle IX (i18n)**: User-facing text identified for translation (pt-BR, en-US as primary; all 7 languages before merge)
 
 ---
 
@@ -123,7 +123,7 @@ When creating this spec from a user prompt:
 
 ---
 
-*Based on Constitution v2.2.0 - See `.specify/memory/constitution.md`*
+*Based on Constitution v2.5.1 - See `.specify/memory/constitution.md`*
 
 ````
 

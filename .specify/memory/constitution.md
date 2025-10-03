@@ -1,41 +1,52 @@
 <!--
 Sync Impact Report:
-- Version change: 2.1.0 → 2.2.0
-- Modified Principles: None
-- Added Sections: None
-- Removed sections: None
-- Expanded Sections:
-    - Development Workflow: Completely restructured and expanded to include specific workflows for all 9 principles
-    - Added 10 workflow subsections: DDD, MVP-First Planning, TDD, API Contract, Async Task, TypeScript Monorepo, Supabase Integration, MCP-Assisted Development, i18n, Code Quality & Observability, Deployment & Release
-- Templates requiring updates:
-    - .specify/templates/plan-template.md (✅ updated - version reference updated to v2.2.0)
-    - .specify/templates/spec-template.md (✅ updated - version reference added as v2.2.0)
-    - .specify/templates/tasks-template.md (✅ updated - version reference updated to v2.2.0)
+- Version change: 2.5.1 (all templates synchronized with constitution)
+- Modified Principles:
+    - **Principle I**: "Domain-Centric Architecture" with concrete, testable rules
+    - **Principle III**: Condensed with "no PR without tests" enforcement
+- Clarified Sections:
+    - **Development Workflow / i18n**: All 7 languages before merge, pt-BR+en-US in every PR
+    - **Governance dates**: Fixed ratification date consistency
+- Templates synchronized:
+    - .specify/templates/plan-template.md (✅ v2.5.1 - Updated Principle I, accurate folder structures for all apps)
+    - .specify/templates/spec-template.md (✅ v2.5.1 - Updated Principle I, i18n clarification)
+    - .specify/templates/tasks-template.md (✅ v2.5.1 - Already correct, version synced)
+- All folder structures validated against actual codebase:
+    - yesod-api: Current routes/ + Future contexts/ DDD structure documented
+    - ezer-bot: modules/ + locales/ structure accurate
+    - worker: handlers/ structure accurate
+    - shaliah-next: app/ + components/ + lib/ structure accurate
 - Follow-up TODOs:
-    - Create docs/architecture/bounded-contexts.md (referenced in DDD workflow)
+    - None - all templates and structures synchronized
 -->
+
 # The Yesod Ecosystem Constitution
 
 This document outlines the core principles, architectural constraints, and development workflows for the Yesod project, which includes the Yesod API, the Shaliah application, the Ezer bot, and the asynchronous worker.
 
 ## Core Principles
 
-### I. Domain-Driven Design (DDD)
+### I. Domain-Centric Architecture
 
-The system architecture and code organization must reflect the business domain and be structured around domain concepts rather than technical concerns. This foundational principle ensures maintainability, clarity, and alignment with business requirements.
-- **Domain Modeling:** Core business entities, value objects, and domain services should be clearly defined and separated from infrastructure concerns.
-- **Bounded Contexts:** Different functional areas (e.g., authentication, content management, bot interactions) should have clear boundaries and well-defined interfaces.
-- **Ubiquitous Language:** Code, documentation, and communication should use consistent terminology that matches the business domain and the real-world problems of target users (pastors, church volunteers).
-- **Domain-First Architecture:** Business logic should be independent of frameworks, databases, and external systems, making the system more testable and adaptable.
+All applications MUST organize code by business domain or feature concerns, not by technical layers. Business logic MUST be independent of infrastructure details, enabling isolated testing and flexible implementation choices.
+
+**Key Rules:**
+- Code organization reflects business capabilities (e.g., `contexts/users/`, `modules/welcome/`), not technical roles (e.g., `controllers/`, `services/`)
+- Business logic layers define interfaces; infrastructure layers implement them
+- Dependencies flow inward: infrastructure depends on domain, never the reverse
+- Each application follows framework-appropriate patterns (DDD for APIs, composer modules for bots)
+
+**Implementation patterns:** See Technology Stack & Architecture section for framework-specific guidance (yesod-api: DDD layering; ezer-bot: grammY composers).
 
 ### II. Pragmatic, MVP-First Development
 Features should be planned and developed in phases. The primary goal is to ship a valuable Minimum Viable Product (MVP) quickly. More complex features or optimizations should be placed on a clear roadmap and built upon a solid foundation, rather than attempting to build everything at once. This principle prioritizes delivering value to users over premature optimization.
 
 ### III. Reliability Through Comprehensive Testing
-All applications must be accompanied by a robust testing suite to ensure correctness and reliability. The choice of testing technology is standardized based on the application's role.
-- **Web Interface (`shaliah-next`):** All UI components and user-facing logic MUST be tested using **Jest** and **React Testing Library**.
-- **Backend APIs (`yesod-api`, `ezer-bot`):** Backend services and libraries MUST be tested using **Vitest**.
-- **Test-Driven Development (TDD):** For business-critical and error-prone parts of the system (e.g., ETL data parsers, asynchronous job handlers, core authentication logic), a TDD approach is mandatory to ensure resilience.
+All applications MUST be accompanied by a robust testing suite to ensure correctness and reliability. Testing frameworks are standardized by application type:
+- **Web Interface (`shaliah-next`):** Jest + React Testing Library
+- **Backend APIs (`yesod-api`, `ezer-bot`, `worker`):** Vitest
+
+**Test-Driven Development (TDD):** For business-critical code (ETL parsers, async job handlers, auth logic), tests MUST precede implementation to ensure resilience. No PR may merge without tests for new business logic.
 
 ### IV. API-First Design
 All client applications (Shaliah, Ezer) are consumers of the central **Yesod API**. The API is the single source of truth and the sole gateway to the database and business logic. Clients should not contain business logic that can be centralized in the API. The API layer serves as the application service that orchestrates domain logic, while core business rules remain in domain entities and services as per DDD principles.
@@ -98,110 +109,116 @@ This section defines the non-negotiable technology stack for the ecosystem. Any 
     - **Formatting:** Prettier with shared configuration.
     - **Type Checking:** TypeScript strict mode enabled across all packages and applications.
 
+### Application-Specific Architecture Patterns
+
+**yesod-api (Hono + DDD):**
+- **Layer Structure:** `domain/` → `application/` → `infra/` → `api/`
+- **Dependency Injection:** Manual DI; composable factories per bounded context when complexity justifies
+- **Configuration:** 
+  - Environment variables in `src/config/env.ts` (see `apps/yesod-api/src/config/env.ts`)
+  - Domain constants in `src/contexts/{context}/constants.ts` (feature-specific: TTLs, limits, formats)
+  - Factory pattern: Per bounded context (`factory.ts`) for environment-based implementation selection
+- **Bounded Contexts:** Each context exports Hono sub-app, mounted in `server.ts`
+
+**ezer-bot (grammY):**
+- **Module Structure:** Feature composers in `src/modules/` ([structuring guide](https://grammy.dev/advanced/structuring))
+- **Middleware Order:** `sequentialize()` → `session()` → `i18n` → feature composers
+- **Reliability Patterns:** `@grammyjs/runner` for long polling, graceful shutdown on SIGTERM/SIGINT, `bot.catch()` error boundary ([reliability guide](https://grammy.dev/advanced/reliability))
+- **Scaling & Rate Limits:** Never throttle artificially; use auto-retry plugin for flood control ([scaling guide](https://grammy.dev/advanced/scaling), [flood guide](https://grammy.dev/advanced/flood))
+- **i18n:** Fluent-based localization with `@grammyjs/i18n` ([i18n plugin](https://grammy.dev/plugins/i18n), [Fluent syntax](https://projectfluent.org/))
+- **Testing:** Mock contexts in isolation, no full bot instantiation (see `apps/ezer-bot/__tests__/welcome.test.ts`)
+- **Deployment:** See [deployment guide](https://grammy.dev/advanced/deployment) for production patterns
+
 ## Development Workflow
 
-This section defines mandatory workflows that enforce the Core Principles in day-to-day development. Each workflow maps directly to one or more constitutional principles.
+This section defines practical workflows grouped by development concerns, not mapped 1:1 to principles. These workflows enforce constitutional principles during day-to-day development.
 
-### Domain-Driven Design Workflow (Principle I)
+### Architecture & Code Organization
 
-- **Code Organization:** All code MUST be organized by domain concepts, not technical layers. Create directories like `domains/worship/`, `domains/scheduling/` rather than `controllers/`, `services/`.
-- **Ubiquitous Language:** Code reviews MUST verify that class names, function names, and variable names use domain terminology (e.g., `ServiceSchedule`, `WorshipLeader`) not generic technical terms (e.g., `DataManager`, `Handler`).
-- **Bounded Context Boundaries:** When introducing a new functional area, explicitly document its bounded context in `docs/architecture/bounded-contexts.md` before implementation begins.
-- **Domain-First Implementation:** Business logic MUST reside in domain entities and services. Infrastructure concerns (HTTP, database, queue) MUST be isolated in separate layers that depend on the domain, never the reverse.
+**yesod-api:**
+- Organize by bounded contexts in `src/contexts/{context-name}/`
+- Follow DDD layering: `domain/` → `application/` → `infra/` → `api/`
+- Wire dependencies explicitly in `server.ts` or per-context `factory.ts`
+- Each context exports a Hono sub-app mounted in main `server.ts`
+- See Technology Stack & Architecture section for detailed layer structure
 
-### MVP-First Planning Workflow (Principle II)
+**ezer-bot:**
+- Organize by features in `src/modules/{feature}.ts`
+- Each module exports a `Composer<Context>`
+- Compose modules in `src/bot.ts` following middleware order
+- Reference: `apps/ezer-bot/src/bot.ts` and [grammY structuring guide](https://grammy.dev/advanced/structuring)
 
-- **Spec-Driven Development:** All significant features MUST begin with a specification document (using `.specify/templates/spec-template.md`) that defines the MVP scope and defers non-essential features to a roadmap.
-- **Feature Scoping:** During planning, explicitly categorize requirements as "MVP" vs "Future Enhancement". Only MVP items proceed to implementation.
-- **Iterative Delivery:** Features MUST be merged and deployed in their MVP form first. Enhancements are treated as separate, subsequent features.
-- **Roadmap Maintenance:** All deferred enhancements MUST be documented in a feature `roadmap.md` file within the spec directory.
+**Configuration Management:**
+- Environment variables: centralized in `config/env.ts` per app with validation
+- Domain constants (yesod-api only): per context in `constants.ts` (e.g., TTLs, limits, formats)
+- Never use `process.env` directly in business logic
 
-### Test-Driven Development Workflow (Principle III)
+### Planning & Specification
 
-- **Red-Green-Refactor Cycle:** For business-critical code (authentication, data parsing, job handlers), developers MUST:
-  1. Write a failing test that describes the expected behavior
-  2. Write the minimal code to make the test pass
-  3. Refactor while keeping tests green
-- **Test-First Commitment:** Tests MUST be written and committed before implementation code. PRs that introduce business logic without corresponding tests MUST be rejected.
-- **Framework Compliance:** 
-  - Web UI tests (`shaliah-next`) MUST use Jest + React Testing Library
-  - Backend/API tests (`yesod-api`, `ezer-bot`, `worker`) MUST use Vitest
-- **Coverage Quality Gates:** PRs MUST NOT reduce test coverage. Critical paths (auth, data integrity) MUST have 100% branch coverage.
+- Begin features with a spec document (`.specify/templates/spec-template.md`)
+- Categorize requirements: "MVP" vs "Future Enhancement"
+- Document only MVP scope; defer enhancements to roadmap
+- Use ubiquitous language (domain terms, not tech jargon)
+- Define API contracts before implementation
 
-### API Contract Workflow (Principle IV)
+### Testing Strategy
 
-- **Contract-First Design:** Before implementing any API endpoint:
-  1. Define the contract (request/response schemas) in `specs/[feature]/contracts/`
-  2. Write contract tests that validate the schema
-  3. Get contract review/approval
-  4. Implement the endpoint to satisfy the contract
-- **Client Validation:** Code reviews MUST verify that client applications (`shaliah-next`, `ezer-bot`) do NOT contain business logic. All business rules MUST be centralized in `yesod-api`.
-- **Single Source of Truth:** Database access, data validation, and business rules MUST only exist in `yesod-api`. Clients are thin consumers that call the API and render results.
+**Test-Driven Development (TDD):**
+- For business-critical code: write failing test → implement → refactor
+- Tests MUST precede implementation in commits
+- No PR without tests for new business logic
 
-### Asynchronous Task Workflow (Principle V)
+**Testing Patterns:**
+- Web UI: Component testing with Jest + RTL
+- Backend/API: Unit and integration tests with Vitest
+- grammY Bot: Mock context pattern (see `apps/ezer-bot/__tests__/welcome.test.ts`)
+- See Principle III for framework requirements per application
 
-- **Task Identification:** During feature planning, identify any operation that:
-  - Takes >1 second to complete
-  - Processes large files (>1MB)
-  - Makes external API calls
-  - Performs CPU-intensive work (audio processing, ML inference)
-- **Job Queue Pattern:** These tasks MUST be:
-  1. Defined as job handlers in `apps/worker/src/handlers/`
-  2. Queued via `pg-boss` from the API endpoint
-  3. Processed asynchronously by the worker
-  4. Return a job ID to the client for status polling
-- **Never Block the API:** Code reviews MUST reject any PR that performs long-running work in an API request handler.
+### Async Work & Background Jobs
 
-### TypeScript Monorepo Workflow (Principle VI)
+**Identification:**
+- Operations >1s, large files (>1MB), external APIs, CPU-intensive tasks
 
-- **TypeScript-Only Rule:** All new code MUST be written in TypeScript. JavaScript files are only permitted for configuration (e.g., `.eslintrc.js`).
-- **Shared Code Extraction:** When code is duplicated across apps, it MUST be extracted to a shared package in `packages/` with proper TypeScript declarations.
-- **Workspace References:** Apps MUST reference shared packages using workspace protocol (`"workspace:*"`) in `package.json`, not by publishing to npm.
-- **Type Safety:** TypeScript strict mode MUST remain enabled. PRs that introduce `any` types or `@ts-ignore` comments MUST provide explicit justification.
+**Pattern:**
+1. Define job handler in `apps/worker/src/handlers/`
+2. Queue via `pg-boss` from API
+3. Return job ID to client for polling
+4. Never block API request/response cycle
 
-### Supabase Integration Workflow (Principle VII)
+### Database & Schema Management
 
-- **Database Schema Changes:** All schema modifications MUST:
-  1. Be authored as Drizzle ORM migration files in TypeScript
-  2. Be tested locally against a Supabase dev branch (via MCP)
-  3. Be reviewed before merging
-  4. Never be applied directly to production database
-- **Authentication Flow:** All user authentication MUST flow through Supabase Auth. Custom auth logic is forbidden.
-- **RLS Policies:** Database tables MUST have Row-Level Security policies defined. Code reviews MUST verify RLS is enabled for new tables.
+- Author migrations as Drizzle TypeScript files
+- Test locally before merging
+- Never apply migrations directly to production
+- Enable Row-Level Security (RLS) on all tables
+- All auth flows via Supabase Auth (no custom logic)
 
-### MCP-Assisted Development Workflow (Principle VIII)
+### Internationalization (i18n)
 
-- **MCP Setup Requirement:** All developers MUST have MCP servers configured:
-  - Chrome DevTools MCP for frontend debugging
-  - Supabase MCP for database inspection
-- **Debugging Best Practice:** When debugging, developers SHOULD:
-  1. Use Supabase MCP to inspect database state (read-only)
-  2. Use Chrome DevTools MCP to automate browser testing
-  3. Document findings in PR descriptions or bug reports
-- **Research Workflow:** When researching unknowns during planning phase, utilize MCP servers to gather live data and validate assumptions.
+**Workflow:**
+- Brazilian Portuguese (pt-BR) and English (en-US) are primary languages and MUST be updated together in every PR
+- All 7 supported languages (pt-BR, en-US, es, fr, de, uk, ru) should be updated before merging to main
+- Never hardcode user-facing strings
+- See Principle IX for tooling requirements per application
 
-### Internationalization Workflow (Principle IX)
+**Implementation References:**
+- shaliah-next: `messages/{locale}.json` files
+- ezer-bot: `src/locales/{locale}.ftl` files, session storage as `__language_code`
 
-- **Translation Key Management:**
-  - User-facing strings MUST NEVER be hardcoded. All text MUST use translation keys.
-  - For `shaliah-next`: Define keys in `messages/en.json` and `messages/pt-BR.json`
-  - For `ezer-bot`: Define keys in `src/locales/en.ftl` and `src/locales/pt-BR.ftl`
-- **Primary Language Parity:** Brazilian Portuguese (pt-BR) and English (en) MUST be updated together. PRs that add English strings without pt-BR equivalents MUST be rejected.
-- **Translation Review:** All new translation keys MUST be reviewed by a native speaker before release.
-- **Fallback Languages:** Spanish (es), French (fr), German (de), Ukrainian (uk), and Russian (ru) translations MAY lag behind primary languages but MUST be updated before major releases.
+### Code Quality & Observability
 
-### Code Quality & Observability Workflow
+- ESLint + Prettier: shared configs from `packages/eslint-config-custom`
+- Logging: use `packages/logger` (Pino); no `console.log`
+- Error tracking: initialize Sentry SDK per-app
+- TypeScript strict mode: no `any` without justification
+- Secrets: env vars only; maintain `.env.example`
 
-- **Linting & Formatting:** All code MUST pass ESLint and Prettier checks before commit. Use shared configs from `packages/eslint-config-custom`.
-- **Structured Logging:** All logging MUST use `packages/logger` module. Direct use of `console.log`, `console.error`, etc. is strictly forbidden.
-- **Error Tracking:** Each application MUST initialize its environment-specific Sentry SDK. All errors MUST be reported through the logger module for consistent context capture.
-- **Secrets Management:** Sensitive credentials MUST be managed via environment variables (`.env`). A `.env.example` file with dummy values MUST be maintained. Secrets MUST NEVER be committed to version control.
+### Deployment & Release
 
-### Deployment & Release Workflow
-
-- **Independent Deployment:** The `yesod-api`, `ezer-bot`, `worker`, and `shaliah-next` MUST be deployed as independent services with separate release cycles.
-- **Database Migration Safety:** Migrations MUST be backwards-compatible. Breaking schema changes MUST be deployed in phases (add new column → migrate data → remove old column).
-- **Release Validation:** Before deploying to production, validate in staging environment with production-like data volume and load.
+- Independent deployment: `yesod-api`, `ezer-bot`, `worker`, `shaliah-next` deploy separately
+- Database migrations: backwards-compatible (add → migrate data → remove)
+- Validate in staging before production
+- grammY bot: use `@grammyjs/runner` for long polling, handle SIGTERM/SIGINT gracefully
 
 ## Governance
 
@@ -209,4 +226,4 @@ This constitution is the supreme source of truth for the project's architecture 
 - All Pull Requests and code reviews must verify compliance with the principles and constraints outlined in this document.
 - Any proposal to amend this constitution must be documented, reviewed, and approved. A clear migration plan must be provided if the change affects existing architecture.
 
-**Version**: 2.2.0 | **Ratified**: 2025-09-25 | **Last Amended**: 2025-10-01
+**Version**: 2.5.1 | **Ratified**: 2025-01-15 | **Last Amended**: 2025-10-02

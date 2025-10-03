@@ -47,15 +47,15 @@
 ## Constitution Check
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-- **Principle I: Domain-Driven Design (DDD)**: Does the design reflect business domain concepts rather than technical concerns? Are bounded contexts, domain entities, and ubiquitous language clearly defined?
+- **Principle I: Domain-Centric Architecture**: Is code organized by business domain/features rather than technical layers? Does business logic remain independent of infrastructure? For yesod-api: Does the design use DDD layering with proper dependency direction? For ezer-bot: Does the design use feature-based composer modules?
 - **Principle II: Pragmatic, MVP-First Development**: Is the feature scoped as an MVP? Are complex features or optimizations deferred to a clear roadmap rather than built all at once?
-- **Principle III: Comprehensive Testing**: Does the plan account for the correct testing framework for the target application (Jest/RTL for web UI, Vitest for backend)? Is TDD applied to business-critical logic?
+- **Principle III: Comprehensive Testing**: Does the plan account for the correct testing framework for the target application (Jest/RTL for web UI, Vitest for backend)? Is TDD applied to business-critical logic? Are tests included for all new business logic (no PR may merge without tests)?
 - **Principle IV: API-First Design**: Do client applications consume the Yesod API as the single source of truth? Is business logic centralized in the API rather than in clients?
 - **Principle V: Decoupled, Asynchronous Processing**: Are time-consuming tasks offloaded to the background worker via job queue rather than executed in the API request-response cycle?
 - **Principle VI: TypeScript-First Monorepo**: Is all new code planned to be written in TypeScript within the monorepo structure? Are shared packages and workspace references properly utilized?
 - **Principle VII: Supabase-First Integration**: If the feature requires a database, auth, or storage, does it use Supabase as the primary backend service?
 - **Principle VIII: MCP-Driven Development & Debugging**: Does the development workflow consider using MCP servers (Chrome DevTools, Supabase) for debugging and testing?
-- **Principle IX: Internationalization (i18n)**: If the feature is user-facing (shaliah-next or ezer-bot), does it include plans for translation and localization using the appropriate tooling (next-intl or @grammyjs/i18n)?
+- **Principle IX: Internationalization (i18n)**: If the feature is user-facing (shaliah-next or ezer-bot), does it include plans for translation and localization in all 7 supported languages (pt-BR, en-US as primary) using the appropriate tooling (next-intl or @grammyjs/i18n)?
 
 ## Project Structure
 
@@ -73,21 +73,52 @@ specs/[###-feature]/
 ### Source Code (repository root)
 ```
 apps/
-├── yesod-api/
+├── yesod-api/              # Backend API (Hono + DDD)
 │   ├── src/
-│   └── tests/
-├── shaliah-next/
+│   │   ├── contexts/       # Future: DDD bounded contexts
+│   │   │   └── {context-name}/
+│   │   │       ├── domain/          # Pure business logic, interfaces
+│   │   │       ├── application/     # Use cases, orchestration
+│   │   │       ├── infra/           # DB repos, external APIs
+│   │   │       │   ├── repositories/
+│   │   │       │   └── external/
+│   │   │       ├── api/             # Hono sub-app routes
+│   │   │       ├── constants.ts     # Domain constants (TTLs, limits)
+│   │   │       └── factory.ts       # Optional: DI wiring
+│   │   ├── config/         # env.ts for environment variables
+│   │   ├── db/             # Drizzle schema and client
+│   │   ├── server.ts       # App composition
+│   │   └── index.ts        # Entry point
+│   └── __tests__/          
+├── shaliah-next/           # Web UI (Next.js + React)
 │   ├── src/
-│   └── __tests__/
-├── ezer-bot/
+│   │   ├── app/            # Next.js App Router pages
+│   │   ├── components/     # React components + shadcn/ui
+│   │   ├── lib/            
+│   │   ├── i18n/           
+│   │   └── types/          
+│   ├── messages/           
+│   └── public/             
+├── ezer-bot/               # Telegram Bot (grammY)
 │   ├── src/
-│   └── __tests__/
-└── worker/
+│   │   ├── modules/        # Feature composers (welcome.ts, etc.)
+│   │   ├── locales/        # Fluent i18n files (*.ftl)
+│   │   ├── types/          # TypeScript types (context.ts)
+│   │   ├── lib/            # Shared utilities
+│   │   ├── bot.ts          # Bot composition (middleware + composers)
+│   │   └── logger.ts       # Pino logger instance
+│   └── __tests__/          
+└── worker/                 # Background job processor (pg-boss)
     ├── src/
-    └── __tests__/
+    │   ├── handlers/       # Job handlers (cleanupAuthTokens.ts, etc.)
+    │   ├── boss.ts         # pg-boss client
+    │   ├── index.ts        # Worker entry point
+    │   └── logger.ts       # Pino logger instance
+    └── __tests__/          
 packages/
 ├── logger/
-└── ...
+├── eslint-config-custom/
+└── typescript-config/
 ```
 
 **Structure Decision**: [Document the selected structure and reference the real
@@ -201,4 +232,4 @@ directories captured above]
 - [ ] Complexity deviations documented
 
 ---
-*Based on Constitution v2.2.0 - See `.specify/memory/constitution.md`*
+*Based on Constitution v2.4.0 - See `.specify/memory/constitution.md`*
