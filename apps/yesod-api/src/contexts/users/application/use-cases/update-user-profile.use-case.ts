@@ -55,7 +55,7 @@ export class UpdateUserProfileUseCase {
 
     if (input.avatar_url !== undefined) {
       // For avatar_url, null is allowed to clear it
-      updatedProfile.avatarUrl = input.avatar_url;
+      updatedProfile.avatarUrl = input.avatar_url || undefined;
       updatedProfile.updatedAt = new Date();
     }
 

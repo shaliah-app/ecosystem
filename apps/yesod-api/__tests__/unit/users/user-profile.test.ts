@@ -14,8 +14,7 @@ describe('UserProfile Domain Entity', () => {
         fullName: validFullName,
         avatarUrl: validAvatarUrl,
         language: validLanguage,
-        telegramUserId: 123456789,
-        activeSpaceId: 1
+        telegramUserId: 123456789
       });
 
       expect(profile.id).toBe(validId);

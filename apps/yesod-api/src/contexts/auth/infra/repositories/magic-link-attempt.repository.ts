@@ -12,7 +12,7 @@ export class MagicLinkAttemptRepository {
       await db.insert(magicLinkAttempts).values({
         email: attempt.getEmail(),
         attemptedAt: attempt.attemptedAt,
-        ipAddress: attempt.ipAddress,
+        ...(attempt.ipAddress && { ipAddress: attempt.ipAddress }),
         success: attempt.success,
       });
 

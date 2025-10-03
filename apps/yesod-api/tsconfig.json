@@ -4,11 +4,14 @@
     "noEmit": false,
     "outDir": "./dist",
     "rootDir": "./src",
-    "module": "CommonJS",
+    "module": "es2022",
     "target": "ES2022",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "lib": ["ES2022", "DOM"],
-    "types": ["node"]
+    "types": ["node"],
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]

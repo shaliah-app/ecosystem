@@ -45,11 +45,7 @@ export class SendMagicLinkUseCase {
         });
 
         // Record failed attempt
-        const failedAttempt = MagicLinkAttempt.create({
-          email: EmailAddress.create(email),
-          ...(ipAddress && { ipAddress }),
-          success: false
-        });
+        const failedAttempt = MagicLinkAttempt.create(email, ipAddress, false);
         await this.repository.create(failedAttempt);
 
         const result: SendMagicLinkResult = {
@@ -65,11 +61,7 @@ export class SendMagicLinkUseCase {
       await this.authService.sendMagicLink(email);
 
       // 5. Record successful attempt
-      const successfulAttempt = MagicLinkAttempt.create({
-        email: EmailAddress.create(email),
-        ...(ipAddress && { ipAddress }),
-        success: true
-      });
+      const successfulAttempt = MagicLinkAttempt.create(email, ipAddress, true);
       await this.repository.create(successfulAttempt);
 
       this.logger.info('Magic link sent successfully', { email });

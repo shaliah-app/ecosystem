@@ -44,7 +44,25 @@ export class MagicLinkAttempt {
     attemptedAt?: Date;
     ipAddress?: string;
     success?: boolean;
-  }): MagicLinkAttempt {
+  }): MagicLinkAttempt;
+  static create(email: string, ipAddr: string | null, successFlag: boolean): MagicLinkAttempt;
+  static create(
+    paramsOrEmail: { email: EmailAddress; attemptedAt?: Date; ipAddress?: string; success?: boolean } | string,
+    ipAddr?: string | null,
+    successFlag?: boolean
+  ): MagicLinkAttempt {
+    // Handle old API
+    if (typeof paramsOrEmail === 'string') {
+      const email = paramsOrEmail;
+      return MagicLinkAttempt.create({
+        email: EmailAddress.create(email),
+        ...(ipAddr && { ipAddress: ipAddr }),
+        success: successFlag ?? true
+      });
+    }
+
+    // Handle new API
+    const params = paramsOrEmail;
     // Validate required fields
     if (!params.email) {
       throw new Error('Email is required');

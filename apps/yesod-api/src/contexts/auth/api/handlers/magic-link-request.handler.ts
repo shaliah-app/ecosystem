@@ -1,9 +1,9 @@
 import type { Context } from 'hono';
 import { z } from 'zod';
 import type { Variables } from '../../../../types';
+import { SendMagicLinkUseCase } from '../../application/use-cases/send-magic-link.use-case';
 import { MagicLinkAttemptRepository } from '../../infra/repositories/magic-link-attempt.repository';
 import { SupabaseAuthService } from '../../infra/services/supabase-auth.service';
-import { SendMagicLinkUseCase } from '../../application/use-cases/send-magic-link.use-case';
 
 const requestSchema = z.object({
   email: z.string().email(),
