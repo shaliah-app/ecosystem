@@ -55,17 +55,17 @@
   **Reference**: data-model.md § 3
 
 ### Configuration & Environment
-- [ ] **T004** [P] Create config/env.ts with validated environment variables  
+- [x] **T004** [P] Create config/env.ts with validated environment variables  
   **Path**: `apps/yesod-api/src/config/env.ts`  
   **Description**: Create centralized configuration module using Zod for validation. Define schema for: DATABASE_URL, SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY, JWT_SECRET, PORT, NODE_ENV. Export validated `env` object. Never use `process.env` directly in application code.  
   **Reference**: Constitution v2.5.1 § Configuration Management
 
-- [ ] **T004a** [P] Define auth context constants  
+- [x] **T004a** [P] Define auth context constants  
   **Path**: `apps/yesod-api/src/contexts/auth/constants.ts`  
   **Description**: Create constants file for auth domain: `MAGIC_LINK_COOLDOWN_SECONDS = 60`, `MAGIC_LINK_HOURLY_LIMIT = 10`, `MAGIC_LINK_EXPIRY_SECONDS = 900` (15 min), `RATE_LIMIT_WINDOW_HOURS = 1`. Export as const object. Single source of truth for all rate limit values.  
   **Reference**: Constitution v2.5.1 § Configuration Management, spec.md FR-004
 
-- [ ] **T005** [P] Configure Supabase Auth settings (Programmatic)  
+- [x] **T005** [P] Configure Supabase Auth settings (Programmatic)  
   **Path**: Execute from repo root + document in `docs/shaliah-auth-config.md`  
   **Description**: Use Supabase CLI or SQL to configure: Enable magic link (15min expiry), configure Google OAuth provider, set JWT expiry (access token 1h, refresh token 7d idle + 30d absolute). Commands:
   ```bash
@@ -86,17 +86,17 @@
   Document manual OAuth setup steps. Automate where possible.  
   **Reference**: research.md § 1, § 6
 
-- [ ] **T006** [P] Set up next-intl configuration  
+- [x] **T006** [P] Set up next-intl configuration  
   **Path**: `apps/shaliah-next/src/i18n/request.ts` + `apps/shaliah-next/src/middleware.ts`  
   **Description**: Configure next-intl middleware to detect locale from Accept-Language header. Set default to 'pt-BR'. Create locale cookie management. Document middleware execution order: i18n → auth → routes.  
   **Reference**: research.md § 3, § 9
 
-- [ ] **T007** [P] Create i18n message files (EN + PT-BR)  
+- [x] **T007** [P] Create i18n message files (EN + PT-BR)  
   **Paths**: `apps/shaliah-next/messages/en.json`, `apps/shaliah-next/messages/pt-BR.json`  
   **Description**: **BOTH files must be created.** Define message keys for auth flow, onboarding, profile dashboard. Include: `auth.continueWith`, `auth.continueWithEmail`, `auth.continueWithGoogle`, `auth.magicLinkSent`, `auth.cooldownTimer`, `auth.cooldownMessage`, `auth.linkExpired`, `auth.linkInvalid`, `auth.linkUsed`, `onboarding.enterFullName`, `profile.changeLanguage`, error messages. EN and PT-BR must have identical key structures (values translated).  
   **Reference**: research.md § 9
 
-- [ ] **T008** [P] Create Supabase Storage bucket for avatars  
+- [x] **T008** [P] Create Supabase Storage bucket for avatars  
   **Path**: Supabase Dashboard > Storage + document in `docs/shaliah-auth-config.md`  
   **Description**: Create `user-avatars` bucket. Configure RLS policies: Users can INSERT/UPDATE/SELECT their own avatars only (WHERE auth.uid()::text = (storage.foldername(name))[1]). Set bucket settings: 5MB file size limit, allowed MIME types: image/jpeg, image/png, image/webp. Public read access for authenticated users.  
   **Reference**: spec.md FR-010b, NFR-006

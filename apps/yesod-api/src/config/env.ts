@@ -1,22 +1,18 @@
 import { config } from 'dotenv'
+import { z } from 'zod'
 
 // Load environment variables
 config()
 
-export const env = {
-  PORT: process.env.PORT || '3000',
-  DATABASE_URL: process.env.DATABASE_URL!,
-  SUPABASE_URL: process.env.SUPABASE_URL!,
-  SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
-  SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  SENTRY_DSN: process.env.SENTRY_DSN,
-  NODE_ENV: process.env.NODE_ENV || 'development',
-}
+const envSchema = z.object({
+  DATABASE_URL: z.url(),
+  SUPABASE_URL: z.url(),
+  SUPABASE_ANON_KEY: z.string().min(1),
+  SUPABASE_SERVICE_ROLE_KEY: z.string().min(1),
+  JWT_SECRET: z.string().min(1),
+  PORT: z.coerce.number().int().positive().default(3000),
+  NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
+  SENTRY_DSN: z.string().optional(),
+})
 
-// Validate required environment variables
-const requiredEnvVars = ['DATABASE_URL', 'SUPABASE_URL', 'SUPABASE_ANON_KEY', 'SUPABASE_SERVICE_ROLE_KEY']
-for (const envVar of requiredEnvVars) {
-  if (!process.env[envVar]) {
-    throw new Error(`Missing required environment variable: ${envVar}`)
-  }
-}
+export const env = envSchema.parse(process.env)

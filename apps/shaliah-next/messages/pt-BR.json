@@ -1,0 +1,42 @@
+{
+  "auth": {
+    "continueWith": "Continuar com",
+    "continueWithEmail": "Continuar com Email",
+    "continueWithGoogle": "Continuar com Google",
+    "magicLinkSent": "Link mágico enviado! Verifique seu email.",
+    "cooldownTimer": "Reenviar em {seconds}s",
+    "cooldownMessage": "Aguarde antes de solicitar outro link.",
+    "linkExpired": "Este link mágico expirou. Solicite um novo.",
+    "linkInvalid": "Este link mágico é inválido. Solicite um novo.",
+    "linkUsed": "Este link mágico já foi usado. Faça login novamente."
+  },
+  "onboarding": {
+    "enterFullName": "Digite seu nome completo"
+  },
+  "profile": {
+    "changeLanguage": "Alterar Idioma"
+  },
+  "HomePage": {
+    "title": "Shaliah Next",
+    "welcome": "Bem-vindo ao Shaliah Next com integração Supabase"
+  },
+  "AuthForm": {
+    "signIn": "Entrar",
+    "signUp": "Criar Conta",
+    "email": "Email",
+    "password": "Senha",
+    "emailPlaceholder": "Digite seu email",
+    "passwordPlaceholder": "Digite sua senha",
+    "signInButton": "Entrar",
+    "signUpButton": "Criar Conta",
+    "loading": "Carregando...",
+    "switchToSignUp": "Não tem conta? Cadastre-se",
+    "switchToSignIn": "Já tem conta? Entre",
+    "unexpectedError": "Ocorreu um erro inesperado"
+  },
+  "UserProfile": {
+    "welcome": "Bem-vindo",
+    "signOut": "Sair",
+    "loading": "Carregando..."
+  }
+}
