@@ -36,7 +36,7 @@ Unified authentication flow for Shaliah Next that merges sign-in/sign-up into a 
 ## Technical Context
 **Language/Version**: TypeScript 5.x (Next.js 14+, Node.js 20+)  
 **Primary Dependencies**: Next.js, Supabase JS client, next-intl, shadcn/ui, React 18  
-**Storage**: Supabase (PostgreSQL) — auth.users, public.user_profiles  
+**Storage**: Supabase (PostgreSQL — auth.users, public.user_profiles; Storage — user-avatars bucket)  
 **Testing**: Jest + React Testing Library (frontend), Vitest (API endpoints if backend touched)  
 **Target Platform**: Web (Chrome/Safari/Firefox modern versions), mobile-responsive  
 **Project Type**: Web (frontend: shaliah-next; backend: yesod-api)  
