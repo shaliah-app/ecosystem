@@ -88,15 +88,34 @@ apps/
 │   │   ├── server.ts       # App composition
 │   │   └── index.ts        # Entry point
 │   └── __tests__/          
-├── shaliah-next/           # Web UI (Next.js + React)
+├── shaliah-next/           # Web UI (Next.js 15 App Router)
 │   ├── src/
 │   │   ├── app/            # Next.js App Router pages
-│   │   ├── components/     # React components + shadcn/ui
+│   │   ├── modules/        # Feature modules (DDD-inspired)
+│   │   │   └── {feature}/
+│   │   │       ├── domain/          # Domain types, validators, factories
+│   │   │       ├── ports/           # Repository interfaces
+│   │   │       ├── adapters/        # Concrete implementations (Supabase)
+│   │   │       ├── use-cases/       # Application operations
+│   │   │       ├── ui/
+│   │   │       │   ├── components/  # Presentational components
+│   │   │       │   ├── server/
+│   │   │       │   │   └── actions.ts  # Server actions
+│   │   │       │   └── hooks/       # Client-side hooks
+│   │   │       ├── stores/          # Zustand stores (scoped)
+│   │   │       └── config.ts        # Module constants
+│   │   ├── components/     # Shared UI components + shadcn/ui
+│   │   ├── stores/         # Global Zustand stores (minimal)
 │   │   ├── lib/            
-│   │   ├── i18n/           
+│   │   │   ├── di.ts       # Composition root (DI wiring)
+│   │   │   ├── env.ts      # Environment variables
+│   │   │   └── supabase-client.ts  # Supabase clients
+│   │   ├── hooks/          # Shared hooks
+│   │   ├── i18n/           # next-intl setup
 │   │   └── types/          
-│   ├── messages/           
-│   └── public/             
+│   ├── messages/           # Translation files (pt-BR.json, en.json)
+│   ├── public/             
+│   └── __tests__/          # Jest + RTL
 ├── ezer-bot/               # Telegram Bot (grammY)
 │   ├── src/
 │   │   ├── modules/        # Feature composers (welcome.ts, etc.)
@@ -230,4 +249,4 @@ directories captured above]
 - [ ] Complexity deviations documented
 
 ---
-*Based on Constitution v3.0.0 - See `.specify/memory/constitution.md`*
+*Based on Constitution v3.1.0 - See `.specify/memory/constitution.md`*

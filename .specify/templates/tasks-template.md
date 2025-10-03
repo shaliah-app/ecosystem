@@ -70,6 +70,18 @@
 - [ ] T016 [P] API routes (Hono sub-app) in apps/yesod-api/src/contexts/{context}/api/routes.ts
 - [ ] T017 Wire context in apps/yesod-api/src/server.ts using app.route()
 
+**For shaliah-next (DDD-inspired modules):**
+- [ ] T011 [P] Domain types and validators in apps/shaliah-next/src/modules/{feature}/domain/
+- [ ] T012 [P] Repository interfaces (ports) in apps/shaliah-next/src/modules/{feature}/ports/
+- [ ] T013 [P] Supabase adapters in apps/shaliah-next/src/modules/{feature}/adapters/
+- [ ] T014 [P] Use cases in apps/shaliah-next/src/modules/{feature}/use-cases/
+- [ ] T015 Composition root wiring in apps/shaliah-next/src/lib/di.ts
+- [ ] T016 [P] Server actions in apps/shaliah-next/src/modules/{feature}/ui/server/actions.ts
+- [ ] T017 [P] Presentational components in apps/shaliah-next/src/modules/{feature}/ui/components/
+- [ ] T018 [P] Client-side hooks in apps/shaliah-next/src/modules/{feature}/ui/hooks/
+- [ ] T019 [P] Zustand stores (scoped) in apps/shaliah-next/src/modules/{feature}/stores/ (if needed)
+- [ ] T020 Wire components in Next.js App Router pages/layouts
+
 **For ezer-bot (composer-based):**
 - [ ] T011 [P] Feature composer in apps/ezer-bot/src/modules/{feature}.ts
 - [ ] T012 [P] i18n keys in apps/ezer-bot/src/locales/*.ftl (pt-BR and en required)
@@ -79,27 +91,27 @@
 - [ ] T016 Setup graceful shutdown (SIGTERM/SIGINT handlers)
 
 **Common to all:**
-- [ ] T018 Input validation with zod in API/bot layer
-- [ ] T019 Error handling and logging via packages/logger
+- [ ] T021 Input validation with zod in API/bot/server action layer
+- [ ] T022 Error handling and logging via packages/logger
 
 ## Phase 3.4: Integration
-- [ ] T018 Connect services to Supabase/DB (Drizzle schema + migrations)
-- [ ] T019 Auth middleware integrated with Supabase Auth
-- [ ] T020 Request/response logging (consistent fields) via packages/logger
-- [ ] T021 CORS and security headers
-- [ ] T022 Queue integration (pg-boss) for long-running tasks (worker)
+- [ ] T023 Connect services to Supabase/DB (Drizzle schema + migrations)
+- [ ] T024 Auth middleware integrated with Supabase Auth
+- [ ] T025 Request/response logging (consistent fields) via packages/logger
+- [ ] T026 CORS and security headers
+- [ ] T027 Queue integration (pg-boss) for long-running tasks (worker)
 
 ## Phase 3.5: i18n & Polish
-- [ ] T023 [P] i18n: Add/enforce translation keys for pt-BR and en-US (mandatory pair) in apps/shaliah-next/messages/*.json
-- [ ] T024 [P] i18n: Document additional planned languages in specs/[###-feature]/roadmap.md (do NOT add partial translations)
-- [ ] T025 [P] i18n: Configure next-intl in apps/shaliah-next/src/i18n/request.ts
-- [ ] T026 [P] i18n (bot): Setup @grammyjs/i18n with pt-BR.ftl and en.ftl in apps/ezer-bot/src/locales/
-- [ ] T027 [P] i18n (bot): Implement /language command with sessions
-- [ ] T028 [P] Unit tests for validation in apps/yesod-api/__tests__/unit/validation.test.ts
-- [ ] T029 Performance tests (<200ms p95 where applicable)
-- [ ] T030 [P] Update docs/api.md and quickstart.md
-- [ ] T031 Remove duplication
-- [ ] T032 Run manual-testing.md
+- [ ] T028 [P] i18n: Add/enforce translation keys for pt-BR and en-US (mandatory pair) in apps/shaliah-next/messages/*.json
+- [ ] T029 [P] i18n: Document additional planned languages in specs/[###-feature]/roadmap.md (do NOT add partial translations)
+- [ ] T030 [P] i18n: Configure next-intl in apps/shaliah-next/src/i18n/request.ts
+- [ ] T031 [P] i18n (bot): Setup @grammyjs/i18n with pt-BR.ftl and en.ftl in apps/ezer-bot/src/locales/
+- [ ] T032 [P] i18n (bot): Implement /language command with sessions
+- [ ] T033 [P] Unit tests for validation in apps/yesod-api/__tests__/unit/validation.test.ts
+- [ ] T034 Performance tests (<200ms p95 where applicable)
+- [ ] T035 [P] Update docs/api.md and quickstart.md
+- [ ] T036 Remove duplication
+- [ ] T037 Run manual-testing.md
 
 ## Dependencies
 - Tests (T004-T007) before implementation (T008-T014)
@@ -158,4 +170,4 @@ Task: "Integration test auth in tests/integration/test_auth.py"
 
 ---
 
-*Based on Constitution v3.0.0 — see `.specify/memory/constitution.md`*
+*Based on Constitution v3.1.0 — see `.specify/memory/constitution.md`*

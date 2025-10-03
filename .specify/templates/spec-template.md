@@ -123,7 +123,7 @@ When creating this spec from a user prompt:
 
 ---
 
-*Based on Constitution v3.0.0 - See `.specify/memory/constitution.md`*
+*Based on Constitution v3.1.0 - See `.specify/memory/constitution.md`*
 
 ````
 

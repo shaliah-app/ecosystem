@@ -1,28 +1,34 @@
 <!--
 Sync Impact Report:
-- Version change: 2.7.0 → 3.0.0 (MAJOR: Principle consolidation - MCP made mandatory)
-- Modified Principles:
-    - **Principle III (Testing)**: Merged MCP requirements into testing principle
-      * MCP servers now MANDATORY (was "encouraged" in former Principle VII)
-      * Added MCP-Driven Testing & Debugging as core testing requirement
-    - **Principle VII**: Former "MCP-Driven Development" removed, content merged into Principle III
-    - **Principle VIII → VII**: Renumbered (i18n moved from VIII to VII)
+- Version change: 3.0.0 → 3.1.0 (MINOR: shaliah-next architecture addition)
 - Added Sections:
-    - Technology Stack: Added "Model Context Protocol (MCP) Servers" section with Shadcn MCP
-    - Development Workflow: Added "MCP Integration" subsection under Testing Strategy
-- Removed Sections:
-    - Former Principle VII (MCP-Driven Development & Debugging) - merged into Principle III
+    - **Application-Specific Architecture Patterns**: Added comprehensive shaliah-next (Next.js 15 App Router) architecture
+      * DDD-inspired module structure with domain/ports/adapters/use-cases/ui layering
+      * Manual DI via lib/di.ts composition root
+      * Zustand for client-side ephemeral state (minimal global stores)
+      * Server components for data fetching, client components for interactivity, server actions for mutations
+      * Supabase separation: server-side client with service keys, browser client for realtime/uploads
+    - **Development Workflow - Architecture & Code Organization**: Added shaliah-next organization patterns
+      * Module-based structure with DDD-inspired layering
+      * Composition root wiring and server action patterns
+      * State management guidelines (Zustand scoping)
+      * Reference to next-intl setup documentation
+    - **Project Structure**: Expanded shaliah-next directory structure in plan-template.md with detailed module layout
+    - **Tasks Template**: Added shaliah-next-specific implementation tasks in Phase 3.3
+- Modified Sections:
+    - Reordered Application-Specific Architecture Patterns: yesod-api → shaliah-next → ezer-bot (alphabetical by concern: backend → frontend → bot)
 - Rationale:
-    - MCP is fundamental to testing workflow, not separate concern
-    - Mandatory MCP usage improves debugging efficiency and test quality
-    - Consolidation reduces principle count from 8 to 7, improving clarity
-    - Shadcn MCP addition supports component-driven development in shaliah-next
+    - Provides explicit architectural guidance for shaliah-next matching yesod-api and ezer-bot patterns
+    - DDD-inspired frontend architecture maintains consistency with backend patterns
+    - Clear separation of concerns: domain, ports/adapters, use-cases, UI
+    - Zustand guidelines prevent state management anti-patterns
+    - Next.js 15 App Router best practices with server/client component separation
 - Templates synchronized:
-    - .specify/templates/plan-template.md (✅ v3.0.0 - Updated Constitution Check, removed Principle VII, renumbered VIII→VII)
-    - .specify/templates/spec-template.md (✅ v3.0.0 - Updated Constitution Alignment, renumbered principles)
-    - .specify/templates/tasks-template.md (✅ v3.0.0 - Updated validation checklist, MCP integration in testing tasks)
+    - .specify/templates/plan-template.md (✅ v3.1.0 - Expanded shaliah-next project structure with modules/)
+    - .specify/templates/tasks-template.md (✅ v3.1.0 - Added shaliah-next implementation tasks in Phase 3.3, renumbered subsequent phases)
+    - .specify/templates/spec-template.md (⚠️ No changes needed - spec is app-agnostic)
 - Follow-up TODOs:
-    - None - all templates synchronized with consolidated MCP principle
+    - None - all relevant templates synchronized with shaliah-next architecture
 -->
 
 # The Yesod Ecosystem Constitution
@@ -119,6 +125,23 @@ This section defines the non-negotiable technology stack for the ecosystem. Any 
   - Factory pattern: Per bounded context (`factory.ts`) for environment-based implementation selection
 - **Bounded Contexts:** Each context exports Hono sub-app, mounted in `server.ts`
 
+**shaliah-next (Next.js 15 App Router + DDD-inspired):**
+- **Module Structure:** Feature modules in `src/modules/{feature}/` with DDD-inspired layering
+  - `domain/`: Domain types, validators, factories (framework-agnostic TypeScript)
+  - `ports/`: Repository interfaces (contracts)
+  - `adapters/`: Concrete implementations (e.g., `supabase-{entity}-repo.ts`)
+  - `use-cases/`: Application operations orchestrating repositories and domain logic
+  - `ui/components/`: Presentational components (shadcn/ui + props-based)
+  - `ui/server/actions.ts`: Server actions (mutation entrypoints)
+  - `ui/hooks/`: Client-side UI hooks
+  - `stores/`: Zustand stores (scoped to module)
+  - `config.ts`: Module-specific constants
+- **Dependency Injection:** Manual DI via `lib/di.ts` composition root; wire adapters into use-cases in server actions
+- **State Management:** Zustand for client-side ephemeral/interactive state (minimal global stores in `src/stores/`); server state via server components/props
+- **Server vs Client:** Server components fetch data and orchestrate use-cases; client components handle interactivity; server actions for mutations
+- **Supabase:** Server-side client (`lib/supabase-client.ts`) with service keys; browser client only for realtime/uploads
+- **Testing:** Unit tests (domain, validators, use-cases), integration tests (server actions), component tests (Jest + RTL), store tests (Zustand)
+
 **ezer-bot (grammY):**
 - **Module Structure:** Feature composers in `src/modules/` ([structuring guide](https://grammy.dev/advanced/structuring))
 - **Middleware Order:** `sequentialize()` → `session()` → `i18n` → feature composers
@@ -140,6 +163,15 @@ This section defines practical workflows grouped by development concerns, not ma
 - Wire dependencies explicitly in `server.ts` or per-context `factory.ts`
 - Each context exports a Hono sub-app mounted in main `server.ts`
 - See Technology Stack & Architecture section for detailed layer structure
+
+**shaliah-next:**
+- Organize by feature modules in `src/modules/{feature}/`
+- Follow DDD-inspired layering: `domain/` → `ports/` → `adapters/` → `use-cases/` → `ui/`
+- Wire dependencies in `lib/di.ts` composition root
+- Server actions (`ui/server/actions.ts`) inject adapters into use-cases for mutations
+- Server components orchestrate use-cases for data fetching; client components handle interactivity
+- Zustand stores (`stores/`) for client-side ephemeral state only; keep global stores minimal
+- Reference: App Router structure at `apps/shaliah-next/src/` and [next-intl setup](https://next-intl.dev/docs/getting-started/app-router)
 
 **ezer-bot:**
 - Organize by features in `src/modules/{feature}.ts`
@@ -233,4 +265,4 @@ This constitution is the supreme source of truth for the project's architecture 
 - All Pull Requests and code reviews must verify compliance with the principles and constraints outlined in this document.
 - Any proposal to amend this constitution must be documented, reviewed, and approved. A clear migration plan must be provided if the change affects existing architecture.
 
-**Version**: 3.0.0 | **Ratified**: 2025-01-15 | **Last Amended**: 2025-10-03
+**Version**: 3.1.0 | **Ratified**: 2025-01-15 | **Last Amended**: 2025-10-03
