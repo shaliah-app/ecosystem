@@ -7,8 +7,8 @@ interface AuthState {
   user: User | null
   loading: boolean
   initialized: boolean
-  signIn: (email: string, password: string) => Promise<{ error: AuthError | null }>
-  signUp: (email: string, password: string) => Promise<{ error: AuthError | null }>
+  signInWithMagicLink: (email: string) => Promise<{ error: AuthError | null }>
+  signInWithGoogle: () => Promise<{ error: AuthError | null; url?: string }>
   signOut: () => Promise<void>
   initialize: () => Promise<void>
 }
@@ -43,26 +43,32 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }
   },
 
-  signIn: async (email: string, password: string) => {
+  signInWithMagicLink: async (email: string) => {
     const supabase = createClient()
 
-    const { error } = await supabase.auth.signInWithPassword({
+    const { error } = await supabase.auth.signInWithOtp({
       email,
-      password,
+      options: {
+        // Redirect to auth callback after clicking magic link
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
+      },
     })
 
     return { error }
   },
 
-  signUp: async (email: string, password: string) => {
+  signInWithGoogle: async () => {
     const supabase = createClient()
 
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        // Redirect to auth callback after OAuth completion
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
     })
 
-    return { error }
+    return { error, url: data?.url }
   },
 
   signOut: async () => {

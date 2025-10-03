@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { useAuth } from '@/lib/auth/store'
 import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -9,98 +8,191 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Icon } from '@/components/ui/icon'
+import { useAuth } from '@/hooks/useAuth'
+import { useCooldownTimer } from '@/hooks/useCooldownTimer'
+import { CooldownTimer } from '@/components/CooldownTimer'
+import { StorageBlockedError } from '@/components/StorageBlockedError'
 
 export function AuthForm() {
   const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [isSignUp, setIsSignUp] = useState(false)
-  const [loading, setLoading] = useState(false)
+  const [showEmailInput, setShowEmailInput] = useState(false)
+  const [magicLinkSent, setMagicLinkSent] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const { signIn, signUp } = useAuth()
-  const t = useTranslations('AuthForm')
+  const { signInWithOtp, signInWithOAuth, loading, storageBlocked } = useAuth()
+  const { canResend, startCooldown, secondsRemaining } = useCooldownTimer(email)
+  const t = useTranslations('auth')
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
+  const handleResend = async () => {
+    if (!canResend) {
+      setError(t('cooldownMessage'))
+      return
+    }
+
     setError(null)
 
-    try {
-      const { error } = isSignUp
-        ? await signUp(email, password)
-        : await signIn(email, password)
+    const { error } = await signInWithOtp(email)
 
-      if (error) {
-        setError(error.message)
-      }
-    } catch {
-      setError(t('unexpectedError'))
-    } finally {
-      setLoading(false)
+    if (error) {
+      setError(error.message)
+    } else {
+      setMagicLinkSent(true)
+      startCooldown()
     }
   }
+
+  const handleRetryStorage = () => {
+    // Force re-render to re-check storage
+    window.location.reload()
+  }
+
+  if (storageBlocked) {
+    return <StorageBlockedError onRetry={handleRetryStorage} />
+  }
+
+  const handleMagicLinkRequest = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    if (!canResend) {
+      setError(t('cooldownMessage'))
+      return
+    }
+
+    setError(null)
+
+    const { error } = await signInWithOtp(email)
+
+    if (error) {
+      setError(error.message)
+    } else {
+      setMagicLinkSent(true)
+      startCooldown()
+    }
+  }
+
+  const handleGoogleSignIn = async () => {
+    setError(null)
+
+    const { error } = await signInWithOAuth('google')
+
+    if (error) {
+      setError(error.message)
+    }
+  }
+
+  const handleBackToProviders = () => {
+    setShowEmailInput(false)
+    setMagicLinkSent(false)
+    setEmail('')
+    setError(null)
+  }
+
+  // If storage is blocked, show error (but task doesn't specify, so maybe handle in parent)
+  // For now, proceed with the form
 
   return (
     <Card className="w-full max-w-md mx-auto">
       <CardHeader>
         <CardTitle className="text-center flex items-center justify-center gap-2">
           <Icon name="person" size={28} />
-          {isSignUp ? t('signUp') : t('signIn')}
+          {t('continueWith')}
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="email" className="flex items-center gap-2">
-              <Icon name="mail" size={16} />
-              {t('email')}
-            </Label>
-            <Input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              placeholder={t('emailPlaceholder')}
-            />
-          </div>
+        {!showEmailInput && !magicLinkSent && (
+          <div className="space-y-4">
+            <Button
+              onClick={() => setShowEmailInput(true)}
+              className="w-full"
+              variant="outline"
+              disabled={loading}
+            >
+              <Icon name="mail" size={20} className="mr-2" />
+              {t('continueWithEmail')}
+            </Button>
 
-          <div className="space-y-2">
-            <Label htmlFor="password" className="flex items-center gap-2">
-              <Icon name="lock" size={16} />
-              {t('password')}
-            </Label>
-            <Input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              minLength={6}
-              placeholder={t('passwordPlaceholder')}
-            />
+            <Button
+              onClick={handleGoogleSignIn}
+              className="w-full"
+              disabled={loading}
+            >
+              {t('continueWithGoogle')}
+            </Button>
           </div>
+        )}
 
-          {error && (
-            <Alert variant="destructive">
-              <AlertDescription>{error}</AlertDescription>
+        {showEmailInput && !magicLinkSent && (
+          <form onSubmit={handleMagicLinkRequest} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email" className="flex items-center gap-2">
+                <Icon name="mail" size={16} />
+                {t('email')}
+              </Label>
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                placeholder={t('emailPlaceholder')}
+                autoFocus
+              />
+            </div>
+
+            {error && (
+              <Alert variant="destructive">
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+
+            <Button type="submit" className="w-full" disabled={loading || !canResend}>
+              {loading ? t('loading') : t('sendMagicLink')}
+            </Button>
+
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={handleBackToProviders}
+              className="w-full"
+            >
+              {t('back')}
+            </Button>
+          </form>
+        )}
+
+        {magicLinkSent && (
+          <div className="space-y-4">
+            <Alert>
+              <AlertDescription>
+                {t('magicLinkSent')}
+              </AlertDescription>
             </Alert>
-          )}
 
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? t('loading') : (isSignUp ? t('signUpButton') : t('signInButton'))}
-          </Button>
-        </form>
+            <div className="space-y-2">
+              <Label htmlFor="email-display">{t('email')}</Label>
+              <Input
+                id="email-display"
+                type="email"
+                value={email}
+                disabled
+              />
+            </div>
 
-        <div className="mt-4 text-center">
-          <Button
-            variant="link"
-            onClick={() => setIsSignUp(!isSignUp)}
-            className="text-sm"
-          >
-            {isSignUp ? t('switchToSignIn') : t('switchToSignUp')}
-          </Button>
-        </div>
+            <CooldownTimer
+              secondsRemaining={secondsRemaining}
+              onResend={handleResend}
+              disabled={loading}
+            />
+
+            <Button
+              variant="ghost"
+              onClick={handleBackToProviders}
+              className="w-full"
+            >
+              {t('back')}
+            </Button>
+          </div>
+        )}
       </CardContent>
     </Card>
   )

@@ -9,7 +9,7 @@ const logger = createLogger({
   sentryDsn: env.SENTRY_DSN,
 })
 
-const port = parseInt(env.PORT)
+const port = env.PORT
 
 logger.info('Server starting', { port })
 

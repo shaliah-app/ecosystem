@@ -1,4 +1,27 @@
 {
+  "auth": {
+    "continueWith": "Continue with",
+    "continueWithEmail": "Continue with Email",
+    "continueWithGoogle": "Continue with Google",
+    "magicLinkSent": "Check your email for a magic link",
+    "sendMagicLink": "Send Magic Link",
+    "resendMagicLink": "Resend Magic Link",
+    "cooldownTimer": "Wait {seconds}s",
+    "cooldownMessage": "Please wait before requesting another link.",
+    "linkExpired": "This magic link has expired. Please request a new one.",
+    "linkInvalid": "This magic link is invalid. Please request a new one.",
+    "linkUsed": "This magic link has already been used. Please sign in again.",
+    "email": "Email",
+    "emailPlaceholder": "Enter your email",
+    "loading": "Loading...",
+    "back": "Back"
+  },
+  "onboarding": {
+    "enterFullName": "Enter your full name"
+  },
+  "profile": {
+    "changeLanguage": "Change Language"
+  },
   "HomePage": {
     "title": "Shaliah Next",
     "welcome": "Welcome to Shaliah Next with Supabase integration"

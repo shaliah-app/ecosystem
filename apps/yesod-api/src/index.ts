@@ -5,6 +5,8 @@ import { prettyJSON } from 'hono/pretty-json'
 import authRoutes from './routes/auth.js'
 import profileRoutes from './routes/profile.js'
 import { authMiddleware } from './middleware/auth.js'
+import { authApp } from './contexts/auth/api/routes.js'
+import { usersApp } from './contexts/users/api/routes.js'
 
 const app = new Hono()
 
@@ -30,6 +32,10 @@ app.route('/api/v1/auth', authRoutes)
 // Profile routes (protected)
 app.use('/api/v1/profile/*', authMiddleware)
 app.route('/api/v1/profile', profileRoutes)
+
+// New bounded context routes
+app.route('/api/auth', authApp)
+app.route('/api/user', usersApp)
 
 // 404 handler
 app.notFound((c) => {

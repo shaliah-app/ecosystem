@@ -18,9 +18,8 @@ describe('Home', () => {
   it('renders the auth form when not authenticated', () => {
     render(<HomeContent title="title" welcome="welcome" />)
 
-    expect(screen.getByPlaceholderText('emailPlaceholder')).toBeInTheDocument()
-    expect(screen.getByPlaceholderText('passwordPlaceholder')).toBeInTheDocument()
-    // Check for the submit button specifically
-    expect(screen.getByRole('button', { name: 'signInButton' })).toBeInTheDocument()
+    // Check for the auth buttons that are shown initially
+    expect(screen.getByText('Continue with Email')).toBeInTheDocument()
+    expect(screen.getByText('Continue with Google')).toBeInTheDocument()
   })
 })
