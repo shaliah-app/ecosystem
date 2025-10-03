@@ -90,10 +90,10 @@
 - [ ] T022 Queue integration (pg-boss) for long-running tasks (worker)
 
 ## Phase 3.5: i18n & Polish
-- [ ] T023 [P] i18n: Add/enforce keys for pt-BR and en (key langs) in apps/shaliah-next/messages/*.json
-- [ ] T024 [P] i18n: Add es, fr, de, uk, ru placeholders/messages
+- [ ] T023 [P] i18n: Add/enforce translation keys for pt-BR and en-US (mandatory pair) in apps/shaliah-next/messages/*.json
+- [ ] T024 [P] i18n: Document additional planned languages in specs/[###-feature]/roadmap.md (do NOT add partial translations)
 - [ ] T025 [P] i18n: Configure next-intl in apps/shaliah-next/src/i18n/request.ts
-- [ ] T026 [P] i18n (bot): Setup @grammyjs/i18n with locales/ in apps/ezer-bot/
+- [ ] T026 [P] i18n (bot): Setup @grammyjs/i18n with pt-BR.ftl and en.ftl in apps/ezer-bot/src/locales/
 - [ ] T027 [P] i18n (bot): Implement /language command with sessions
 - [ ] T028 [P] Unit tests for validation in apps/yesod-api/__tests__/unit/validation.test.ts
 - [ ] T029 Performance tests (<200ms p95 where applicable)
@@ -151,10 +151,10 @@ Task: "Integration test auth in tests/integration/test_auth.py"
 - [ ] Each task specifies exact file path
 - [ ] No task modifies same file as another [P] task
 - [ ] Supabase usage validated for auth/db/storage where applicable
-- [ ] i18n coverage for pt-BR and en (key langs); es, fr, de, uk, ru planned
+- [ ] i18n coverage for pt-BR and en-US (mandatory pair); additional languages deferred to roadmap.md
 - [ ] Observability wired (logger + Sentry) in every app touched
 - [ ] Long-running work queued via pg-boss (no blocking API requests)
 
 ---
 
-*Based on Constitution v2.6.0 — see `.specify/memory/constitution.md`*
+*Based on Constitution v2.7.0 — see `.specify/memory/constitution.md`*

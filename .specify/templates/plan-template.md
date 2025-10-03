@@ -54,7 +54,7 @@
 - **Principle V: Decoupled, Asynchronous Processing**: Are time-consuming tasks offloaded to the background worker via job queue rather than executed in the API request-response cycle?
 - **Principle VI: TypeScript-First Monorepo**: Is all new code planned to be written in TypeScript within the monorepo structure? Are shared packages and workspace references properly utilized?
 - **Principle VII: MCP-Driven Development & Debugging**: Does the development workflow consider using MCP servers (Chrome DevTools, Supabase) for debugging and testing?
-- **Principle VIII: Internationalization (i18n)**: If the feature is user-facing (shaliah-next or ezer-bot), does it include plans for translation and localization in all 7 supported languages (pt-BR, en-US as primary) using the appropriate tooling (next-intl or @grammyjs/i18n)?
+- **Principle VIII (i18n)**: If the feature is user-facing (shaliah-next or ezer-bot), does it include plans for translation in both mandatory languages (pt-BR and en-US) using the appropriate tooling (next-intl or @grammyjs/i18n)? Are additional languages properly deferred to roadmap.md?
 
 ## Project Structure
 
@@ -74,7 +74,7 @@ specs/[###-feature]/
 apps/
 ├── yesod-api/              # Backend API (Hono + DDD)
 │   ├── src/
-│   │   ├── contexts/       # Future: DDD bounded contexts
+│   │   ├── contexts/       # DDD bounded contexts
 │   │   │   └── {context-name}/
 │   │   │       ├── domain/          # Pure business logic, interfaces
 │   │   │       ├── application/     # Use cases, orchestration
@@ -231,4 +231,4 @@ directories captured above]
 - [ ] Complexity deviations documented
 
 ---
-*Based on Constitution v2.6.0 - See `.specify/memory/constitution.md`*
+*Based on Constitution v2.7.0 - See `.specify/memory/constitution.md`*

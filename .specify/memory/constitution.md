@@ -1,20 +1,24 @@
 <!--
 Sync Impact Report:
-- Version change: 2.5.1 → 2.6.0 (MINOR: Principle replacement - architectural shift)
+- Version change: 2.6.0 → 2.7.0 (MINOR: Principle refinement - i18n workflow enforcement)
 - Modified Principles:
-    - **Principle IV**: Replaced "API-First Design" with "Supabase-First Integration"
-    - Rationale: Architectural shift to leverage Supabase's built-in capabilities (auth, realtime, storage, database) as primary backend, with Yesod API handling only what Supabase cannot or should not handle
-- Removed Sections:
-    - Former Principle IV (API-First Design) - superseded by Supabase-First approach
-    - Principle VII (Supabase-First Integration) - promoted to Principle IV position
-- Added Sections:
-    - Expanded Principle IV with clear guidance on when to use Supabase vs Yesod API
+    - **Principle IV (Supabase-First)**: Condensed for consistency (semantic content unchanged)
+    - **Principle VIII (i18n)**: Refined translation workflow and requirements
+      * Clarified mandatory language pair: pt-BR and en-US MUST be updated together
+      * Established deferral pattern: remaining languages deferred to roadmap.md
+      * Condensed presentation to match other principle sizes
+- Rationale:
+    - Enforces translation discipline to prevent incomplete localizations
+    - Reduces cognitive load by focusing on 2 primary languages during feature development
+    - Provides clear deferral mechanism for additional languages via roadmap
+    - Aligns with MVP-first principle (Principle II) by limiting initial scope
+    - Improves constitution readability through consistent principle formatting
 - Templates synchronized:
-    - .specify/templates/plan-template.md (✅ v2.6.0 - Updated Constitution Check section)
-    - .specify/templates/spec-template.md (✅ v2.6.0 - Updated Constitution Alignment checklist)
-    - .specify/templates/tasks-template.md (✅ v2.6.0 - Already references Supabase throughout)
+    - .specify/templates/plan-template.md (✅ v2.7.0 - Updated Constitution Check, i18n workflow)
+    - .specify/templates/spec-template.md (✅ v2.7.0 - Updated Constitution Alignment checklist)
+    - .specify/templates/tasks-template.md (✅ v2.7.0 - Updated Phase 3.5 i18n tasks)
 - Follow-up TODOs:
-    - None - all templates synchronized with new Supabase-First principle
+    - None - all templates synchronized with refined i18n principle
 -->
 
 # The Yesod Ecosystem Constitution
@@ -47,21 +51,9 @@ All applications MUST be accompanied by a robust testing suite to ensure correct
 
 ### IV. Supabase-First Integration
 
-All backend functionality MUST leverage Supabase's built-in capabilities as the primary backend service before considering custom implementation. Supabase provides comprehensive, production-ready features that should be utilized maximally.
+All backend functionality MUST leverage Supabase's built-in capabilities (auth, database, storage, realtime) as the primary backend service before considering custom implementation. The Yesod API serves ONLY for complex business logic orchestration, custom integrations with external services, or computational tasks that Supabase cannot handle directly.
 
-**Key Rules:**
-- **Authentication & Authorization:** Use Supabase Auth exclusively for user identity, sessions, OAuth providers, and magic links. Never implement custom auth logic.
-- **Database Operations:** Direct database access through Supabase clients with Row-Level Security (RLS) policies. Use Supabase's realtime subscriptions for live data.
-- **Storage:** Use Supabase Storage for file uploads, images, and media with built-in CDN and access policies.
-- **Realtime Features:** Leverage Supabase Realtime for live updates, presence, and broadcast features.
-
-**Yesod API Scope:** The Yesod API serves ONLY for:
-- Complex business logic that requires orchestration across multiple domains
-- Custom integrations with external services not supported by Supabase
-- Computational tasks requiring specialized processing
-- Intermediation layer when Supabase cannot directly handle a specific requirement
-
-**Rationale:** Supabase provides battle-tested, scalable infrastructure for common backend needs. By maximizing its use, we reduce custom code maintenance, improve security through established patterns, and accelerate development. The Yesod API focuses on domain-specific business logic rather than reinventing infrastructure.
+**Rationale:** Supabase provides battle-tested infrastructure for common backend needs. Maximizing its use reduces maintenance burden, improves security, and accelerates development while keeping the Yesod API focused on domain-specific logic.
 
 ### V. Decoupled, Asynchronous Processing
 Time-consuming and resource-intensive tasks (e.g., audio fingerprinting, stem separation, transcription) are **never** executed in the main API request-response cycle. They are offloaded to a persistent background **worker** via a robust job queue, ensuring the API remains fast and responsive.
@@ -81,13 +73,10 @@ The use of Model-Context-Protocol (MCP) servers is strongly encouraged during de
 - **Rationale:** MCP servers provide a standardized, tool-agnostic way to interact with and control development services, improving debugging efficiency and enabling advanced automation workflows.
 
 ### VIII. Internationalization (i18n) for User-Facing Applications
-All user-facing applications must be internationalized to support a global user base.
-- **Target Applications:** This principle applies to `shaliah-next` and `ezer-bot`.
-- **Supported Languages:** The applications will support Brazilian Portuguese (pt-BR), English (en-US), Spanish (es), French (fr), German (de), Ukrainian (uk), and Russian (ru).
-- **Key Languages:** Brazilian Portuguese and English are the primary languages and must always be fully supported and up-to-date.
-- **Tooling:**
-    - `shaliah-next` MUST use `next-intl`.
-    - `ezer-bot` MUST use the `@grammyjs/i18n` plugin. Any questions regarding its implementation should refer to the official documentation at `https://grammy.dev/plugins/i18n`.
+
+All user-facing applications (`shaliah-next`, `ezer-bot`) MUST support internationalization with strict translation discipline. Brazilian Portuguese (pt-BR) and US English (en-US) are the mandatory language pair and MUST be updated together in every feature PR—never merge with only one translated. Additional languages MUST be deferred to `specs/[###-feature]/roadmap.md`. Use `next-intl` for web apps and `@grammyjs/i18n` for bots.
+
+**Rationale:** Mandating simultaneous pt-BR and en-US updates ensures both primary markets receive consistent feature releases. Deferring additional languages prevents translation debt and aligns with MVP-first development (Principle II).
 
 ## Technology Stack & Architecture
 
@@ -163,7 +152,7 @@ This section defines practical workflows grouped by development concerns, not ma
 
 - Begin features with a spec document (`.specify/templates/spec-template.md`)
 - Categorize requirements: "MVP" vs "Future Enhancement"
-- Document only MVP scope; defer enhancements to roadmap
+- Document only MVP scope; defer enhancements to a `specs/[###-feature]/roadmap.md` file
 - Use ubiquitous language (domain terms, not tech jargon)
 - Define API contracts before implementation
 
@@ -202,14 +191,16 @@ This section defines practical workflows grouped by development concerns, not ma
 ### Internationalization (i18n)
 
 **Workflow:**
-- Brazilian Portuguese (pt-BR) and English (en-US) are primary languages and MUST be updated together in every PR
-- All 7 supported languages (pt-BR, en-US, es, fr, de, uk, ru) should be updated before merging to main
-- Never hardcode user-facing strings
-- See Principle IX for tooling requirements per application
+- Brazilian Portuguese (pt-BR) and US English (en-US) MUST be updated together in every feature PR
+  * Both translations must be complete before requesting code review
+  * Never merge with only one language translated
+- Additional languages (if planned) MUST be documented in `specs/[###-feature]/roadmap.md` under "Future Enhancements"
+  * Do not include partial translations for non-mandatory languages in feature PRs
+- Never hardcode user-facing strings; all text MUST use translation keys
 
 **Implementation References:**
-- shaliah-next: `messages/{locale}.json` files
-- ezer-bot: `src/locales/{locale}.ftl` files, session storage as `__language_code`
+- shaliah-next: `messages/{locale}.json` files (pt-BR.json and en.json required)
+- ezer-bot: `src/locales/{locale}.ftl` files (pt-BR.ftl and en.ftl required), session storage as `__language_code`
 
 ### Code Quality & Observability
 
@@ -232,4 +223,4 @@ This constitution is the supreme source of truth for the project's architecture 
 - All Pull Requests and code reviews must verify compliance with the principles and constraints outlined in this document.
 - Any proposal to amend this constitution must be documented, reviewed, and approved. A clear migration plan must be provided if the change affects existing architecture.
 
-**Version**: 2.6.0 | **Ratified**: 2025-01-15 | **Last Amended**: 2025-10-03
+**Version**: 2.7.0 | **Ratified**: 2025-01-15 | **Last Amended**: 2025-10-03
