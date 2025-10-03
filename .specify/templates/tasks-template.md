@@ -165,9 +165,10 @@ Task: "Integration test auth in tests/integration/test_auth.py"
 - [ ] Supabase usage validated for auth/db/storage where applicable
 - [ ] i18n coverage for pt-BR and en-US (mandatory pair); additional languages deferred to roadmap.md
 - [ ] MCP servers (Chrome DevTools, Supabase, Shadcn) configured and used in testing workflows
+- [ ] For shaliah-next: existing components audited and reusable components explicitly listed in plan.md
 - [ ] Observability wired (logger + Sentry) in every app touched
 - [ ] Long-running work queued via pg-boss (no blocking API requests)
 
 ---
 
-*Based on Constitution v3.1.1 — see `.specify/memory/constitution.md`*
+*Based on Constitution v3.2.0 — see `.specify/memory/constitution.md`*

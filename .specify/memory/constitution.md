@@ -1,24 +1,38 @@
 <!--
 Sync Impact Report:
-- Version change: 3.1.0 → 3.1.1 (PATCH: shaliah-next env.ts configuration addition)
+- Version change: 3.1.1 → 3.2.0 (MINOR: Component reuse requirement for shaliah-next)
 - Modified Sections:
-    - **Application-Specific Architecture Patterns - shaliah-next**: Added Configuration subsection
-      * Environment variables in src/lib/env.ts with Zod validation (consistent with yesod-api pattern)
-      * Module-specific constants in modules/{feature}/config.ts for UI limits, timeouts, formats
-    - **Development Workflow - Architecture & Code Organization - shaliah-next**: Added configuration management
-      * Environment variables centralized in lib/env.ts with Zod validation
-      * Module constants per feature in modules/{feature}/config.ts
+    - **Application-Specific Architecture Patterns - shaliah-next**: Added Component Reuse requirement
+      * MUST audit existing components in src/components/ (shared) and src/modules/*/ui/components/ (feature-scoped) before creating new ones
+      * Reuse atomic components (shadcn/ui wrappers) and composed components when they satisfy requirements
+      * Document evaluated components explicitly in planning phase
+    - **Development Workflow - Architecture & Code Organization - shaliah-next**: Added component reuse workflow
+      * Audit shared and feature-scoped components before creating new ones
+      * Document evaluated components in plan.md
+    - **Development Workflow - Planning & Specification**: Added shaliah-next component audit requirement
+      * Audit existing components during planning phase
+      * List reusable components explicitly in plan.md to avoid duplication
+- Added Sections:
+    - **plan-template.md Phase 1**: Added step 2 for component audit
+      * Search shared components (src/components/)
+      * Search feature-scoped components (src/modules/*/ui/components/)
+      * Document reusable components in "Component Reuse Analysis" section
+      * Identify gaps requiring new components
+    - **plan-template.md Phase 1 Output**: Added component reuse analysis to output list
+    - **tasks-template.md Validation Checklist**: Added component reuse validation
+      * For shaliah-next: existing components audited and reusable components explicitly listed in plan.md
 - Rationale:
-    - Ensures consistent configuration management pattern across yesod-api and shaliah-next
-    - Zod validation for environment variables provides type safety and runtime validation
-    - Clear separation: env.ts for infrastructure config, config.ts for domain constants
-    - Completes shaliah-next architecture documentation (no semantic change to principles)
+    - Prevents component duplication and promotes code reuse
+    - Leverages existing shadcn/ui atomic components and composed patterns
+    - Reduces maintenance burden by centralizing shared UI logic
+    - Aligns with DRY principle and monorepo benefits
+    - Makes component inventory visible during planning phase
 - Templates synchronized:
-    - .specify/templates/plan-template.md (⚠️ No changes needed - structure already shows lib/ directory)
-    - .specify/templates/spec-template.md (⚠️ No changes needed - spec is app-agnostic)
-    - .specify/templates/tasks-template.md (⚠️ No changes needed - tasks already cover configuration setup)
+    - .specify/templates/plan-template.md (✅ v3.2.0 - Added Phase 1 component audit step and output)
+    - .specify/templates/tasks-template.md (✅ v3.2.0 - Added component reuse validation to checklist)
+    - .specify/templates/spec-template.md (⚠️ No changes needed - spec is app-agnostic, UI details handled in planning)
 - Follow-up TODOs:
-    - None - templates implicitly cover configuration through existing setup tasks
+    - None - all relevant templates synchronized with component reuse requirement
 -->
 
 # The Yesod Ecosystem Constitution
@@ -127,6 +141,7 @@ This section defines the non-negotiable technology stack for the ecosystem. Any 
   - `stores/`: Zustand stores (scoped to module)
   - `config.ts`: Module-specific constants
 - **Dependency Injection:** Manual DI via `lib/di.ts` composition root; wire adapters into use-cases in server actions
+- **Component Reuse:** Before creating new UI components, MUST audit existing components in `src/components/` (shared) and `src/modules/*/ui/components/` (feature-scoped). Reuse atomic components (shadcn/ui wrappers) and composed components when they satisfy requirements. Document evaluated components explicitly in planning phase.
 - **Environment variables:** in `src/lib/env.ts` with Zod validation (see `apps/shaliah-next/src/lib/env.ts`)
 - **State Management:** Zustand for client-side ephemeral/interactive state (minimal global stores in `src/stores/`); server state via server components/props
 - **Server vs Client:** Server components fetch data and orchestrate use-cases; client components handle interactivity; server actions for mutations
@@ -164,6 +179,7 @@ This section defines practical workflows grouped by development concerns, not ma
 - Zustand stores (`stores/`) for client-side ephemeral state only; keep global stores minimal
 - Environment variables: centralized in `lib/env.ts` with Zod validation
 - Module constants: per feature in `modules/{feature}/config.ts` (e.g., UI limits, timeouts)
+- Component reuse: Audit `src/components/` (shared) and `src/modules/*/ui/components/` (feature-scoped) before creating new components; document evaluated components in plan.md
 - Reference: App Router structure at `apps/shaliah-next/src/` and [next-intl setup](https://next-intl.dev/docs/getting-started/app-router)
 
 **ezer-bot:**
@@ -173,8 +189,8 @@ This section defines practical workflows grouped by development concerns, not ma
 - Reference: `apps/ezer-bot/src/bot.ts` and [grammY structuring guide](https://grammy.dev/advanced/structuring)
 
 **Configuration Management:**
-- Environment variables: centralized in `config/env.ts` per app with validation
-- Domain constants (yesod-api only): per context in `constants.ts` (e.g., TTLs, limits, formats)
+- Environment variables: centralized in `lib|config/env.ts` with validation
+- Domain constants: per context in `config.ts` (e.g., TTLs, limits, formats)
 - Never use `process.env` directly in business logic
 
 ### Planning & Specification
@@ -184,6 +200,7 @@ This section defines practical workflows grouped by development concerns, not ma
 - Document only MVP scope; defer enhancements to a `specs/[###-feature]/roadmap.md` file
 - Use ubiquitous language (domain terms, not tech jargon)
 - Define API contracts before implementation
+- **For shaliah-next features:** Audit existing components (shared and feature-scoped) during planning phase; list reusable components explicitly in plan.md to avoid duplication
 
 ### Testing Strategy
 
@@ -258,4 +275,4 @@ This constitution is the supreme source of truth for the project's architecture 
 - All Pull Requests and code reviews must verify compliance with the principles and constraints outlined in this document.
 - Any proposal to amend this constitution must be documented, reviewed, and approved. A clear migration plan must be provided if the change affects existing architecture.
 
-**Version**: 3.1.1 | **Ratified**: 2025-01-15 | **Last Amended**: 2025-10-03
+**Version**: 3.2.0 | **Ratified**: 2025-01-15 | **Last Amended**: 2025-10-03

@@ -170,21 +170,27 @@ directories captured above]
    - Validation rules from requirements
    - State transitions if applicable
 
-2. **Generate API contracts** from functional requirements:
+2. **For shaliah-next features: Audit existing components**:
+   - Search `apps/shaliah-next/src/components/` for shared components (atomic shadcn/ui wrappers, composed components)
+   - Search `apps/shaliah-next/src/modules/*/ui/components/` for feature-scoped components
+   - Document reusable components in plan.md under "Component Reuse Analysis"
+   - Identify gaps requiring new components
+
+3. **Generate API contracts** from functional requirements:
    - For each user action → endpoint
    - Use standard REST/GraphQL patterns
    - Output OpenAPI/GraphQL schema to `/contracts/`
 
-3. **Generate contract tests** from contracts:
+4. **Generate contract tests** from contracts:
    - One test file per endpoint
    - Assert request/response schemas
    - Tests must fail (no implementation yet)
 
-4. **Extract test scenarios** from user stories:
+5. **Extract test scenarios** from user stories:
    - Each story → integration test scenario
    - Quickstart test = story validation steps
 
-5. **Update agent file incrementally** (O(1) operation):
+6. **Update agent file incrementally** (O(1) operation):
    - Run `.specify/scripts/bash/update-agent-context.sh copilot`
      **IMPORTANT**: Execute it exactly as specified above. Do not add or remove any arguments.
    - If exists: Add only NEW tech from current plan
@@ -193,7 +199,7 @@ directories captured above]
    - Keep under 150 lines for token efficiency
    - Output to repository root
 
-**Output**: data-model.md, /contracts/*, failing tests, quickstart.md, agent-specific file
+**Output**: data-model.md, component reuse analysis (in plan.md for shaliah-next), /contracts/*, failing tests, quickstart.md, agent-specific file
 
 ## Phase 2: Task Planning Approach
 *This section describes what the /tasks command will do - DO NOT execute during /plan*
@@ -249,4 +255,4 @@ directories captured above]
 - [ ] Complexity deviations documented
 
 ---
-*Based on Constitution v3.1.1 - See `.specify/memory/constitution.md`*
+*Based on Constitution v3.2.0 - See `.specify/memory/constitution.md`*
