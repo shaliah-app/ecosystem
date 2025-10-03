@@ -486,42 +486,42 @@
   **Reference**: spec.md FR-013
 
 ### Frontend: Onboarding & Profile Components
-- [ ] **T053** Build `OnboardingForm` component  
+- [x] **T053** Build `OnboardingForm` component  
   **Path**: `apps/shaliah-next/src/components/OnboardingForm.tsx`  
   **Description**: Form with full_name input (required), avatar upload (optional, Supabase Storage), language dropdown (pre-filled). Submit → PATCH /api/user/profile → redirect to dashboard. Use shadcn/ui Form, Input, Select. i18n.  
   **Reference**: spec.md FR-010, FR-010a  
   **Depends on**: T047, T049
 
-- [ ] **T054** Build `ProfileDashboard` component  
+- [x] **T054** Build `ProfileDashboard` component  
   **Path**: `apps/shaliah-next/src/components/ProfileDashboard.tsx`  
   **Description**: Display user info (name, avatar with placeholder, language). Language change dropdown → PATCH /api/user/profile → update locale cookie. Logout button (app-local). Use shadcn/ui. i18n.  
   **Reference**: spec.md FR-011, FR-012  
   **Depends on**: T047
 
 ### Frontend: Page Routes & Auth Callbacks
-- [ ] **T055** Create `/auth` page  
+- [x] **T055** Create `/auth` page  
   **Path**: `apps/shaliah-next/src/app/auth/page.tsx`  
   **Description**: Render AuthForm component. Detect storage blocked → show StorageBlockedError. Server-side: infer language, set locale cookie.  
   **Depends on**: T050, T052
 
-- [ ] **T055a** Handle magic link errors in `/auth/callback`  
+- [x] **T055a** Handle magic link errors in `/auth/callback`  
   **Path**: `apps/shaliah-next/src/app/auth/callback/page.tsx` (extends T056)  
   **Description**: Catch and handle magic link errors: expired link, reused link, invalid token. Show user-friendly error page with "Request new link" button (respects cooldown). Use next-intl for error messages (`auth.linkExpired`, `auth.linkInvalid`, `auth.linkUsed`). Display retry-after countdown if within cooldown.  
   **Reference**: spec.md FR-014  
   **Depends on**: T056
 
-- [ ] **T056** Create `/auth/callback` page  
+- [x] **T056** Create `/auth/callback` page  
   **Path**: `apps/shaliah-next/src/app/auth/callback/page.tsx`  
   **Description**: Handle Supabase auth callback (magic link click, OAuth redirect). Exchange code for session. Fetch user_profiles. Redirect logic: if full_name NULL → /onboarding, else → /profile. Error handling for expired/reused links (see T055a).  
   **Reference**: research.md § 4  
   **Depends on**: T047
 
-- [ ] **T057** Create `/onboarding` page  
+- [x] **T057** Create `/onboarding` page  
   **Path**: `apps/shaliah-next/src/app/onboarding/page.tsx`  
   **Description**: Protected route (require auth). Render OnboardingForm component. On submit success → redirect to /profile.  
   **Depends on**: T053, T056
 
-- [ ] **T058** Create `/profile` page  
+- [x] **T058** Create `/profile` page  
   **Path**: `apps/shaliah-next/src/app/profile/page.tsx`  
   **Description**: Protected route (require auth). Render ProfileDashboard component. Fetch user profile on mount (GET /api/user/profile).  
   **Depends on**: T054, T056
@@ -611,12 +611,12 @@
   **Reference**: spec.md NFR-006
 
 ### Unit Tests & Performance
-- [ ] **T069** [P] Unit test: RateLimitService  
-  **Path**: `apps/yesod-api/__tests__/unit/rate-limit-service.test.ts`  
+- [x] **T069** [P] Unit test: RateLimitService  
+  **Path**: `apps/yesod-api/__tests__/unit/auth/rate-limit-policy.test.ts`  
   **Description**: Test cooldown calculation, hourly limit logic, edge cases (expired rows, timezone). Use Vitest.
 
-- [ ] **T070** [P] Unit test: Input validation schemas  
-  **Path**: `apps/yesod-api/__tests__/unit/validation.test.ts`  
+- [x] **T070** [P] Unit test: Input validation schemas  
+  **Path**: `apps/yesod-api/__tests__/unit/users/profile-validation.test.ts`  
   **Description**: Test Zod schemas for user profile (valid/invalid full_name, avatar_url, language). Use Vitest.
 
 - [ ] **T071** Performance test: Auth UI load time  
