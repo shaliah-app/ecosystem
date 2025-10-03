@@ -39,17 +39,17 @@
 ## Phase 3.1: Setup & Infrastructure
 
 ### Database & Migrations
-- [ ] **T001** [P] Create migration: `magic_link_attempts` table  
+- [x] **T001** [P] Create migration: `magic_link_attempts` table  
   **Path**: `apps/yesod-api/drizzle/0005_create_magic_link_attempts.sql`  
   **Description**: Create table with fields: id (serial), email (text), attempted_at (timestamp), ip_address (inet), success (boolean). Add index on (email, attempted_at DESC).  
   **Reference**: data-model.md § 3
 
-- [ ] **T002** [P] Create migration: Update `handle_new_user()` trigger  
+- [x] **T002** [P] Create migration: Update `handle_new_user()` trigger  
   **Path**: `apps/yesod-api/drizzle/0002_update_user_profile_trigger.sql` (rename from 0006 to preserve order)  
   **Description**: DROP TRIGGER IF EXISTS on_auth_user_created; DROP FUNCTION IF EXISTS handle_new_user(); then recreate function to infer language from `raw_app_meta_data->>'inferred_language'` or default to 'pt-BR'. Recreate trigger for auto-creation of user_profiles on auth.users INSERT.  
   **Reference**: data-model.md § 2
 
-- [ ] **T003** [P] Add Drizzle schema for `magic_link_attempts`  
+- [x] **T003** [P] Add Drizzle schema for `magic_link_attempts`  
   **Path**: `apps/yesod-api/src/db/schema/magic-link-attempts.ts`  
   **Description**: Define Drizzle schema matching migration. Export table definition.  
   **Reference**: data-model.md § 3

@@ -1,4 +1,4 @@
-import { pgTable, serial, uuid, text, varchar, bigint, integer, timestamp, boolean, inet } from "drizzle-orm/pg-core";
+import { pgTable, serial, uuid, text, varchar, bigint, integer, timestamp, boolean } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 
 // Existing table (keeping for now)
@@ -20,17 +20,12 @@ export const userProfiles = pgTable('user_profiles', {
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
-export const magicLinkAttempts = pgTable('magic_link_attempts', {
-  id: serial('id').primaryKey(),
-  email: text('email').notNull(),
-  attemptedAt: timestamp('attempted_at').defaultNow().notNull(),
-  ipAddress: inet('ip_address'),
-  success: boolean('success').default(true).notNull(),
-});
-
 // Reference to Supabase auth.users table
 export const authUsers = pgTable('auth.users', {
   id: uuid('id').primaryKey(),
   email: text('email'),
   rawUserMetaData: text('raw_user_meta_data'),
 });
+
+// Re-export magic link attempts schema
+export { magicLinkAttempts } from './schema/magic-link-attempts';
