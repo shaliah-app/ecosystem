@@ -112,7 +112,7 @@
 **CRITICAL: Must complete before Phase 3.2 (Tests First)**
 
 ### Auth Context Structure
-- [ ] **T008a** [P] Create Auth bounded context structure  
+- [x] **T008a** [P] Create Auth bounded context structure  
   **Paths**: Create directory structure:  
   ```
   apps/yesod-api/src/contexts/auth/
@@ -124,7 +124,7 @@
   **Description**: Create folder structure for Auth bounded context following DDD layering. Add empty `index.ts` in each layer directory.  
   **Reference**: Constitution v2.5.1 Principle I, § Application-Specific Architecture Patterns
 
-- [ ] **T008b** [P] Create Auth context Hono sub-app  
+- [x] **T008b** [P] Create Auth context Hono sub-app  
   **Path**: `apps/yesod-api/src/contexts/auth/api/routes.ts`  
   **Description**: Create Hono sub-app for Auth context:  
   ```typescript
@@ -142,7 +142,7 @@
   **Reference**: Constitution v2.5.1 § Bounded Contexts
 
 ### Users Context Structure
-- [ ] **T008c** [P] Create Users bounded context structure  
+- [x] **T008c** [P] Create Users bounded context structure  
   **Paths**: Create directory structure:  
   ```
   apps/yesod-api/src/contexts/users/
@@ -154,7 +154,7 @@
   **Description**: Create folder structure for Users bounded context. Add empty `index.ts` in each layer directory.  
   **Reference**: Constitution v2.5.1 Principle I
 
-- [ ] **T008d** [P] Create Users context Hono sub-app  
+- [x] **T008d** [P] Create Users context Hono sub-app  
   **Path**: `apps/yesod-api/src/contexts/users/api/routes.ts`  
   **Description**: Create Hono sub-app for Users context:  
   ```typescript
