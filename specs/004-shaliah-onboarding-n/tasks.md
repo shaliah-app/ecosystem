@@ -468,19 +468,19 @@
   **Reference**: research.md § 3
 
 ### Frontend: Auth Components
-- [ ] **T050** Build `AuthForm` component  
+- [x] **T050** Build `AuthForm` component  
   **Path**: `apps/shaliah-next/src/components/AuthForm.tsx`  
   **Description**: Render "Continue with Email" and "Continue with Google" buttons (shadcn/ui Button). Email flow: show input → send magic link → transition to confirmation state with email, cooldown timer, back button. Use useAuth hook. i18n with next-intl.  
   **Reference**: spec.md FR-001, FR-005  
   **Depends on**: T047, T048
 
-- [ ] **T051** [P] Build `CooldownTimer` component  
+- [x] **T051** [P] Build `CooldownTimer` component  
   **Path**: `apps/shaliah-next/src/components/CooldownTimer.tsx`  
   **Description**: Display countdown (MM:SS format), disable resend button until 0s. Use useCooldownTimer hook. i18n for labels.  
   **Reference**: spec.md FR-004  
   **Depends on**: T048
 
-- [ ] **T052** [P] Build `StorageBlockedError` component  
+- [x] **T052** [P] Build `StorageBlockedError` component  
   **Path**: `apps/shaliah-next/src/components/StorageBlockedError.tsx`  
   **Description**: Non-dismissible full-screen overlay (Dialog from shadcn/ui). Show error message + instructions. Retry button re-checks storage. i18n.  
   **Reference**: spec.md FR-013

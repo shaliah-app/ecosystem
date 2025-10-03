@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { useAuth } from '@/lib/auth/store'
 import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -9,75 +8,61 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Icon } from '@/components/ui/icon'
+import { useAuth } from '@/hooks/useAuth'
+import { useCooldownTimer } from '@/hooks/useCooldownTimer'
+import { CooldownTimer } from '@/components/CooldownTimer'
+import { StorageBlockedError } from '@/components/StorageBlockedError'
 
 export function AuthForm() {
   const [email, setEmail] = useState('')
   const [showEmailInput, setShowEmailInput] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
   const [magicLinkSent, setMagicLinkSent] = useState(false)
-  const [cooldownSeconds, setCooldownSeconds] = useState(0)
+  const [error, setError] = useState<string | null>(null)
 
-  const { signInWithMagicLink, signInWithGoogle } = useAuth()
-  const t = useTranslations('AuthForm')
+  const { signInWithOtp, signInWithOAuth, loading, storageBlocked } = useAuth()
+  const { secondsRemaining, canResend, startCooldown } = useCooldownTimer(email)
+  const t = useTranslations('auth')
+
+  const handleResend = () => {
+    handleMagicLinkRequest({} as React.FormEvent)
+  }
+
+  const handleRetryStorage = () => {
+    // Force re-render to re-check storage
+    window.location.reload()
+  }
+
+  if (storageBlocked) {
+    return <StorageBlockedError onRetry={handleRetryStorage} />
+  }
 
   const handleMagicLinkRequest = async (e: React.FormEvent) => {
     e.preventDefault()
-    
-    // Check cooldown
-    if (cooldownSeconds > 0) {
-      setError(t('cooldownActive'))
+
+    if (!canResend) {
+      setError(t('cooldownMessage'))
       return
     }
 
-    setLoading(true)
     setError(null)
 
-    try {
-      const { error } = await signInWithMagicLink(email)
+    const { error } = await signInWithOtp(email)
 
-      if (error) {
-        setError(error.message)
-      } else {
-        setMagicLinkSent(true)
-        // Start 60-second cooldown
-        setCooldownSeconds(60)
-        const interval = setInterval(() => {
-          setCooldownSeconds((prev) => {
-            if (prev <= 1) {
-              clearInterval(interval)
-              return 0
-            }
-            return prev - 1
-          })
-        }, 1000)
-        // Store in localStorage for persistence
-        localStorage.setItem('magicLinkCooldown', String(Date.now() + 60000))
-      }
-    } catch {
-      setError(t('unexpectedError'))
-    } finally {
-      setLoading(false)
+    if (error) {
+      setError(error.message)
+    } else {
+      setMagicLinkSent(true)
+      startCooldown()
     }
   }
 
   const handleGoogleSignIn = async () => {
-    setLoading(true)
     setError(null)
 
-    try {
-      const { error, url } = await signInWithGoogle()
+    const { error } = await signInWithOAuth('google')
 
-      if (error) {
-        setError(error.message)
-      } else if (url) {
-        // Redirect to Google OAuth
-        window.location.href = url
-      }
-    } catch {
-      setError(t('unexpectedError'))
-    } finally {
-      setLoading(false)
+    if (error) {
+      setError(error.message)
     }
   }
 
@@ -87,6 +72,9 @@ export function AuthForm() {
     setEmail('')
     setError(null)
   }
+
+  // If storage is blocked, show error (but task doesn't specify, so maybe handle in parent)
+  // For now, proceed with the form
 
   return (
     <Card className="w-full max-w-md mx-auto">
@@ -143,7 +131,7 @@ export function AuthForm() {
               </Alert>
             )}
 
-            <Button type="submit" className="w-full" disabled={loading || cooldownSeconds > 0}>
+            <Button type="submit" className="w-full" disabled={loading || !canResend}>
               {loading ? t('loading') : t('sendMagicLink')}
             </Button>
 
@@ -176,20 +164,11 @@ export function AuthForm() {
               />
             </div>
 
-            {cooldownSeconds > 0 && (
-              <div className="text-center text-sm text-muted-foreground">
-                {t('cooldownMessage', { seconds: cooldownSeconds })}
-              </div>
-            )}
-
-            <Button
-              onClick={handleMagicLinkRequest}
-              variant="outline"
-              className="w-full"
-              disabled={cooldownSeconds > 0 || loading}
-            >
-              {t('resendMagicLink')}
-            </Button>
+            <CooldownTimer
+              email={email}
+              onResend={handleResend}
+              disabled={loading}
+            />
 
             <Button
               variant="ghost"
