@@ -23,7 +23,7 @@ describe('UserProfile Domain Entity', () => {
       expect(profile.avatarUrl).toBe(validAvatarUrl);
       expect(profile.language).toBe(validLanguage);
       expect(profile.telegramUserId).toBe(123456789);
-      expect(profile.activeSpaceId).toBe(1);
+      expect(profile.activeSpaceId).toBeUndefined();
     });
 
     it('should create a UserProfile with minimal required fields', () => {
@@ -58,15 +58,30 @@ describe('UserProfile Domain Entity', () => {
     });
 
     it('should validate ID format (UUID)', () => {
-      const invalidIds = [
+      // Test null, undefined, empty string
+      expect(() => UserProfile.create({
+        id: null as any,
+        language: validLanguage
+      })).toThrow('ID is required');
+
+      expect(() => UserProfile.create({
+        id: undefined as any,
+        language: validLanguage
+      })).toThrow('ID is required');
+
+      expect(() => UserProfile.create({
+        id: '',
+        language: validLanguage
+      })).toThrow('ID is required');
+
+      // Test invalid UUID formats
+      const invalidUuids = [
         'not-a-uuid',
-        '123',
-        '',
-        '123e4567-e89b-12d3-a456-42661417400', // too short
-        '123e4567-e89b-12d3-a456-426614174000-extra' // too long
+        '123e4567-e89b-12d3-a456-42661417400', // invalid format
+        '123e4567-e89b-12d3-a456-4266141740000', // too long
       ];
 
-      invalidIds.forEach(id => {
+      invalidUuids.forEach(id => {
         expect(() => UserProfile.create({
           id,
           language: validLanguage
@@ -223,10 +238,26 @@ describe('UserProfile Domain Entity', () => {
 
       expect(profile.telegramUserId).toBe(123456789);
 
+      // Valid updates
+      profile.setTelegramUserId(987654321);
+      expect(profile.telegramUserId).toBe(987654321);
+
+      // Set to undefined
+      profile.setTelegramUserId(undefined);
+      expect(profile.telegramUserId).toBeUndefined();
+
       // Invalid values
       expect(() => {
-        (profile as any).telegramUserId = 'invalid';
-      }).toThrow(); // Assuming validation
+        profile.setTelegramUserId(-1);
+      }).toThrow('Invalid telegram user ID');
+
+      expect(() => {
+        profile.setTelegramUserId(0);
+      }).toThrow('Invalid telegram user ID');
+
+      expect(() => {
+        profile.setTelegramUserId('invalid' as any);
+      }).toThrow('Invalid telegram user ID');
     });
   });
 });

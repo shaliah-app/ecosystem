@@ -8,7 +8,7 @@ describe('RateLimitPolicy Domain Service', () => {
 
   describe('canSendMagicLink', () => {
     it('should allow sending when no previous attempts', () => {
-      const result = RateLimitPolicy.canSendMagicLink([]);
+      const result = RateLimitPolicy.canSendMagicLink([], now.getTime());
 
       expect(result.allowed).toBe(true);
       expect(result.retryAfterSeconds).toBeUndefined();
@@ -22,7 +22,7 @@ describe('RateLimitPolicy Domain Service', () => {
         success: true
       });
 
-      const result = RateLimitPolicy.canSendMagicLink([recentAttempt]);
+      const result = RateLimitPolicy.canSendMagicLink([recentAttempt], now.getTime());
 
       expect(result.allowed).toBe(false);
       expect(result.retryAfterSeconds).toBe(30); // 60 - 30 = 30 seconds remaining
@@ -36,7 +36,7 @@ describe('RateLimitPolicy Domain Service', () => {
         success: true
       });
 
-      const result = RateLimitPolicy.canSendMagicLink([oldAttempt]);
+      const result = RateLimitPolicy.canSendMagicLink([oldAttempt], now.getTime());
 
       expect(result.allowed).toBe(true);
       expect(result.retryAfterSeconds).toBeUndefined();
@@ -52,23 +52,23 @@ describe('RateLimitPolicy Domain Service', () => {
         })
       );
 
-      const result = RateLimitPolicy.canSendMagicLink(attempts);
+      const result = RateLimitPolicy.canSendMagicLink(attempts, now.getTime());
 
       expect(result.allowed).toBe(false);
       expect(result.retryAfterSeconds).toBeGreaterThan(0);
     });
 
     it('should allow sending when under hourly limit', () => {
-      // Create 9 attempts within the last hour
+      // Create 9 attempts within the last hour, most recent 2 minutes ago (not in cooldown)
       const attempts = Array.from({ length: 9 }, (_, i) =>
         MagicLinkAttempt.create({
           email,
-          attemptedAt: new Date(now.getTime() - i * 60 * 1000), // i minutes ago
+          attemptedAt: new Date(now.getTime() - (i + 2) * 60 * 1000), // 2-10 minutes ago
           success: true
         })
       );
 
-      const result = RateLimitPolicy.canSendMagicLink(attempts);
+      const result = RateLimitPolicy.canSendMagicLink(attempts, now.getTime());
 
       expect(result.allowed).toBe(true);
       expect(result.retryAfterSeconds).toBeUndefined();
@@ -84,7 +84,7 @@ describe('RateLimitPolicy Domain Service', () => {
         })
       );
 
-      const result = RateLimitPolicy.canSendMagicLink(failedAttempts);
+      const result = RateLimitPolicy.canSendMagicLink(failedAttempts, now.getTime());
 
       expect(result.allowed).toBe(true);
       expect(result.retryAfterSeconds).toBeUndefined();
@@ -106,7 +106,7 @@ describe('RateLimitPolicy Domain Service', () => {
         success: true
       });
 
-      const result = RateLimitPolicy.canSendMagicLink([...oldAttempts, recentAttempt]);
+      const result = RateLimitPolicy.canSendMagicLink([...oldAttempts, recentAttempt], now.getTime());
 
       // Should be blocked by cooldown, not by hourly limit
       expect(result.allowed).toBe(false);
@@ -129,7 +129,7 @@ describe('RateLimitPolicy Domain Service', () => {
         })
       );
 
-      const result = RateLimitPolicy.canSendMagicLink([recentAttempt, ...hourlyAttempts]);
+      const result = RateLimitPolicy.canSendMagicLink([recentAttempt, ...hourlyAttempts], now.getTime());
 
       // Should return cooldown time since it's more restrictive
       expect(result.allowed).toBe(false);
@@ -137,7 +137,7 @@ describe('RateLimitPolicy Domain Service', () => {
     });
 
     it('should handle empty attempts array', () => {
-      const result = RateLimitPolicy.canSendMagicLink([]);
+      const result = RateLimitPolicy.canSendMagicLink([], now.getTime());
 
       expect(result.allowed).toBe(true);
       expect(result.retryAfterSeconds).toBeUndefined();

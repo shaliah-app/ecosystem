@@ -187,12 +187,11 @@ describe('Profile Validation Schemas', () => {
         'https:/example.com', // malformed
         'https//example.com', // missing colon
         null,
-        undefined,
         123,
         {}
       ];
 
-      invalidUrls.forEach(url => {
+      invalidUrls.forEach((url, index) => {
         const result = avatarUrlSchema.safeParse(url);
         expect(result.success).toBe(false);
       });

@@ -298,12 +298,12 @@
 ## Phase 3.3: Core Implementation (ONLY after tests are failing)
 
 ### Backend: Auth Context - Domain Layer
-- [ ] **T031** [P] Create MagicLinkAttempt domain entity  
+- [x] **T031** [P] Create MagicLinkAttempt domain entity  
   **Path**: `apps/yesod-api/src/contexts/auth/domain/entities/magic-link-attempt.ts`  
   **Description**: Define MagicLinkAttempt entity with fields: id, email, attemptedAt, ipAddress, success. Include factory method `create()` and value object EmailAddress with validation.  
   **Reference**: data-model.md § 3, Constitution v2.5.1 Principle I
 
-- [ ] **T032** [P] Create RateLimitPolicy domain service  
+- [x] **T032** [P] Create RateLimitPolicy domain service  
   **Path**: `apps/yesod-api/src/contexts/auth/domain/services/rate-limit-policy.ts`  
   **Description**: Implement domain service with pure business logic:
   - `canSendMagicLink(attempts: MagicLinkAttempt[]): { allowed: boolean, retryAfterSeconds?: number }`
@@ -313,7 +313,7 @@
   **Reference**: spec.md FR-004, Constitution v2.5.1 § DDD layering
 
 ### Backend: Auth Context - Infrastructure Layer
-- [ ] **T033** Create MagicLinkAttemptRepository (Infrastructure)  
+- [x] **T033** Create MagicLinkAttemptRepository (Infrastructure)  
   **Path**: `apps/yesod-api/src/contexts/auth/infra/repositories/magic-link-attempt.repository.ts`  
   **Description**: Implement repository with methods:
   - `create(attempt: MagicLinkAttempt): Promise<void>` - Insert to DB
@@ -321,7 +321,7 @@
   Use Drizzle ORM, log via packages/logger.  
   **Reference**: data-model.md § 3, Constitution v2.5.1 § DDD infrastructure layer
 
-- [ ] **T034** Create SupabaseAuthService (Infrastructure)  
+- [x] **T034** Create SupabaseAuthService (Infrastructure)  
   **Path**: `apps/yesod-api/src/contexts/auth/infra/services/supabase-auth.service.ts`  
   **Description**: Wrapper for Supabase Auth SDK:
   - `sendMagicLink(email: string): Promise<void>` - Calls `supabase.auth.signInWithOtp()`
@@ -329,7 +329,7 @@
   **Reference**: Constitution v2.5.1 § DDD infrastructure layer
 
 ### Backend: Auth Context - Application Layer
-- [ ] **T035** Create SendMagicLinkUseCase (Application Service)  
+- [x] **T035** Create SendMagicLinkUseCase (Application Service)  
   **Path**: `apps/yesod-api/src/contexts/auth/application/use-cases/send-magic-link.use-case.ts`  
   **Description**: Orchestrate the magic link flow:
   1. Validate email (use Zod schema)
@@ -342,7 +342,7 @@
   **Reference**: Constitution v2.5.1 § DDD application layer
 
 ### Backend: Auth Context - API Layer
-- [ ] **T036** POST /api/auth/magic-link/request route handler  
+- [x] **T036** POST /api/auth/magic-link/request route handler  
   **Path**: `apps/yesod-api/src/contexts/auth/api/handlers/magic-link-request.handler.ts`  
   **Description**: Hono route handler:
   - Parse request body
@@ -352,7 +352,7 @@
   **Depends on**: T035  
   **Reference**: contracts/magic-link-request.md
 
-- [ ] **T037** Wire magic-link route to Auth sub-app  
+- [x] **T037** Wire magic-link route to Auth sub-app  
   **Path**: `apps/yesod-api/src/contexts/auth/api/routes.ts` (update T008b)  
   **Description**: Import handler from T036, add to authApp:
   ```typescript
@@ -362,7 +362,7 @@
   **Depends on**: T036
 
 ### Backend: Users Context - Domain Layer
-- [ ] **T038** [P] Create UserProfile domain entity  
+- [x] **T038** [P] Create UserProfile domain entity  
   **Path**: `apps/yesod-api/src/contexts/users/domain/entities/user-profile.ts`  
   **Description**: Define UserProfile entity with:
   - Fields: id, fullName, avatarUrl, language, telegramUserId, activeSpaceId
@@ -370,7 +370,7 @@
   - Validation rules (2-100 chars for fullName)  
   **Reference**: data-model.md § 2
 
-- [ ] **T039** [P] Create validation schemas in domain  
+- [x] **T039** [P] Create validation schemas in domain  
   **Path**: `apps/yesod-api/src/contexts/users/domain/validation/profile-validation.ts`  
   **Description**: Define Zod schemas for:
   - `fullNameSchema` (2-100 chars, trimmed)
@@ -380,7 +380,7 @@
   **Reference**: data-model.md § 2, Constitution v2.5.1 § DDD domain layer
 
 ### Backend: Users Context - Infrastructure Layer
-- [ ] **T040** Create UserProfileRepository (Infrastructure)  
+- [x] **T040** Create UserProfileRepository (Infrastructure)  
   **Path**: `apps/yesod-api/src/contexts/users/infra/repositories/user-profile.repository.ts`  
   **Description**: Implement repository with methods:
   - `findById(id: string): Promise<UserProfile | null>`
@@ -389,7 +389,7 @@
   **Reference**: data-model.md § 2
 
 ### Backend: Users Context - Application Layer
-- [ ] **T041** Create GetUserProfileUseCase  
+- [x] **T041** Create GetUserProfileUseCase  
   **Path**: `apps/yesod-api/src/contexts/users/application/use-cases/get-user-profile.use-case.ts`  
   **Description**: Use case to fetch user profile:
   - Input: userId (from auth context)
@@ -397,7 +397,7 @@
   - Return profile DTO or throw NotFoundError  
   **Depends on**: T038, T040
 
-- [ ] **T042** Create UpdateUserProfileUseCase  
+- [x] **T042** Create UpdateUserProfileUseCase  
   **Path**: `apps/yesod-api/src/contexts/users/application/use-cases/update-user-profile.use-case.ts`  
   **Description**: Use case to update profile:
   - Input: userId, update fields (fullName, avatarUrl, language)
@@ -408,7 +408,7 @@
   **Depends on**: T038, T039, T040
 
 ### Backend: Users Context - API Layer
-- [ ] **T043** GET /api/user/profile route handler  
+- [x] **T043** GET /api/user/profile route handler  
   **Path**: `apps/yesod-api/src/contexts/users/api/handlers/get-profile.handler.ts`  
   **Description**: Hono route handler:
   - Extract userId from context (via auth middleware)
@@ -417,7 +417,7 @@
   **Depends on**: T041  
   **Reference**: contracts/user-profile-get.md
 
-- [ ] **T044** PATCH /api/user/profile route handler  
+- [x] **T044** PATCH /api/user/profile route handler  
   **Path**: `apps/yesod-api/src/contexts/users/api/handlers/update-profile.handler.ts`  
   **Description**: Hono route handler:
   - Extract userId from context
@@ -428,7 +428,7 @@
   **Depends on**: T042  
   **Reference**: contracts/user-profile-update.md
 
-- [ ] **T045** Wire profile routes to Users sub-app  
+- [x] **T045** Wire profile routes to Users sub-app  
   **Path**: `apps/yesod-api/src/contexts/users/api/routes.ts` (update T008d)  
   **Description**: Import handlers, add to usersApp:
   ```typescript
@@ -440,7 +440,7 @@
   **Depends on**: T043, T044, T046
 
 ### Backend: Shared Middleware
-- [ ] **T046** Auth middleware for protected routes  
+- [x] **T046** Auth middleware for protected routes  
   **Path**: `apps/yesod-api/src/middleware/auth.ts`  
   **Description**: Implement Hono middleware compliant with Constitution v2.5.1 and Hono.js best practices:
   - Verify Supabase JWT from Authorization header
