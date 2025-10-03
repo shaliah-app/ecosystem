@@ -195,27 +195,27 @@
   **Reference**: contracts/user-profile-update.md
 
 ### Component Tests (Frontend UI)
-- [ ] **T012** [P] Component test: AuthForm (email + Google)  
+- [x] **T012** [P] Component test: AuthForm (email + Google)  
   **Path**: `apps/shaliah-next/__tests__/components/AuthForm.test.tsx`  
   **Description**: Test rendering of "Continue with Email" and "Continue with Google" buttons, email input validation, form submission. Use Jest + RTL.  
   **Reference**: spec.md FR-001
 
-- [ ] **T013** [P] Component test: CooldownTimer  
+- [x] **T013** [P] Component test: CooldownTimer  
   **Path**: `apps/shaliah-next/__tests__/components/CooldownTimer.test.tsx`  
   **Description**: Test countdown display (60s → 0s), button disabled during cooldown, button enabled at 0s. Mock timers. Use Jest + RTL.  
   **Reference**: spec.md FR-004
 
-- [ ] **T014** [P] Component test: OnboardingForm  
+- [x] **T014** [P] Component test: OnboardingForm  
   **Path**: `apps/shaliah-next/__tests__/components/OnboardingForm.test.tsx`  
   **Description**: Test full_name input (required), avatar upload (optional), language dropdown (pre-filled), form submission. Use Jest + RTL.  
   **Reference**: spec.md FR-010, FR-010a
 
-- [ ] **T015** [P] Component test: ProfileDashboard  
+- [x] **T015** [P] Component test: ProfileDashboard  
   **Path**: `apps/shaliah-next/__tests__/components/ProfileDashboard.test.tsx`  
   **Description**: Test display of user info (name, avatar, language), language change dropdown, save action. Use Jest + RTL.  
   **Reference**: spec.md FR-011
 
-- [ ] **T016** [P] Component test: StorageBlockedError  
+- [x] **T016** [P] Component test: StorageBlockedError  
   **Path**: `apps/shaliah-next/__tests__/components/StorageBlockedError.test.tsx`  
   **Description**: Test non-dismissible overlay rendering, instructions text, retry button. Use Jest + RTL.  
   **Reference**: spec.md FR-013
