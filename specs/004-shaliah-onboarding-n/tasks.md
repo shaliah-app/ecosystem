@@ -179,17 +179,17 @@
 **CRITICAL: These tests MUST be written and MUST FAIL before ANY implementation**
 
 ### Contract Tests (Backend API)
-- [ ] **T009** [P] Contract test: POST /api/auth/magic-link/request  
+- [x] **T009** [P] Contract test: POST /api/auth/magic-link/request  
   **Path**: `apps/yesod-api/__tests__/contract/magic-link-request.test.ts`  
   **Description**: Test success (200), cooldown (429), hourly limit (429), invalid email (400). Assert response schemas match contract. Use Vitest + supertest.  
   **Reference**: contracts/magic-link-request.md
 
-- [ ] **T010** [P] Contract test: GET /api/user/profile  
+- [x] **T010** [P] Contract test: GET /api/user/profile  
   **Path**: `apps/yesod-api/__tests__/contract/user-profile-get.test.ts`  
   **Description**: Test authenticated success (200), unauthorized (401), profile fields. Mock Supabase auth. Use Vitest + supertest.  
   **Reference**: contracts/user-profile-get.md
 
-- [ ] **T011** [P] Contract test: PATCH /api/user/profile  
+- [x] **T011** [P] Contract test: PATCH /api/user/profile  
   **Path**: `apps/yesod-api/__tests__/contract/user-profile-update.test.ts`  
   **Description**: Test full_name update (200), language update (200), validation errors (400), unauthorized (401). Assert profile returned. Use Vitest + supertest.  
   **Reference**: contracts/user-profile-update.md
@@ -221,22 +221,22 @@
   **Reference**: spec.md FR-013
 
 ### Unit Tests (Domain & Application Layer - TDD Critical)
-- [ ] **T017** [P] Unit test: MagicLinkAttempt domain entity  
+- [x] **T017** [P] Unit test: MagicLinkAttempt domain entity  
   **Path**: `apps/yesod-api/__tests__/unit/auth/magic-link-attempt.test.ts`  
   **Description**: Test MagicLinkAttempt entity creation, validation, factory methods. Test EmailAddress value object validation (valid/invalid formats). Use Vitest.  
   **Reference**: T025 (entity implementation)
 
-- [ ] **T018** [P] Unit test: RateLimitPolicy domain service  
+- [x] **T018** [P] Unit test: RateLimitPolicy domain service  
   **Path**: `apps/yesod-api/__tests__/unit/auth/rate-limit-policy.test.ts`  
   **Description**: Test business logic: cooldown calculation (< 60s), hourly limit logic (≥10 attempts), edge cases (expired rows, timezone). Mock attempt data. Use Vitest.  
   **Reference**: T026 (service implementation)
 
-- [ ] **T019** [P] Unit test: UserProfile domain entity  
+- [x] **T019** [P] Unit test: UserProfile domain entity  
   **Path**: `apps/yesod-api/__tests__/unit/users/user-profile.test.ts`  
   **Description**: Test UserProfile entity methods: updateFullName(), updateLanguage(), isOnboardingComplete(). Test validation rules (2-100 chars). Use Vitest.  
   **Reference**: T032 (entity implementation)
 
-- [ ] **T020** [P] Unit test: Profile validation schemas  
+- [x] **T020** [P] Unit test: Profile validation schemas  
   **Path**: `apps/yesod-api/__tests__/unit/users/profile-validation.test.ts`  
   **Description**: Test Zod schemas for user profile (valid/invalid fullName, avatarUrl, language enum). Test edge cases: empty strings, XSS, Unicode. Use Vitest.  
   **Reference**: T033 (validation implementation)
