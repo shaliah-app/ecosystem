@@ -148,8 +148,6 @@ As a new or returning user, I can authenticate to Shaliah in a single step by co
 - **FR-010 (Conditional onboarding)**: Only show onboarding if required profile data is missing. At minimum, require full_name if not already present. Skip onboarding otherwise and route to profile dashboard.
 - **FR-010a (Avatar optional)**: Avatar editing is optional during onboarding; if no avatar is provided or available from Google, use a default placeholder image.
 - **FR-011 (Profile dashboard placeholder)**: Provide a basic profile page showing user info and allowing language change. This replaces the prior "Connect to Ezer" onboarding step.
-- **FR-012 (Cross-app authentication)**: Sessions should log the user into other Shaliah applications in the ecosystem, initially including the Ezer bot integration roadmap. [Scope note: exact mechanism is outside this spec’s HOW.]
-   - Clarified: Logout is app-local; logging out in one app does not force logout across other apps.
 - **FR-013 (Storage restrictions UX)**: If cookies/local storage are blocked and session cannot be saved, display a prominent, non-dismissible error explaining the issue and remediation.
 - **FR-014 (Error/expired link UX)**: Expired or reused magic links must show clear errors and offer a flow to request a fresh link (respecting cooldown).
 - **FR-015 (Security and audit)**: Log authentication attempts and critical events for security monitoring. Required events:
@@ -178,6 +176,7 @@ As a new or returning user, I can authenticate to Shaliah in a single step by co
 
 ## Review & Acceptance Checklist
 *GATE: Automated checks run during main() execution*
+*Based on Constitution v2.5.1*
 
 ## Clarifications
 ### Session 2025-10-01

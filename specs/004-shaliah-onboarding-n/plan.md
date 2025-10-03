@@ -71,6 +71,19 @@ specs/[###-feature]/
 apps/
 ├── yesod-api/
 │   ├── src/
+│   │   ├── contexts/          # DDD bounded contexts (to be created)
+│   │   │   ├── auth/
+│   │   │   │   ├── domain/
+│   │   │   │   ├── application/
+│   │   │   │   ├── infra/
+│   │   │   │   └── api/
+│   │   │   └── users/
+│   │   │       ├── domain/
+│   │   │       ├── application/
+│   │   │       ├── infra/
+│   │   │       └── api/
+│   │   ├── routes/            # Legacy bootstrap structure (to be removed)
+│   │   └── config/
 │   └── tests/
 ├── shaliah-next/
 │   ├── src/
@@ -86,7 +99,7 @@ packages/
 └── ...
 ```
 
-**Structure Decision**: Web project (frontend + backend). Primary changes in `apps/shaliah-next/src/` (auth components, onboarding flow, profile dashboard). Minor API changes in `apps/yesod-api/src/routes/` for rate-limit tracking and audit logging. Shared `packages/logger` for structured logging.
+**Structure Decision**: Web project (frontend + backend). Primary changes in `apps/shaliah-next/src/` (auth components, onboarding flow, profile dashboard). Backend changes in `apps/yesod-api/src/contexts/` following DDD bounded contexts per Constitution v2.5.1 Principle I. Current `routes/` structure is minimal bootstrapping code and will be replaced during this feature implementation. Shared `packages/logger` for structured logging.
 
 ## Phase 0: Outline & Research
 1. **Extract unknowns from Technical Context** above:
@@ -242,4 +255,4 @@ packages/
 - [x] Complexity deviations documented (none)
 
 ---
-*Based on Constitution v2.1.0 - See `.specify/memory/constitution.md`*
+*Based on Constitution v2.5.1 - See `.specify/memory/constitution.md`*
