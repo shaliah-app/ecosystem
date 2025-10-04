@@ -106,6 +106,7 @@ When creating this spec from a user prompt:
 - [ ] **Principle III (Testing & MCP)**: Acceptance scenarios are testable and measurable; MCP servers (Chrome DevTools, Supabase, Shadcn) identified for testing/debugging workflows
 - [ ] **Principle IV (Supabase-First)**: If feature requires database, auth, storage, or realtime capabilities, it leverages Supabase's built-in features; Yesod API used only for complex business logic or custom integrations
 - [ ] **Principle V (Async)**: Long-running operations identified for background processing
+- [ ] **Principle VI (TypeScript-First Monorepo)**: New code written in TypeScript within monorepo; shared packages properly utilized
 - [ ] **Principle VII (i18n)**: User-facing text identified for translation in both mandatory languages (pt-BR and en-US); additional languages deferred to roadmap.md
 
 ---
@@ -123,7 +124,7 @@ When creating this spec from a user prompt:
 
 ---
 
-*Based on Constitution v3.2.0 - See `.specify/memory/constitution.md`*
+*Based on Constitution v3.3.0 - See `.specify/memory/constitution.md`*
 
 ````
 

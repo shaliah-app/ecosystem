@@ -189,6 +189,7 @@ Task: "Integration test auth in tests/integration/test_auth.py"
 - [ ] Each task specifies exact file path
 - [ ] No task modifies same file as another [P] task
 - [ ] Supabase usage validated for auth/db/storage where applicable
+- [ ] TypeScript-first enforced: all new code in TypeScript, shared packages utilized (Principle VI)
 - [ ] i18n coverage for pt-BR and en-US (mandatory pair); additional languages deferred to roadmap.md
 - [ ] MCP servers (Chrome DevTools, Supabase, Shadcn) used in dedicated testing tasks
 - [ ] For shaliah-next: existing components audited and reusable components explicitly listed in plan.md
@@ -197,4 +198,4 @@ Task: "Integration test auth in tests/integration/test_auth.py"
 
 ---
 
-*Based on Constitution v3.2.0 — see `.specify/memory/constitution.md`*
+*Based on Constitution v3.3.0 — see `.specify/memory/constitution.md`*

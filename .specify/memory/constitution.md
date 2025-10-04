@@ -48,13 +48,6 @@ Sync Impact Report:
 -->
 
 # Yesod Ecosystem Constitution v3.3.0
-    - .specify/templates/tasks-template.md (✅ v3.2.0 - Added component reuse validation to checklist)
-    - .specify/templates/spec-template.md (⚠️ No changes needed - spec is app-agnostic, UI details handled in planning)
-- Follow-up TODOs:
-    - None - all relevant templates synchronized with component reuse requirement
--->
-
-# The Yesod Ecosystem Constitution
 
 This document outlines the core principles, architectural constraints, and development workflows for the Yesod project, which includes the Yesod API, the Shaliah application, the Ezer bot, and the asynchronous worker.
 
@@ -304,4 +297,4 @@ This constitution is the supreme source of truth for the project's architecture 
 - All Pull Requests and code reviews must verify compliance with the principles and constraints outlined in this document.
 - Any proposal to amend this constitution must be documented, reviewed, and approved. A clear migration plan must be provided if the change affects existing architecture.
 
-**Version**: 3.2.0 | **Ratified**: 2025-01-15 | **Last Amended**: 2025-10-03
+**Version**: 3.3.0 | **Ratified**: 2025-01-15 | **Last Amended**: 2025-10-04
