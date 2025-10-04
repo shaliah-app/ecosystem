@@ -1,34 +1,53 @@
 <!--
 Sync Impact Report:
-- Version change: 3.1.1 → 3.2.0 (MINOR: Component reuse requirement for shaliah-next)
+- Version change: 3.2.0 → 3.3.0 (MINOR: Testing integration into implementation workflow)
 - Modified Sections:
-    - **Application-Specific Architecture Patterns - shaliah-next**: Added Component Reuse requirement
-      * MUST audit existing components in src/components/ (shared) and src/modules/*/ui/components/ (feature-scoped) before creating new ones
-      * Reuse atomic components (shadcn/ui wrappers) and composed components when they satisfy requirements
-      * Document evaluated components explicitly in planning phase
-    - **Development Workflow - Architecture & Code Organization - shaliah-next**: Added component reuse workflow
-      * Audit shared and feature-scoped components before creating new ones
-      * Document evaluated components in plan.md
-    - **Development Workflow - Planning & Specification**: Added shaliah-next component audit requirement
-      * Audit existing components during planning phase
-      * List reusable components explicitly in plan.md to avoid duplication
-- Added Sections:
-    - **plan-template.md Phase 1**: Added step 2 for component audit
-      * Search shared components (src/components/)
-      * Search feature-scoped components (src/modules/*/ui/components/)
-      * Document reusable components in "Component Reuse Analysis" section
-      * Identify gaps requiring new components
-    - **plan-template.md Phase 1 Output**: Added component reuse analysis to output list
-    - **tasks-template.md Validation Checklist**: Added component reuse validation
-      * For shaliah-next: existing components audited and reusable components explicitly listed in plan.md
+    - **Development Workflow - Testing Strategy**: Expanded with Testing Iteration Pattern
+      * Added 3-step workflow: Tests First → Implementation + Testing → Code Quality Validation
+      * Phase 3.2 (Tests First): Write failing tests before implementation
+      * Phase 3.3-3.4 (Implementation + Testing): Each task includes iterative testing cycle (implement → test → fix → repeat)
+      * Phase 3.5 (Code Quality): ESLint, TypeScript type checking, Prettier, documented suppressions
+      * Clarified: tests should pass after implementation (not fail), update tests only if requirements misunderstood
+    - **tasks-template.md Phase 3.3**: Renamed "Core Implementation" to "Core Implementation + Testing"
+      * Each implementation task now includes: "implement + run tests, iterate until passing"
+      * Added "Testing Iteration Pattern" subsection with explicit workflow steps
+      * Applied pattern to all app types: yesod-api (T011-T017), shaliah-next (T011-T020), ezer-bot (T011-T016)
+      * Updated common tasks (T021-T022) with testing iteration
+    - **tasks-template.md Phase 3.4**: Updated "Integration" section
+      * Integration tasks (T023-T027) now include testing iteration pattern
+    - **tasks-template.md Phase 3.5**: NEW - "Code Quality Validation"
+      * T028: Run ESLint and fix violations
+      * T029: Run TypeScript type check (tsc --noEmit) and resolve errors
+      * T030: Add suppression comments with detailed justification for unavoidable errors
+      * T031: Run Prettier for consistent formatting
+      * T032: Verify no console.log statements (use logger package)
+    - **tasks-template.md Phase 3.6**: Renamed from "Phase 3.5: i18n & Polish"
+      * Renumbered tasks: T028-T037 → T033-T040
+      * Removed redundant unit/performance test tasks (now integrated in Phase 3.3-3.4)
+    - **tasks-template.md Execution Flow**: Updated task category descriptions
+      * "Core Implementation: implement + test iteration until passing"
+      * Added "Code Quality: linting, type checking, formatting"
+    - **tasks-template.md Notes**: Added testing iteration clarity
+      * Each implementation task includes testing iteration
+      * Update tests only if requirements misunderstood
+      * Code quality validation catches linting/type errors after implementation
+    - **tasks-template.md Validation Checklist**: Expanded testing validation
+      * Each implementation task includes testing iteration (Phase 3.3-3.4)
+      * Code quality validation phase included (Phase 3.5)
 - Rationale:
-    - Prevents component duplication and promotes code reuse
-    - Leverages existing shadcn/ui atomic components and composed patterns
-    - Reduces maintenance burden by centralizing shared UI logic
-    - Aligns with DRY principle and monorepo benefits
-    - Makes component inventory visible during planning phase
+    - Testing should not be isolated phase - it guides and validates implementation
+    - Aligns with true TDD philosophy: tests guide development, not just verify afterward
+    - Makes iteration explicit: developers know to run tests after each implementation
+    - Code quality gate ensures professional code standards before i18n/polish
+    - Reduces "forgot to run tests" errors by making testing part of task definition
+    - Clarifies when to update tests (requirements misunderstood) vs implementation (tests correct)
 - Templates synchronized:
-    - .specify/templates/plan-template.md (✅ v3.2.0 - Added Phase 1 component audit step and output)
+    - .specify/templates/tasks-template.md (✅ v3.3.0 - Integrated testing into implementation, added code quality phase)
+    - .specify/templates/plan-template.md (✅ v3.3.0 - Version bump only, no content changes needed)
+    - .specify/templates/spec-template.md (✅ v3.3.0 - Version bump only, no content changes needed)
+-->
+
+# Yesod Ecosystem Constitution v3.3.0
     - .specify/templates/tasks-template.md (✅ v3.2.0 - Added component reuse validation to checklist)
     - .specify/templates/spec-template.md (⚠️ No changes needed - spec is app-agnostic, UI details handled in planning)
 - Follow-up TODOs:
@@ -207,13 +226,23 @@ This section defines practical workflows grouped by development concerns, not ma
 **Test-Driven Development (TDD):**
 - For business-critical code: write failing test → implement → refactor
 - Tests MUST precede implementation in commits
-- No PR without tests for new business logic
+- Implementation tasks integrate iterative testing: implement → run tests → analyze failures → fix → repeat until tests pass
+- Update tests only if requirements were misunderstood, not to make implementation easier
+- No PR may merge without tests for new business logic
 
 **Testing Patterns:**
 - Web UI: Component testing with Jest + RTL
 - Backend/API: Unit and integration tests with Vitest
 - grammY Bot: Mock context pattern (see `apps/ezer-bot/__tests__/welcome.test.ts`)
 - See Principle III for framework requirements per application
+
+**Code Quality Validation:**
+- After implementation and testing complete, run final validation before i18n/polish:
+  * ESLint for code quality violations
+  * TypeScript type checker (tsc --noEmit) for type errors
+  * Prettier for formatting consistency
+  * Add suppression comments with documented justification for unavoidable errors
+  * Verify no console.log statements remain (use logger package)
 
 **MCP Integration:**
 - Chrome DevTools MCP: Automate browser interactions, capture screenshots, debug frontend
