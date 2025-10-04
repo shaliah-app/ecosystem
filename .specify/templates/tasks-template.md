@@ -201,5 +201,5 @@ Task: "Web UI component test in apps/shaliah-next/__tests__/components/UserProfi
 
 ---
 
-*Based on Constitution v3.4.0 — see `.specify/memory/constitution.md`*
+*Based on Constitution v3.5.0 — see `.specify/memory/constitution.md`*
 ````

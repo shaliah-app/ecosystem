@@ -124,7 +124,7 @@ When creating this spec from a user prompt:
 
 ---
 
-*Based on Constitution v3.4.0 - See `.specify/memory/constitution.md`*
+*Based on Constitution v3.5.0 - See `.specify/memory/constitution.md`*
 
 ````
 

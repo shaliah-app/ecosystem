@@ -1,27 +1,23 @@
 <!--
 Sync Impact Report:
-- Version change: 3.3.0 → 3.4.0 (PATCH: Semantic consolidation and clarity improvements)
+- Version change: 3.4.0 → 3.5.0 (MINOR: Added architecture documentation review requirement)
+- Added Sections:
+    - **Architecture Documentation Review**: New mandatory step in Architecture & Code Organization workflow requiring LLMs to read app-specific architecture guides before planning
 - Modified Sections:
-    - **Principle III (Testing)**: Clarified MCP usage from MUST to SHOULD for appropriate scenarios
-    - **Configuration Management**: Consolidated from 3 scattered references into single workflow section
-    - **Testing Strategy**: Clarified TDD applies to all new business logic (not just "business-critical" code)
-    - **Component Reuse**: Moved from Architecture section to Development Workflow for proper categorization
-    - **i18n Workflow**: Consolidated scattered references; single authoritative workflow section
-- Removed Sections:
-    - Removed redundant configuration guidance from app-specific patterns (now in centralized workflow)
+    - **Architecture & Code Organization**: Added architecture documentation review workflow with links to app-specific guides
 - Templates synchronized:
-    - .specify/templates/tasks-template.md (✅ v3.4.0 - No changes needed, already correct)
-    - .specify/templates/plan-template.md (✅ v3.4.0 - No changes needed, already correct)
-    - .specify/templates/spec-template.md (✅ v3.4.0 - No changes needed, already correct)
+    - .specify/templates/plan-template.md (✅ v3.5.0 - Added architecture review step in execution flow)
+    - .specify/templates/tasks-template.md (✅ v3.5.0 - Updated version reference)
+    - .specify/templates/spec-template.md (✅ v3.5.0 - Updated version reference)
 - Rationale:
-    - MCP servers are powerful tools but shouldn't block development when unavailable/inappropriate
-    - Configuration guidance was scattered and contradictory; consolidated for clarity
-    - TDD ambiguity resolved: applies to ALL new business logic, not just "critical" code
-    - Improved document navigability by grouping related concepts
-    - No semantic changes to principles, only clarifications and reorganization
+    - Architecture documentation provides critical context for maintaining consistency across applications
+    - LLMs must understand established patterns before proposing modifications
+    - Improves code quality by ensuring adherence to application-specific best practices
+    - Prevents architectural drift by making guides authoritative references
+    - MINOR version bump: adds new mandatory workflow step (material expansion of guidance)
 -->
 
-# Yesod Ecosystem Constitution v3.4.0
+# Yesod Ecosystem Constitution v3.5.0
 
 This document outlines the core principles, architectural constraints, and development workflows for the Yesod project, which includes the Yesod API, the Shaliah application, the Ezer bot, and the asynchronous worker.
 
@@ -143,6 +139,14 @@ This section defines practical workflows grouped by development concerns, not ma
 
 ### Architecture & Code Organization
 
+**Architecture Documentation Review:**
+Before planning features that modify existing applications, MUST read the application-specific architecture guide in `docs/architecture/` to understand established patterns, conventions, and best practices:
+- `docs/architecture/yesod-api.md`: Backend API architecture (Hono + DDD)
+- `docs/architecture/shaliah-next.md`: Frontend architecture (Next.js + DDD-inspired)
+- `docs/architecture/ezer-bot.md`: Telegram bot architecture (grammY + composers)
+
+These guides provide detailed patterns for module structure, testing strategies, middleware ordering, and integration approaches that MUST be followed to maintain consistency across the codebase.
+
 **yesod-api:**
 - Organize by bounded contexts in `src/contexts/{context-name}/`
 - Follow DDD layering: `domain/` → `application/` → `infra/` → `api/`
@@ -263,4 +267,4 @@ This constitution is the supreme source of truth for the project's architecture 
 - All Pull Requests and code reviews must verify compliance with the principles and constraints outlined in this document.
 - Any proposal to amend this constitution must be documented, reviewed, and approved. A clear migration plan must be provided if the change affects existing architecture.
 
-**Version**: 3.4.0 | **Ratified**: 2025-01-15 | **Last Amended**: 2025-10-04
+**Version**: 3.5.0 | **Ratified**: 2025-01-15 | **Last Amended**: 2025-10-04

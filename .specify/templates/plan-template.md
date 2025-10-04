@@ -8,22 +8,28 @@
 ```
 1. Load feature spec from Input path
    → If not found: ERROR "No feature spec at {path}"
-2. Fill Technical Context (scan for NEEDS CLARIFICATION)
+2. Identify affected applications from feature spec
+   → Read corresponding architecture guides from docs/architecture/
+   → For yesod-api changes: Read docs/architecture/yesod-api.md
+   → For shaliah-next changes: Read docs/architecture/shaliah-next.md
+   → For ezer-bot changes: Read docs/architecture/ezer-bot.md
+   → Document key architectural patterns to follow in Technical Context
+3. Fill Technical Context (scan for NEEDS CLARIFICATION)
    → Detect Project Type from file system structure or context (web=frontend+backend, mobile=app+api)
    → Set Structure Decision based on project type
-3. Fill the Constitution Check section based on the content of the constitution document.
-4. Evaluate Constitution Check section below
+4. Fill the Constitution Check section based on the content of the constitution document.
+5. Evaluate Constitution Check section below
    → If violations exist: Document in Complexity Tracking
    → If no justification possible: ERROR "Simplify approach first"
    → Update Progress Tracking: Initial Constitution Check
-5. Execute Phase 0 → research.md
+6. Execute Phase 0 → research.md
    → If NEEDS CLARIFICATION remain: ERROR "Resolve unknowns"
-6. Execute Phase 1 → contracts, data-model.md, quickstart.md, agent-specific template file (e.g., `CLAUDE.md` for Claude Code, `.github/copilot-instructions.md` for GitHub Copilot, `GEMINI.md` for Gemini CLI, `QWEN.md` for Qwen Code or `AGENTS.md` for opencode).
-7. Re-evaluate Constitution Check section
+7. Execute Phase 1 → contracts, data-model.md, quickstart.md, agent-specific template file (e.g., `CLAUDE.md` for Claude Code, `.github/copilot-instructions.md` for GitHub Copilot, `GEMINI.md` for Gemini CLI, `QWEN.md` for Qwen Code or `AGENTS.md` for opencode).
+8. Re-evaluate Constitution Check section
    → If new violations: Refactor design, return to Phase 1
    → Update Progress Tracking: Post-Design Constitution Check
-8. Plan Phase 2 → Describe task generation approach (DO NOT create tasks.md)
-9. STOP - Ready for /tasks command
+9. Plan Phase 2 → Describe task generation approach (DO NOT create tasks.md)
+10. STOP - Ready for /tasks command
 ```
 
 **IMPORTANT**: The /plan command STOPS at step 7. Phases 2-4 are executed by other commands:
@@ -43,6 +49,24 @@
 **Performance Goals**: [domain-specific, e.g., 1000 req/s, 10k lines/sec, 60 fps or NEEDS CLARIFICATION]  
 **Constraints**: [domain-specific, e.g., <200ms p95, <100MB memory, offline-capable or NEEDS CLARIFICATION]  
 **Scale/Scope**: [domain-specific, e.g., 10k users, 1M LOC, 50 screens or NEEDS CLARIFICATION]
+
+## Architecture Review
+*Required for features modifying existing applications. Document patterns from architecture guides.*
+
+**Affected Applications**: [e.g., yesod-api, shaliah-next, ezer-bot]  
+**Architecture Guide(s) Read**: [e.g., docs/architecture/yesod-api.md]
+
+**Key Architectural Patterns to Follow**:
+- [Pattern 1 from guide, e.g., "DDD layering with domain → application → infra → api"]
+- [Pattern 2 from guide, e.g., "Manual DI via composition root in handlers"]
+- [Pattern 3 from guide, e.g., "Use createFactory() for complex dependency wiring"]
+- [Testing approach from guide, e.g., "Use app.request() with transformer functions for integration tests"]
+- [Module structure from guide, e.g., "One feature per composer in src/modules/"]
+
+**Relevant Conventions**:
+- [Convention 1, e.g., "Route chaining for RPC type inference"]
+- [Convention 2, e.g., "Middleware order: sequentialize → session → i18n → modules → error handler"]
+- [Convention 3, e.g., "Always answer callback queries with ctx.answerCallbackQuery()"]
 
 ## Constitution Check
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
@@ -255,4 +279,4 @@ directories captured above]
 - [ ] Complexity deviations documented
 
 ---
-*Based on Constitution v3.4.0 - See `.specify/memory/constitution.md`*
+*Based on Constitution v3.5.0 - See `.specify/memory/constitution.md`*
