@@ -1,53 +1,27 @@
 <!--
 Sync Impact Report:
-- Version change: 3.2.0 → 3.3.0 (MINOR: Testing integration into implementation workflow)
+- Version change: 3.3.0 → 3.4.0 (PATCH: Semantic consolidation and clarity improvements)
 - Modified Sections:
-    - **Development Workflow - Testing Strategy**: Expanded with Testing Iteration Pattern
-      * Added 3-step workflow: Tests First → Implementation + Testing → Code Quality Validation
-      * Phase 3.2 (Tests First): Write failing tests before implementation
-      * Phase 3.3-3.4 (Implementation + Testing): Each task includes iterative testing cycle (implement → test → fix → repeat)
-      * Phase 3.5 (Code Quality): ESLint, TypeScript type checking, Prettier, documented suppressions
-      * Clarified: tests should pass after implementation (not fail), update tests only if requirements misunderstood
-    - **tasks-template.md Phase 3.3**: Renamed "Core Implementation" to "Core Implementation + Testing"
-      * Each implementation task now includes: "implement + run tests, iterate until passing"
-      * Added "Testing Iteration Pattern" subsection with explicit workflow steps
-      * Applied pattern to all app types: yesod-api (T011-T017), shaliah-next (T011-T020), ezer-bot (T011-T016)
-      * Updated common tasks (T021-T022) with testing iteration
-    - **tasks-template.md Phase 3.4**: Updated "Integration" section
-      * Integration tasks (T023-T027) now include testing iteration pattern
-    - **tasks-template.md Phase 3.5**: NEW - "Code Quality Validation"
-      * T028: Run ESLint and fix violations
-      * T029: Run TypeScript type check (tsc --noEmit) and resolve errors
-      * T030: Add suppression comments with detailed justification for unavoidable errors
-      * T031: Run Prettier for consistent formatting
-      * T032: Verify no console.log statements (use logger package)
-    - **tasks-template.md Phase 3.6**: Renamed from "Phase 3.5: i18n & Polish"
-      * Renumbered tasks: T028-T037 → T033-T040
-      * Removed redundant unit/performance test tasks (now integrated in Phase 3.3-3.4)
-    - **tasks-template.md Execution Flow**: Updated task category descriptions
-      * "Core Implementation: implement + test iteration until passing"
-      * Added "Code Quality: linting, type checking, formatting"
-    - **tasks-template.md Notes**: Added testing iteration clarity
-      * Each implementation task includes testing iteration
-      * Update tests only if requirements misunderstood
-      * Code quality validation catches linting/type errors after implementation
-    - **tasks-template.md Validation Checklist**: Expanded testing validation
-      * Each implementation task includes testing iteration (Phase 3.3-3.4)
-      * Code quality validation phase included (Phase 3.5)
-- Rationale:
-    - Testing should not be isolated phase - it guides and validates implementation
-    - Aligns with true TDD philosophy: tests guide development, not just verify afterward
-    - Makes iteration explicit: developers know to run tests after each implementation
-    - Code quality gate ensures professional code standards before i18n/polish
-    - Reduces "forgot to run tests" errors by making testing part of task definition
-    - Clarifies when to update tests (requirements misunderstood) vs implementation (tests correct)
+    - **Principle III (Testing)**: Clarified MCP usage from MUST to SHOULD for appropriate scenarios
+    - **Configuration Management**: Consolidated from 3 scattered references into single workflow section
+    - **Testing Strategy**: Clarified TDD applies to all new business logic (not just "business-critical" code)
+    - **Component Reuse**: Moved from Architecture section to Development Workflow for proper categorization
+    - **i18n Workflow**: Consolidated scattered references; single authoritative workflow section
+- Removed Sections:
+    - Removed redundant configuration guidance from app-specific patterns (now in centralized workflow)
 - Templates synchronized:
-    - .specify/templates/tasks-template.md (✅ v3.3.0 - Integrated testing into implementation, added code quality phase)
-    - .specify/templates/plan-template.md (✅ v3.3.0 - Version bump only, no content changes needed)
-    - .specify/templates/spec-template.md (✅ v3.3.0 - Version bump only, no content changes needed)
+    - .specify/templates/tasks-template.md (✅ v3.4.0 - No changes needed, already correct)
+    - .specify/templates/plan-template.md (✅ v3.4.0 - No changes needed, already correct)
+    - .specify/templates/spec-template.md (✅ v3.4.0 - No changes needed, already correct)
+- Rationale:
+    - MCP servers are powerful tools but shouldn't block development when unavailable/inappropriate
+    - Configuration guidance was scattered and contradictory; consolidated for clarity
+    - TDD ambiguity resolved: applies to ALL new business logic, not just "critical" code
+    - Improved document navigability by grouping related concepts
+    - No semantic changes to principles, only clarifications and reorganization
 -->
 
-# Yesod Ecosystem Constitution v3.3.0
+# Yesod Ecosystem Constitution v3.4.0
 
 This document outlines the core principles, architectural constraints, and development workflows for the Yesod project, which includes the Yesod API, the Shaliah application, the Ezer bot, and the asynchronous worker.
 
@@ -74,9 +48,9 @@ All applications MUST be accompanied by a robust testing suite to ensure correct
 - **Web Interface (`shaliah-next`):** Jest + React Testing Library
 - **Backend APIs (`yesod-api`, `ezer-bot`, `worker`):** Vitest
 
-**Test-Driven Development (TDD):** For business-critical code (ETL parsers, async job handlers, auth logic), tests MUST precede implementation to ensure resilience. No PR may merge without tests for new business logic.
+**Test-Driven Development (TDD):** For all new business logic (domain operations, use cases, data transformations, auth flows), tests MUST precede implementation to ensure correctness and resilience. No PR may merge without tests covering new business logic.
 
-**MCP-Driven Testing & Debugging:** Model Context Protocol (MCP) servers MUST be used during development and testing to enable introspection, debugging, and automated testing workflows. See Technology Stack & Architecture section for required MCP servers and Development Workflow for testing integration patterns.
+**MCP-Assisted Testing & Debugging:** Model Context Protocol (MCP) servers SHOULD be used during development and testing to enable introspection, debugging, and automated testing workflows when appropriate. See Technology Stack & Architecture section for available MCP servers and Development Workflow for integration patterns.
 
 ### IV. Supabase-First Integration
 
@@ -85,7 +59,7 @@ All backend functionality MUST leverage Supabase's built-in capabilities (auth, 
 **Rationale:** Supabase provides battle-tested infrastructure for common backend needs. Maximizing its use reduces maintenance burden, improves security, and accelerates development while keeping the Yesod API focused on domain-specific logic.
 
 ### V. Decoupled, Asynchronous Processing
-Time-consuming and resource-intensive tasks (e.g., audio fingerprinting, stem separation, transcription) are **never** executed in the main API request-response cycle. They are offloaded to a persistent background **worker** via a robust job queue, ensuring the API remains fast and responsive.
+Time-consuming and resource-intensive tasks are **never** executed in the main API request-response cycle. Operations exceeding 1 second, processing files >1MB, calling external APIs, or requiring significant CPU (e.g., audio fingerprinting, stem separation, transcription) MUST be offloaded to a persistent background **worker** via a robust job queue, ensuring the API remains fast and responsive.
 
 ### VI. TypeScript-First Monorepo
 
@@ -135,10 +109,6 @@ This section defines the non-negotiable technology stack for the ecosystem. Any 
 **yesod-api (Hono + DDD):**
 - **Layer Structure:** `domain/` → `application/` → `infra/` → `api/`
 - **Dependency Injection:** Manual DI; composable factories per bounded context when complexity justifies
-- **Configuration:** 
-  - Environment variables in `src/config/env.ts` (see `apps/yesod-api/src/config/env.ts`)
-  - Domain constants in `src/contexts/{context}/constants.ts` (feature-specific: TTLs, limits, formats)
-  - Factory pattern: Per bounded context (`factory.ts`) for environment-based implementation selection
 - **Bounded Contexts:** Each context exports Hono sub-app, mounted in `server.ts`
 
 **shaliah-next (Next.js 15 App Router + DDD-inspired):**
@@ -153,8 +123,6 @@ This section defines the non-negotiable technology stack for the ecosystem. Any 
   - `stores/`: Zustand stores (scoped to module)
   - `config.ts`: Module-specific constants
 - **Dependency Injection:** Manual DI via `lib/di.ts` composition root; wire adapters into use-cases in server actions
-- **Component Reuse:** Before creating new UI components, MUST audit existing components in `src/components/` (shared) and `src/modules/*/ui/components/` (feature-scoped). Reuse atomic components (shadcn/ui wrappers) and composed components when they satisfy requirements. Document evaluated components explicitly in planning phase.
-- **Environment variables:** in `src/lib/env.ts` with Zod validation (see `apps/shaliah-next/src/lib/env.ts`)
 - **State Management:** Zustand for client-side ephemeral/interactive state (minimal global stores in `src/stores/`); server state via server components/props
 - **Server vs Client:** Server components fetch data and orchestrate use-cases; client components handle interactivity; server actions for mutations
 - **Supabase:** Server-side client (`lib/supabase-client.ts`) with service keys; browser client only for realtime/uploads
@@ -189,9 +157,6 @@ This section defines practical workflows grouped by development concerns, not ma
 - Server actions (`ui/server/actions.ts`) inject adapters into use-cases for mutations
 - Server components orchestrate use-cases for data fetching; client components handle interactivity
 - Zustand stores (`stores/`) for client-side ephemeral state only; keep global stores minimal
-- Environment variables: centralized in `lib/env.ts` with Zod validation
-- Module constants: per feature in `modules/{feature}/config.ts` (e.g., UI limits, timeouts)
-- Component reuse: Audit `src/components/` (shared) and `src/modules/*/ui/components/` (feature-scoped) before creating new components; document evaluated components in plan.md
 - Reference: App Router structure at `apps/shaliah-next/src/` and [next-intl setup](https://next-intl.dev/docs/getting-started/app-router)
 
 **ezer-bot:**
@@ -201,9 +166,10 @@ This section defines practical workflows grouped by development concerns, not ma
 - Reference: `apps/ezer-bot/src/bot.ts` and [grammY structuring guide](https://grammy.dev/advanced/structuring)
 
 **Configuration Management:**
-- Environment variables: centralized in `lib|config/env.ts` with validation
-- Domain constants: per context in `config.ts` (e.g., TTLs, limits, formats)
-- Never use `process.env` directly in business logic
+- **Environment Variables:** Centralized in `lib/env.ts` (shaliah-next) or `config/env.ts` (yesod-api) with Zod validation; never use `process.env` directly in business logic
+- **Domain Constants:** Per context/feature in `contexts/{context}/constants.ts` (yesod-api) or `modules/{feature}/config.ts` (shaliah-next) for feature-specific values (TTLs, limits, formats, thresholds)
+- **Factory Pattern:** Optional per bounded context (`factory.ts`) for environment-based implementation selection when complexity justifies
+- **Component Reuse (shaliah-next only):** Before creating new UI components, MUST audit existing components in `src/components/` (shared) and `src/modules/*/ui/components/` (feature-scoped); reuse atomic components (shadcn/ui wrappers) and composed components when they satisfy requirements; document evaluated components explicitly in planning phase
 
 ### Planning & Specification
 
@@ -217,7 +183,7 @@ This section defines practical workflows grouped by development concerns, not ma
 ### Testing Strategy
 
 **Test-Driven Development (TDD):**
-- For business-critical code: write failing test → implement → refactor
+- For all new business logic: write failing test → implement → refactor
 - Tests MUST precede implementation in commits
 - Implementation tasks integrate iterative testing: implement → run tests → analyze failures → fix → repeat until tests pass
 - Update tests only if requirements were misunderstood, not to make implementation easier
@@ -237,11 +203,11 @@ This section defines practical workflows grouped by development concerns, not ma
   * Add suppression comments with documented justification for unavoidable errors
   * Verify no console.log statements remain (use logger package)
 
-**MCP Integration:**
-- Chrome DevTools MCP: Automate browser interactions, capture screenshots, debug frontend
+**MCP Integration (when appropriate):**
+- Chrome DevTools MCP: Automate browser interactions, capture screenshots, debug frontend issues
 - Supabase MCP: Inspect database state, validate data migrations, debug queries
 - Shadcn MCP: Scaffold components, validate shadcn/ui integration in `shaliah-next`
-- Use MCP servers to reproduce bugs, validate fixes, and create regression tests
+- Use MCP servers to reproduce bugs, validate fixes, and create regression tests when available and applicable
 
 ### Async Work & Background Jobs
 
@@ -297,4 +263,4 @@ This constitution is the supreme source of truth for the project's architecture 
 - All Pull Requests and code reviews must verify compliance with the principles and constraints outlined in this document.
 - Any proposal to amend this constitution must be documented, reviewed, and approved. A clear migration plan must be provided if the change affects existing architecture.
 
-**Version**: 3.3.0 | **Ratified**: 2025-01-15 | **Last Amended**: 2025-10-04
+**Version**: 3.4.0 | **Ratified**: 2025-01-15 | **Last Amended**: 2025-10-04

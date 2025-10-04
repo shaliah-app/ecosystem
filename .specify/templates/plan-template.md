@@ -49,7 +49,7 @@
 
 - **Principle I: Domain-Centric Architecture**: Is code organized by business domain/features rather than technical layers? Does business logic remain independent of infrastructure? For yesod-api: Does the design use DDD layering with proper dependency direction? For ezer-bot: Does the design use feature-based composer modules?
 - **Principle II: Pragmatic, MVP-First Development**: Is the feature scoped as an MVP? Are complex features or optimizations deferred to a clear roadmap rather than built all at once?
-- **Principle III: Comprehensive Testing**: Does the plan account for the correct testing framework for the target application (Jest/RTL for web UI, Vitest for backend)? Is TDD applied to business-critical logic? Are tests included for all new business logic (no PR may merge without tests)? Does the plan incorporate MCP servers (Chrome DevTools, Supabase, Shadcn) for testing, debugging, and development workflows?
+- **Principle III: Comprehensive Testing**: Does the plan account for the correct testing framework for the target application (Jest/RTL for web UI, Vitest for backend)? Is TDD applied to all new business logic? Are tests included for all new business logic (no PR may merge without tests)? Does the plan identify appropriate scenarios for MCP servers (Chrome DevTools, Supabase, Shadcn) when applicable for testing, debugging, and development workflows?
 - **Principle IV: Supabase-First Integration**: Does the feature leverage Supabase's built-in capabilities (auth, database, storage, realtime) as the primary backend? Is the Yesod API used only for complex business logic, custom integrations, or when Supabase cannot handle the requirement?
 - **Principle V: Decoupled, Asynchronous Processing**: Are time-consuming tasks offloaded to the background worker via job queue rather than executed in the API request-response cycle?
 - **Principle VI: TypeScript-First Monorepo**: Is all new code planned to be written in TypeScript within the monorepo structure? Are shared packages and workspace references properly utilized?
@@ -173,7 +173,7 @@ directories captured above]
 2. **For shaliah-next features: Audit existing components**:
    - Search `apps/shaliah-next/src/components/` for shared components (atomic shadcn/ui wrappers, composed components)
    - Search `apps/shaliah-next/src/modules/*/ui/components/` for feature-scoped components
-   - Document reusable components in plan.md under "Component Reuse Analysis"
+   - **Document findings**: Create "Component Reuse Analysis" section in this plan.md listing each evaluated component, whether it will be reused or why it doesn't fit requirements
    - Identify gaps requiring new components
 
 3. **Generate API contracts** from functional requirements:
@@ -255,4 +255,4 @@ directories captured above]
 - [ ] Complexity deviations documented
 
 ---
-*Based on Constitution v3.3.0 - See `.specify/memory/constitution.md`*
+*Based on Constitution v3.4.0 - See `.specify/memory/constitution.md`*

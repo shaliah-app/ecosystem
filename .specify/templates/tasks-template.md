@@ -101,9 +101,10 @@
 
 **Testing & Validation (after implementation complete):**
 - [ ] T023 Run all related tests for implemented features (unit, integration, component)
-- [ ] T024 Use Supabase MCP to inspect DB state and validate data operations (yesod-api, shaliah-next adapters)
-- [ ] T025 Use Chrome DevTools MCP for browser testing and UI validation (shaliah-next components/pages)
+- [ ] T024 [when appropriate] Use Supabase MCP to inspect DB state and validate data operations (yesod-api, shaliah-next adapters)
+- [ ] T025 [when appropriate] Use Chrome DevTools MCP for browser testing and UI validation (shaliah-next components/pages)
 - [ ] T026 Iterate on failures: analyze → fix implementation (or test if requirements misunderstood) → retest
+- [ ] T027 Verify all Phase 3 implementation complete before proceeding to integration
 
 ## Phase 4: Integration
 - [ ] T028 Connect services to Supabase/DB (Drizzle schema + migrations)
@@ -127,26 +128,28 @@
 - [ ] T041 Verify no console.log statements remain (use logger package instead)
 
 ## Phase 6: i18n & Polishing
-- [ ] T042 [P] i18n: Add/enforce translation keys for pt-BR and en-US (mandatory pair) in apps/shaliah-next/messages/*.json
+- [ ] T042 [P] i18n: Add translation keys for ALL user-facing text in both pt-BR and en-US (mandatory pair) in apps/shaliah-next/messages/*.json (MUST be complete before PR)
 - [ ] T043 [P] i18n: Document additional planned languages in specs/[###-feature]/roadmap.md (do NOT add partial translations)
-- [ ] T044 [P] i18n: Configure next-intl in apps/shaliah-next/src/i18n/request.ts
-- [ ] T045 [P] i18n (bot): Setup @grammyjs/i18n with pt-BR.ftl and en.ftl in apps/ezer-bot/src/locales/
-- [ ] T046 [P] i18n (bot): Implement /language command with sessions
+- [ ] T044 [P] i18n: Configure next-intl in apps/shaliah-next/src/i18n/request.ts (if first i18n setup)
+- [ ] T045 [P] i18n (bot): Add translation keys for ALL user-facing text in both pt-BR.ftl and en.ftl in apps/ezer-bot/src/locales/ (MUST be complete before PR)
+- [ ] T046 [P] i18n (bot): Implement /language command with sessions (if first i18n setup)
 - [ ] T047 Remove code duplication
 
 ## Dependencies
-- Tests (T004-T007) before implementation (T008-T014)
-- T008 blocks T009, T015
-- T016 blocks T018
-- Implementation before polish (T019-T023)
+- Setup (Phase 1: T001-T005) before Tests (Phase 2: T006-T010)
+- Tests (Phase 2: T006-T010) MUST complete before Implementation (Phase 3: T011-T027)
+- Implementation (Phase 3: T011-T027) before Integration (Phase 4: T028-T036)
+- Integration (Phase 4: T028-T036) before Code Quality (Phase 5: T037-T041)
+- Code Quality (Phase 5: T037-T041) before i18n & Polish (Phase 6: T042-T047)
+- Within phases: Tasks marked [P] can run in parallel; sequential tasks must complete in order
 
 ## Parallel Example
 ```
-# Launch T004-T007 together:
-Task: "Contract test POST /api/users in tests/contract/test_users_post.py"
-Task: "Contract test GET /api/users/{id} in tests/contract/test_users_get.py"
-Task: "Integration test registration in tests/integration/test_registration.py"
-Task: "Integration test auth in tests/integration/test_auth.py"
+# Launch T006-T009 together (Phase 2: Tests First):
+Task: "Contract test POST /api/users in apps/yesod-api/__tests__/contract/users.post.test.ts (Vitest)"
+Task: "Contract test GET /api/users/{id} in apps/yesod-api/__tests__/contract/users.get.test.ts (Vitest)"
+Task: "Integration test auth flow in apps/yesod-api/__tests__/integration/auth.test.ts (Vitest)"
+Task: "Web UI component test in apps/shaliah-next/__tests__/components/UserProfile.test.tsx (Jest+RTL)"
 ```
 
 ## Notes
@@ -191,11 +194,12 @@ Task: "Integration test auth in tests/integration/test_auth.py"
 - [ ] Supabase usage validated for auth/db/storage where applicable
 - [ ] TypeScript-first enforced: all new code in TypeScript, shared packages utilized (Principle VI)
 - [ ] i18n coverage for pt-BR and en-US (mandatory pair); additional languages deferred to roadmap.md
-- [ ] MCP servers (Chrome DevTools, Supabase, Shadcn) used in dedicated testing tasks
+- [ ] MCP servers (Chrome DevTools, Supabase, Shadcn) identified for use in testing tasks when appropriate and available
 - [ ] For shaliah-next: existing components audited and reusable components explicitly listed in plan.md
 - [ ] Observability wired (logger + Sentry) in every app touched
 - [ ] Long-running work queued via pg-boss (no blocking API requests)
 
 ---
 
-*Based on Constitution v3.3.0 — see `.specify/memory/constitution.md`*
+*Based on Constitution v3.4.0 — see `.specify/memory/constitution.md`*
+````
