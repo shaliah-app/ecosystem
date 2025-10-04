@@ -1,10 +1,9 @@
 import { Hono } from 'hono';
 import type { Variables } from '../../../types';
-import { magicLinkRequestHandler } from './handlers/magic-link-request.handler';
 
 const authApp = new Hono<{ Variables: Variables }>();
 
-// Routes will be added by implementation tasks
-authApp.post('/magic-link/request', magicLinkRequestHandler);
+// Auth context routes removed - magic link functionality moved to Supabase Auth directly
+// Routes will be added by future implementation tasks if needed
 
 export { authApp };

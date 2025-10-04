@@ -5,7 +5,6 @@ import { prettyJSON } from 'hono/pretty-json'
 import authRoutes from './routes/auth.js'
 import profileRoutes from './routes/profile.js'
 import { authMiddleware } from './middleware/auth.js'
-import { authApp } from './contexts/auth/api/routes.js'
 import { usersApp } from './contexts/users/api/routes.js'
 
 const app = new Hono()
@@ -34,7 +33,7 @@ app.use('/api/v1/profile/*', authMiddleware)
 app.route('/api/v1/profile', profileRoutes)
 
 // New bounded context routes
-app.route('/api/auth', authApp)
+// Auth context removed - magic link functionality moved to Supabase Auth directly
 app.route('/api/user', usersApp)
 
 // 404 handler

@@ -27,5 +27,4 @@ export const authUsers = pgTable('auth.users', {
   rawUserMetaData: text('raw_user_meta_data'),
 });
 
-// Re-export magic link attempts schema
-export { magicLinkAttempts } from './schema/magic-link-attempts';
+// Magic link attempts table removed - functionality moved to Supabase Auth directly

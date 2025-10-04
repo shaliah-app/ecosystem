@@ -1,4 +1,0 @@
-export const MAGIC_LINK_COOLDOWN_SECONDS = 60
-export const MAGIC_LINK_HOURLY_LIMIT = 10
-export const MAGIC_LINK_EXPIRY_SECONDS = 900 // 15 minutes
-export const RATE_LIMIT_WINDOW_HOURS = 1
