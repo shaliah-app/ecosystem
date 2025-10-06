@@ -2,6 +2,7 @@
 # Implementation Plan: [FEATURE]
 
 **Branch**: `[###-feature-name]` | **Date**: [DATE] | **Spec**: [link]
+**Constitution Version**: 4.1.0
 **Input**: Feature specification from `/specs/[###-feature-name]/spec.md`
 
 ## Execution Flow (/plan command scope)
@@ -52,8 +53,8 @@
 ## Architecture Review
 *Required for features modifying existing applications. Document patterns from architecture guides.*
 
-**Affected Applications**: [e.g., shaliah-next, ezer-bot, worker]  
-**Architecture Guide(s) Read**: [e.g., docs/architecture/shaliah-next.md]
+**Affected Applications**: [e.g., shaliah-next, ezer-bot, poel-worker]  
+**Architecture Guide(s) Read**: [e.g., docs/architecture/shaliah-next.md, docs/architecture/poel-worker.md]
 
 **Key Architectural Patterns to Follow**:
 - [Pattern 1 from guide, e.g., "DDD-inspired layering with domain → ports → adapters → use-cases → ui"]
@@ -72,11 +73,11 @@
 
 - **Principle I: Domain-Centric Architecture**: Is code organized by business domain/features rather than technical layers? Does business logic remain independent of infrastructure? For shaliah-next: Does the design use DDD-inspired layering with proper dependency direction? For ezer-bot: Does the design use feature-based composer modules?
 - **Principle II: Pragmatic, MVP-First Development**: Is the feature scoped as an MVP? Are complex features or optimizations deferred to a clear roadmap rather than built all at once?
-- **Principle III: Comprehensive Testing**: Does the plan account for the correct testing framework for the target application (Jest/RTL for web UI, Vitest for server actions/use-cases and backend services)? Is TDD applied to all new business logic? Are tests included for all new business logic (no PR may merge without tests)? Does the plan identify appropriate scenarios for MCP servers (Chrome DevTools, Supabase, Shadcn) when applicable for testing, debugging, and development workflows?
-- **Principle IV: Supabase-First Integration**: Does the feature leverage Supabase's built-in capabilities (auth, database, storage, realtime) as the primary backend? Is complex business logic implemented via Next.js server actions and use-cases in shaliah-next when Supabase cannot handle the requirement directly?
-- **Principle V: Decoupled, Asynchronous Processing**: Are time-consuming tasks offloaded to the background worker via job queue rather than executed in the API request-response cycle?
+- **Principle III: Comprehensive Testing**: Does the plan account for the correct testing framework for the target application (Jest/RTL for shaliah-next UI components, Vitest for shaliah-next server actions/use-cases and backend services like poel-worker/ezer-bot)? Is TDD applied to all new business logic? Are tests included for all new business logic (no PR may merge without tests)? Does the plan identify appropriate scenarios for MCP servers (Chrome DevTools, Supabase, Shadcn) when applicable for testing, debugging, and development workflows?
+- **Principle IV: Supabase-First Integration**: Does the feature leverage Supabase's built-in capabilities (auth, database, storage, realtime) as the primary backend? Is complex business logic implemented via Next.js server actions, server components, and API routes in shaliah-next when Supabase cannot handle the requirement directly? Does the plan use Drizzle ORM for type-safe database queries?
+- **Principle V: Decoupled, Asynchronous Processing**: Are time-consuming tasks (>1s, >1MB files, external APIs, CPU-intensive) offloaded to poel-worker via job queue rather than executed in the API request-response cycle?
 - **Principle VI: TypeScript-First Monorepo**: Is all new code planned to be written in TypeScript within the monorepo structure? Are shared packages and workspace references properly utilized?
-- **Principle VII (i18n)**: If the feature is user-facing (shaliah-next or ezer-bot), does it include plans for translation in both mandatory languages (pt-BR and en-US) using the appropriate tooling (next-intl or @grammyjs/i18n)? Are additional languages properly deferred to roadmap.md?
+- **Principle VII (i18n)**: If the feature is user-facing (shaliah-next or ezer-bot), does it include plans for translation in both mandatory languages (pt-BR and en-US) using the appropriate tooling (next-intl or @grammyjs/i18n)? For shaliah-next: Does the plan account for feature-based translation organization (common translations in `messages/{locale}.json` + feature translations in `modules/<feature>/messages/{locale}.json`)? Are additional languages properly deferred to roadmap.md?
 
 ## Project Structure
 
@@ -94,14 +95,22 @@ specs/[###-feature]/
 ### Source Code (repository root)
 ```
 apps/
-├── shaliah-next/           # Web Application (Next.js 15 App Router)
+├── shaliah-next/           # Full-Stack Web Application (Next.js 15 App Router)
+│   ├── db/
+│   │   ├── schema/         # Drizzle ORM schema (single source of truth)
+│   │   │   ├── index.ts     # Export all schemas
+│   │   │   ├── users.ts
+│   │   │   ├── user-profiles.ts
+│   │   │   └── job-queue.ts # Background job queue table
+│   │   └── migrations/     # Drizzle-generated migrations
+│   ├── drizzle.config.ts   # Drizzle Kit configuration
 │   ├── src/
-│   │   ├── app/            # Next.js App Router pages
+│   │   ├── app/            # Next.js App Router pages + API routes
 │   │   ├── modules/        # Feature modules (DDD-inspired)
 │   │   │   └── {feature}/
 │   │   │       ├── domain/          # Domain types, validators, factories
 │   │   │       ├── ports/           # Repository interfaces
-│   │   │       ├── adapters/        # Concrete implementations (Supabase)
+│   │   │       ├── adapters/        # Concrete implementations (Drizzle + Supabase)
 │   │   │       ├── use-cases/       # Application operations
 │   │   │       ├── ui/
 │   │   │       │   ├── components/  # Presentational components
@@ -109,19 +118,21 @@ apps/
 │   │   │       │   │   └── actions.ts  # Server actions
 │   │   │       │   └── hooks/       # Client-side hooks
 │   │   │       ├── stores/          # Zustand stores (scoped)
+│   │   │       ├── messages/        # Feature translations (en.json, pt-BR.json)
 │   │   │       └── config.ts        # Module constants
 │   │   ├── components/     # Shared UI components + shadcn/ui
 │   │   ├── stores/         # Global Zustand stores (minimal)
 │   │   ├── lib/            
 │   │   │   ├── di.ts       # Composition root (DI wiring)
 │   │   │   ├── env.ts      # Environment variables
-│   │   │   └── supabase-client.ts  # Supabase clients
+│   │   │   ├── db.ts       # Drizzle client instance
+│   │   │   └── supabase/   # Supabase clients (server.ts, client.ts)
 │   │   ├── hooks/          # Shared hooks
-│   │   ├── i18n/           # next-intl setup
+│   │   ├── i18n/           # next-intl setup + load-messages.ts
 │   │   └── types/          
-│   ├── messages/           # Translation files (pt-BR.json, en.json)
+│   ├── messages/           # Common translations (pt-BR.json, en.json)
 │   ├── public/             
-│   └── __tests__/          # Jest + RTL
+│   └── __tests__/          # Jest + RTL + Vitest
 ├── ezer-bot/               # Telegram Bot (grammY)
 │   ├── src/
 │   │   ├── modules/        # Feature composers (welcome.ts, etc.)
@@ -130,21 +141,21 @@ apps/
 │   │   ├── lib/            # Shared utilities
 │   │   ├── bot.ts          # Bot composition (middleware + composers)
 │   │   └── logger.ts       # Logger package instance
-│   └── __tests__/          
-└── worker/                 # Background job processor (pg-boss)
+│   └── __tests__/          # Vitest
+└── poel-worker/            # Background job processor (Deno + pg-boss)
     ├── src/
     │   ├── handlers/       # Job handlers (cleanupAuthTokens.ts, etc.)
     │   ├── boss.ts         # pg-boss client
     │   ├── index.ts        # Worker entry point
     │   └── logger.ts       # Logger package instance
-    └── __tests__/          
+    └── __tests__/          # Deno test          
 packages/
 ├── logger/
 ├── eslint-config-custom/
 └── typescript-config/
 ```
 
-**Structure Decision**: [Document the selected structure - Primary changes in shaliah-next for web application features, ezer-bot for Telegram bot features, worker for background jobs. Reference the real directories captured above]
+**Structure Decision**: [Document the selected structure - Primary changes in shaliah-next for web application features (UI + backend via server actions/API routes), ezer-bot for Telegram bot features, poel-worker for background jobs. Reference the real directories captured above. Note: Database schema changes always go in shaliah-next/db/schema/]
 
 ## Phase 0: Outline & Research
 1. **Extract unknowns from Technical Context** above:

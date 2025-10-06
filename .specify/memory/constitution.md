@@ -1,36 +1,36 @@
 <!--
 Sync Impact Report:
-- Version change: 3.5.0 → 4.0.0 (MAJOR: Architectural change - removed yesod-api backend)
-- Removed Sections:
-    - **yesod-api (Hono + DDD)**: Backend API application removed from ecosystem
-    - **docs/architecture/yesod-api.md**: Architecture guide archived (functionality moved to shaliah-next)
+- Version change: 4.0.0 → 4.1.0 (MINOR: Feature-based i18n, Drizzle centralization, poel-worker naming)
+- Added Sections:
+    - **Technology Stack - Database Schema**: Added Drizzle ORM as centralized schema management with shaliah-next as single source of truth
 - Modified Sections:
-    - **Document Header**: Removed yesod-api from ecosystem description
-    - **Principle I (Domain-Centric Architecture)**: Removed yesod-api DDD pattern reference
-    - **Principle III (Comprehensive Testing)**: Removed yesod-api from backend testing framework list
-    - **Principle IV (Supabase-First Integration)**: Removed references to Yesod API as custom implementation layer; shaliah-next now handles complex business logic via server actions and use-cases
-    - **Technology Stack & Architecture**: Removed Backend API (yesod-api) entry
-    - **Application-Specific Architecture Patterns**: Removed yesod-api section entirely; shaliah-next patterns remain unchanged
-    - **Development Workflow - Architecture & Code Organization**: Removed yesod-api architecture review and code organization guidance
-    - **Development Workflow - Configuration Management**: Removed yesod-api env.ts reference
-    - **Development Workflow - Deployment & Release**: Removed yesod-api from independent deployment list
+    - **Document Header**: Updated worker naming from "asynchronous worker" to "poel-worker" for clarity
+    - **Principle IV (Supabase-First Integration)**: Expanded to include Next.js API routes alongside server actions
+    - **Principle VII (Internationalization)**: Kept clean as principle statute (implementation details in Application Patterns and Development Workflow sections)
+    - **Technology Stack - Database**: Added Drizzle ORM schema centralization details
+    - **Technology Stack - Web Application**: Expanded to clarify full-stack nature (server actions + API routes for backend)
+    - **Application-Specific Architecture Patterns - shaliah-next**: Added Drizzle ORM schema management, feature-based i18n organization with dynamic loader, API route patterns
+    - **Development Workflow - Database & Schema Management**: Added Drizzle ORM migration workflow and type sharing patterns
+    - **Development Workflow - Internationalization**: Added feature-based translation file organization (common + feature-specific) with detailed structure
 - Templates synchronized:
-    - .specify/templates/plan-template.md (✅ v4.0.0 - Removed yesod-api from architecture review, technical context, structure examples)
-    - .specify/templates/spec-template.md (✅ v4.0.0 - Updated version reference, removed yesod-api from constitution checks)
-    - .specify/templates/tasks-template.md (✅ v4.0.0 - Removed yesod-api from application list, examples, task patterns, validation checklist)
+    - .specify/templates/plan-template.md (✅ v4.1.0 - Added feature-based i18n, Drizzle schema, poel-worker references)
+    - .specify/templates/spec-template.md (✅ v4.1.0 - Updated version, added i18n structure requirements)
+    - .specify/templates/tasks-template.md (✅ v4.1.0 - Added Drizzle migration tasks, feature-based i18n validation)
 - Documentation synchronized:
-    - docs/architecture/yesod-api.md (✅ Archived with migration note)
+    - docs/architecture/shaliah-next.md (✅ Updated with feature-based i18n, Drizzle schema management, full-stack patterns)
+    - docs/architecture/poel-worker.md (✅ Updated with schema consumption from shaliah-next)
 - Rationale:
-    - shaliah-next Next.js application now handles all backend functionality via server actions, server components, and use-cases
-    - Consolidates backend logic into single application, reducing operational complexity
-    - Eliminates need for separate backend API deployment and maintenance
-    - Leverages Next.js server-side capabilities and Supabase direct integration
-    - MAJOR version bump: backward incompatible architectural change (removal of core application)
+    - Feature-based i18n improves modularity and maintainability for DDD/feature-driven architecture
+    - Drizzle ORM centralization ensures type safety across ecosystem
+    - poel-worker naming clarifies specific application identity
+    - API routes documented alongside server actions for complete backend picture
+    - Clean principle statutes with implementation details in appropriate workflow sections
+    - MINOR version bump: new guidance and expanded patterns (backward compatible)
 -->
 
-# Yesod Ecosystem Constitution v4.0.0
+# Yesod Ecosystem Constitution v4.1.0
 
-This document outlines the core principles, architectural constraints, and development workflows for the Yesod project, which includes the Shaliah Next.js application, the Ezer bot, and the asynchronous worker.
+This document outlines the core principles, architectural constraints, and development workflows for the Yesod project, which includes the Shaliah Next.js full-stack application, the Ezer Telegram bot, and the poel-worker background job processor.
 
 ## Core Principles
 
@@ -61,12 +61,12 @@ All applications MUST be accompanied by a robust testing suite to ensure correct
 
 ### IV. Supabase-First Integration
 
-All backend functionality MUST leverage Supabase's built-in capabilities (auth, database, storage, realtime) as the primary backend service before considering custom implementation. Complex business logic orchestration, custom integrations with external services, or computational tasks that Supabase cannot handle directly are implemented via Next.js server actions and use-cases in `shaliah-next`.
+All backend functionality MUST leverage Supabase's built-in capabilities (auth, database, storage, realtime) as the primary backend service before considering custom implementation. Complex business logic orchestration, custom integrations with external services, or computational tasks that Supabase cannot handle directly are implemented via Next.js server actions, server components, and API routes in `shaliah-next`.
 
-**Rationale:** Supabase provides battle-tested infrastructure for common backend needs. Maximizing its use reduces maintenance burden, improves security, and accelerates development. Custom backend logic is implemented using Next.js server-side capabilities (server actions, server components, route handlers) keeping all functionality within the web application.
+**Rationale:** Supabase provides battle-tested infrastructure for common backend needs. Maximizing its use reduces maintenance burden, improves security, and accelerates development. Custom backend logic is implemented using Next.js server-side capabilities (server actions for mutations, server components for data fetching, API routes for external integrations and webhooks) keeping all functionality within the web application.
 
 ### V. Decoupled, Asynchronous Processing
-Time-consuming and resource-intensive tasks are **never** executed in the main API request-response cycle. Operations exceeding 1 second, processing files >1MB, calling external APIs, or requiring significant CPU (e.g., audio fingerprinting, stem separation, transcription) MUST be offloaded to a persistent background **worker** via a robust job queue, ensuring the API remains fast and responsive.
+Time-consuming and resource-intensive tasks are **never** executed in the main API request-response cycle. Operations exceeding 1 second, processing files >1MB, calling external APIs, or requiring significant CPU (e.g., audio fingerprinting, stem separation, transcription) MUST be offloaded to **poel-worker** (persistent background job processor) via a robust job queue, ensuring the API remains fast and responsive.
 
 ### VI. TypeScript-First Monorepo
 
@@ -87,7 +87,10 @@ This section defines the non-negotiable technology stack for the ecosystem. Any 
 
 - **Database:** Supabase (PostgreSQL)
 - **Database Migrations & ORM:** `Drizzle ORM` (Schema defined in TypeScript)
-- **Web Application (`shaliah-next`):** `Next.js` (React framework) with `shadcn/ui` for UI components. Server actions and server components handle backend logic.
+  - **Schema Centralization**: All database schema MUST be defined in `shaliah-next/db/schema/` as single source of truth
+  - **Type Sharing**: Other applications (`poel-worker`, `ezer-bot`) MUST consume types via workspace references (`@yesod/shaliah-next/db/schema`)
+  - **Migration Workflow**: Schema changes in `shaliah-next` → generate migration → commit together
+- **Web Application (`shaliah-next`):** `Next.js` (React framework) with `shadcn/ui` for UI components. Full-stack application with server actions (mutations), server components (data fetching), and API routes (external integrations).
 - **Telegram Bot (`ezer-bot`):** `grammY` framework.
 - **Job Queue:** `pg-boss` with a persistent TypeScript worker.
 - **Testing:**
@@ -122,12 +125,15 @@ This section defines the non-negotiable technology stack for the ecosystem. Any 
   - `ui/server/actions.ts`: Server actions (mutation entrypoints)
   - `ui/hooks/`: Client-side UI hooks
   - `stores/`: Zustand stores (scoped to module)
+  - `messages/`: Feature-specific translations (`en.json`, `pt-BR.json`)
   - `config.ts`: Module-specific constants
+- **Database Schema (Drizzle ORM):** All schema in `db/schema/` (single source of truth); exports types for ecosystem consumption; migrations via `drizzle-kit`
 - **Dependency Injection:** Manual DI via `lib/di.ts` composition root; wire adapters into use-cases in server actions
 - **State Management:** Zustand for client-side ephemeral/interactive state (minimal global stores in `src/stores/`); server state via server components/props
-- **Server vs Client:** Server components fetch data and orchestrate use-cases; client components handle interactivity; server actions for mutations
-- **Supabase:** Server-side client (`lib/supabase-client.ts`) with service keys; browser client only for realtime/uploads
-- **Testing:** Unit tests (domain, validators, use-cases), integration tests (server actions), component tests (Jest + RTL), store tests (Zustand)
+- **Server vs Client:** Server components fetch data and orchestrate use-cases; client components handle interactivity; server actions for mutations; API routes for external integrations
+- **i18n (next-intl):** Common translations in `messages/{locale}.json`; feature translations in `modules/<feature>/messages/{locale}.json`; dynamic loader (`src/i18n/load-messages.ts`) merges with namespaces
+- **Supabase & Drizzle:** Server-side Supabase client (`lib/supabase/server.ts`) for auth; Drizzle ORM (`lib/db.ts`) for type-safe queries; browser client only for realtime/uploads
+- **Testing:** Unit tests (domain, validators, use-cases with Vitest), integration tests (server actions with Vitest), component tests (Jest + RTL), store tests (Zustand)
 
 **ezer-bot (grammY):**
 - **Module Structure:** Feature composers in `src/modules/` ([structuring guide](https://grammy.dev/advanced/structuring))
@@ -222,9 +228,31 @@ These guides provide detailed patterns for module structure, testing strategies,
 
 ### Database & Schema Management
 
-- Author migrations as Drizzle TypeScript files
-- Test locally before merging
-- Never apply migrations directly to production
+**Centralized Schema (shaliah-next):**
+- All database schema MUST be defined in `shaliah-next/db/schema/` using Drizzle ORM
+- One file per table or logical grouping (e.g., `users.ts`, `user-profiles.ts`, `job-queue.ts`)
+- Export all schemas from `db/schema/index.ts`
+- Schema is the single source of truth for the entire ecosystem
+
+**Migration Workflow:**
+1. Define/modify schema in `shaliah-next/db/schema/*.ts`
+2. Generate migration: `pnpm drizzle-kit generate:pg`
+3. Review migration in `db/migrations/`
+4. Apply migration: `pnpm drizzle-kit push:pg` (dev) or via Supabase migrations (prod)
+5. Commit schema + migration together
+6. Never apply migrations directly to production
+
+**Type Sharing:**
+- Other applications (`poel-worker`, `ezer-bot`) import via workspace reference:
+  ```typescript
+  import { jobQueue } from '@yesod/shaliah-next/db/schema'
+  import type { InferSelectModel } from 'drizzle-orm'
+  type Job = InferSelectModel<typeof jobQueue>
+  ```
+- Use Drizzle's `InferSelectModel` and `InferInsertModel` for type inference
+- Never duplicate schema definitions in consuming apps
+
+**Security:**
 - Enable Row-Level Security (RLS) on all tables
 - All auth flows via Supabase Auth (no custom logic)
 
@@ -239,8 +267,17 @@ These guides provide detailed patterns for module structure, testing strategies,
 - Never hardcode user-facing strings; all text MUST use translation keys
 
 **Implementation References:**
-- shaliah-next: `messages/{locale}.json` files (pt-BR.json and en.json required)
-- ezer-bot: `src/locales/{locale}.ftl` files (pt-BR.ftl and en.ftl required), session storage as `__language_code`
+
+**shaliah-next (feature-based organization):**
+- Common translations: `messages/{locale}.json` at project root (shared UI copy)
+- Feature translations: `modules/<feature>/messages/{locale}.json` (feature-specific strings)
+- Both pt-BR.json and en.json required for common AND each feature
+- Dynamic loader: `src/i18n/load-messages.ts` merges common + feature messages
+- Usage: `const t = useTranslations('featureName')` for namespaced keys
+
+**ezer-bot:**
+- `src/locales/{locale}.ftl` files (pt-BR.ftl and en.ftl required)
+- Session storage as `__language_code`
 
 ### Code Quality & Observability
 
@@ -252,10 +289,12 @@ These guides provide detailed patterns for module structure, testing strategies,
 
 ### Deployment & Release
 
-- Independent deployment: `ezer-bot`, `worker`, `shaliah-next` deploy separately
+- Independent deployment: `ezer-bot`, `poel-worker`, `shaliah-next` deploy separately
 - Database migrations: backwards-compatible (add → migrate data → remove)
+  * Schema changes managed in `shaliah-next` and applied before deploying consuming apps
 - Validate in staging before production
 - grammY bot: use `@grammyjs/runner` for long polling, handle SIGTERM/SIGINT gracefully
+- poel-worker: Deno runtime with least-privilege permissions
 
 ## Governance
 
@@ -263,4 +302,4 @@ This constitution is the supreme source of truth for the project's architecture 
 - All Pull Requests and code reviews must verify compliance with the principles and constraints outlined in this document.
 - Any proposal to amend this constitution must be documented, reviewed, and approved. A clear migration plan must be provided if the change affects existing architecture.
 
-**Version**: 4.0.0 | **Ratified**: 2025-01-15 | **Last Amended**: 2025-10-06
+**Version**: 4.1.0 | **Ratified**: 2025-01-15 | **Last Amended**: 2025-10-06

@@ -2,7 +2,7 @@
 
 **Input**: Design documents from `/specs/[###-feature-name]/`
 **Prerequisites**: plan.md (required), research.md, data-model.md, contracts/
-**Application(s):** [shaliah-next | ezer-bot | worker]
+**Application(s):** [shaliah-next | ezer-bot | poel-worker]
 
 ## Execution Flow (main)
 ```
@@ -38,7 +38,7 @@
 - Include exact file paths in descriptions
 
 ## Path Conventions (TypeScript Monorepo)
-- **Apps**: `apps/{shaliah-next|ezer-bot|worker}/src/`
+- **Apps**: `apps/{shaliah-next|ezer-bot|poel-worker}/src/`
 - **Tests (backend)**: colocated or `apps/<app>/__tests__/` with Vitest
 - **Tests (web UI)**: `apps/shaliah-next/__tests__/` with Jest + RTL
 - **Packages**: `packages/<name>/src/`
@@ -98,40 +98,45 @@
 - [ ] T027 Verify all Phase 3 implementation complete before proceeding to integration
 
 ## Phase 4: Integration
-- [ ] T028 Connect services to Supabase/DB (Drizzle schema + migrations)
-- [ ] T029 Auth middleware integrated with Supabase Auth
-- [ ] T030 Request/response logging (consistent fields) via packages/logger
-- [ ] T031 CORS and security headers
-- [ ] T032 Queue integration (pg-boss) for long-running tasks (worker)
+- [ ] T028 Drizzle schema definition in apps/shaliah-next/db/schema/ (single source of truth)
+- [ ] T029 Generate Drizzle migration in apps/shaliah-next/db/migrations/ and apply to Supabase
+- [ ] T030 Type imports via workspace references (e.g., from '@yesod/shaliah-next/db/schema') if consumed by poel-worker
+- [ ] T031 Connect services to Supabase/DB using Drizzle ORM
+- [ ] T032 Auth middleware integrated with Supabase Auth
+- [ ] T033 Request/response logging (consistent fields) via packages/logger
+- [ ] T034 CORS and security headers
+- [ ] T035 Queue integration (pg-boss) for long-running tasks (poel-worker)
 
 **Integration Testing & Validation:**
-- [ ] T033 Run integration tests for database connections and Supabase operations
-- [ ] T034 Use Supabase MCP to validate schema, migrations, and RLS policies
-- [ ] T035 Test auth flows end-to-end (login, session, permissions)
-- [ ] T036 Iterate on failures: analyze → fix → retest until all integration tests pass
+- [ ] T036 Run integration tests for database connections and Supabase operations
+- [ ] T037 Use Supabase MCP to validate schema, migrations, and RLS policies
+- [ ] T038 Test auth flows end-to-end (login, session, permissions)
+- [ ] T039 Iterate on failures: analyze → fix → retest until all integration tests pass
 
 ## Phase 5: Code Quality Validation
 **CRITICAL: Run after all implementation + testing complete**
-- [ ] T037 Run ESLint across all modified files and fix violations
-- [ ] T038 Run TypeScript type check (tsc --noEmit) and resolve type errors
-- [ ] T039 For unavoidable ESLint/TS errors: add suppression comments (@ts-expect-error, eslint-disable-next-line) with detailed justification
-- [ ] T040 Run Prettier to ensure consistent formatting
-- [ ] T041 Verify no console.log statements remain (use logger package instead)
+- [ ] T040 Run ESLint across all modified files and fix violations
+- [ ] T041 Run TypeScript type check (tsc --noEmit) and resolve type errors
+- [ ] T042 For unavoidable ESLint/TS errors: add suppression comments (@ts-expect-error, eslint-disable-next-line) with detailed justification
+- [ ] T043 Run Prettier to ensure consistent formatting
+- [ ] T044 Verify no console.log statements remain (use logger package instead)
 
 ## Phase 6: i18n & Polishing
-- [ ] T042 [P] i18n: Add translation keys for ALL user-facing text in both pt-BR and en-US (mandatory pair) in apps/shaliah-next/messages/*.json (MUST be complete before PR)
-- [ ] T043 [P] i18n: Document additional planned languages in specs/[###-feature]/roadmap.md (do NOT add partial translations)
-- [ ] T044 [P] i18n: Configure next-intl in apps/shaliah-next/src/i18n/request.ts (if first i18n setup)
-- [ ] T045 [P] i18n (bot): Add translation keys for ALL user-facing text in both pt-BR.ftl and en.ftl in apps/ezer-bot/src/locales/ (MUST be complete before PR)
-- [ ] T046 [P] i18n (bot): Implement /language command with sessions (if first i18n setup)
-- [ ] T047 Remove code duplication
+- [ ] T045 [P] i18n: Add common translation keys in apps/shaliah-next/messages/{pt-BR,en}.json (MUST be complete before PR)
+- [ ] T046 [P] i18n: Add feature-specific translation keys in apps/shaliah-next/src/modules/{feature}/messages/{pt-BR,en}.json if feature has domain-specific terms
+- [ ] T047 [P] i18n: Configure dynamic message loader in apps/shaliah-next/src/i18n/load-messages.ts to merge common and feature translations (if first feature-based i18n setup)
+- [ ] T048 [P] i18n: Document additional planned languages in specs/[###-feature]/roadmap.md (do NOT add partial translations)
+- [ ] T049 [P] i18n: Configure next-intl in apps/shaliah-next/src/i18n/request.ts (if first i18n setup)
+- [ ] T050 [P] i18n (bot): Add translation keys for ALL user-facing text in both pt-BR.ftl and en.ftl in apps/ezer-bot/src/locales/ (MUST be complete before PR)
+- [ ] T051 [P] i18n (bot): Implement /language command with sessions (if first i18n setup)
+- [ ] T052 Remove code duplication
 
 ## Dependencies
 - Setup (Phase 1: T001-T005) before Tests (Phase 2: T006-T010)
 - Tests (Phase 2: T006-T010) MUST complete before Implementation (Phase 3: T011-T027)
-- Implementation (Phase 3: T011-T027) before Integration (Phase 4: T028-T036)
-- Integration (Phase 4: T028-T036) before Code Quality (Phase 5: T037-T041)
-- Code Quality (Phase 5: T037-T041) before i18n & Polish (Phase 6: T042-T047)
+- Implementation (Phase 3: T011-T027) before Integration (Phase 4: T028-T039)
+- Integration (Phase 4: T028-T039) before Code Quality (Phase 5: T040-T044)
+- Code Quality (Phase 5: T040-T044) before i18n & Polish (Phase 6: T045-T052)
 - Within phases: Tasks marked [P] can run in parallel; sequential tasks must complete in order
 
 ## Parallel Example
@@ -183,14 +188,16 @@ Task: "Web UI component test in apps/shaliah-next/__tests__/components/UserProfi
 - [ ] Each task specifies exact file path
 - [ ] No task modifies same file as another [P] task
 - [ ] Supabase usage validated for auth/db/storage where applicable
+- [ ] Drizzle schema changes centralized in apps/shaliah-next/db/schema/ with proper migrations
+- [ ] Type sharing via workspace references when schema consumed by poel-worker
 - [ ] TypeScript-first enforced: all new code in TypeScript, shared packages utilized (Principle VI)
-- [ ] i18n coverage for pt-BR and en-US (mandatory pair); additional languages deferred to roadmap.md
+- [ ] i18n coverage with feature-based organization: common translations in messages/ and feature-specific in modules/<feature>/messages/ for pt-BR and en-US (mandatory pair); additional languages deferred to roadmap.md
 - [ ] MCP servers (Chrome DevTools, Supabase, Shadcn) identified for use in testing tasks when appropriate and available
 - [ ] For shaliah-next: existing components audited and reusable components explicitly listed in plan.md
 - [ ] Observability wired (logger + Sentry) in every app touched
-- [ ] Long-running work queued via pg-boss (no blocking API requests)
+- [ ] Long-running work queued via pg-boss to poel-worker (no blocking API requests)
 
 ---
 
-*Based on Constitution v4.0.0 — see `.specify/memory/constitution.md`*
+*Based on Constitution v4.1.0 — see `.specify/memory/constitution.md`*
 ````
