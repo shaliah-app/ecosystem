@@ -66,7 +66,7 @@ App Router** applications, using `next-intl`, Zustand, Supabase, and
 
 ------------------------------------------------------------------------
 
-# Suggested repo layout
+# Repo layout
 
     __tests__/                     # Jest + RTL tests
       unit/
