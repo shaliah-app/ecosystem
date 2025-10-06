@@ -19,21 +19,21 @@ This feature implements cross-application authentication linking between Shaliah
 
 ## Phase 1: Setup
 
-- [ ] **T001** Install `next-qrcode` dependency in `apps/shaliah-next/package.json`
+- [x] **T001** Install `next-qrcode` dependency in `apps/shaliah-next/package.json`
   - Run: `cd apps/shaliah-next && pnpm add next-qrcode`
   - Verify: Check package.json includes next-qrcode
 
-- [ ] **T002** [P] Verify ESLint and TypeScript configurations are active
+- [x] **T002** [P] Verify ESLint and TypeScript configurations are active
   - Check: `apps/shaliah-next/eslint.config.mjs` extends shared config
   - Check: `apps/ezer-bot/tsconfig.json` extends shared config
   - No changes needed if already configured
 
-- [ ] **T003** [P] Verify logger package wiring
+- [x] **T003** [P] Verify logger package wiring
   - Shaliah: Check `apps/shaliah-next/src/lib/logger.ts` exists and imports `@yesod/logger`
   - Ezer: Check `apps/ezer-bot/src/logger.ts` exists and imports `@yesod/logger`
   - No changes needed if already configured
 
-- [ ] **T004** [P] Verify Supabase client setup
+- [x] **T004** [P] Verify Supabase client setup
   - Shaliah: Check `apps/shaliah-next/src/lib/supabase/server.ts` and `client.ts` exist
   - Ezer: Check `apps/ezer-bot/src/lib/supabase.ts` exists with service role key
   - Verify environment variables: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `TELEGRAM_BOT_USERNAME`
@@ -56,40 +56,40 @@ This feature implements cross-application authentication linking between Shaliah
 
 ### Integration Tests
 
-- [ ] **T007** [P] Integration test: Generate token and verify database state
+- [x] **T007** [P] Integration test: Generate token and verify database state
   - File: `apps/shaliah-next/__tests__/integration/ezer-auth-token-generation.test.ts`
   - Test: Token inserted into auth_tokens table with correct expiration
   - Test: Old active tokens marked inactive when new token generated
   - Framework: Jest
   - Expected: FAIL (no implementation yet)
 
-- [ ] **T008** [P] Integration test: Sign-out propagates to Ezer (unlinks account)
+- [x] **T008** [P] Integration test: Sign-out propagates to Ezer (unlinks account)
   - File: `apps/shaliah-next/__tests__/integration/ezer-auth-signout.test.ts`
   - Test: Sign-out sets telegram_user_id to NULL
   - Test: Auth tokens remain unchanged (audit trail preserved)
   - Framework: Jest
   - Expected: FAIL (no implementation yet)
 
-- [ ] **T009** [P] Integration test: Bot links account successfully
+- [x] **T009** [P] Integration test: Bot links account successfully
   - File: `apps/ezer-bot/__tests__/integration/auth-link-success.test.ts`
   - Test: Valid token updates user_profiles.telegram_user_id
   - Test: Token marked as used (used_at timestamp set)
   - Test: Bot sends success message in correct language
-  - Framework: Vitest
+  - Framework: Jest
   - Expected: FAIL (no implementation yet)
 
-- [ ] **T010** [P] Integration test: Bot rejects expired/invalid tokens
+- [x] **T010** [P] Integration test: Bot rejects expired/invalid tokens
   - File: `apps/ezer-bot/__tests__/integration/auth-link-errors.test.ts`
   - Test: Expired token returns error message
   - Test: Already-used token returns error message
   - Test: Invalid token format returns error message
   - Test: Telegram account collision returns error message
-  - Framework: Vitest
+  - Framework: Jest
   - Expected: FAIL (no implementation yet)
 
 ### UI Component Tests
 
-- [ ] **T011** [P] Component test: QRCodeDisplay component
+- [x] **T011** [P] Component test: QRCodeDisplay component
   - File: `apps/shaliah-next/__tests__/components/QRCodeDisplay.test.tsx`
   - Test: Renders QR code SVG with correct deep link
   - Test: Displays loading state while generating
@@ -97,7 +97,7 @@ This feature implements cross-application authentication linking between Shaliah
   - Framework: Jest + React Testing Library
   - Expected: FAIL (component doesn't exist yet)
 
-- [ ] **T012** [P] Component test: EzerAuthSection component
+- [x] **T012** [P] Component test: EzerAuthSection component
   - File: `apps/shaliah-next/__tests__/components/EzerAuthSection.test.tsx`
   - Test: Displays QR code when token generated
   - Test: Displays "Or you might use this [link]" text with clickable link

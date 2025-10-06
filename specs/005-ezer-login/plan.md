@@ -10,7 +10,14 @@
 1. Load feature spec from Input path
    → If not found: ERROR "No feature spec at {path}"
 2. Identify affected applications from feature spec
-   → Read corresponding architecture guides from docs/architecture/
+   → Read corresponding architecture gu**Phase Status**:
+- [x] Phase 0: Research complete (/plan command) - ✅ research.md generated
+- [x] Phase 1: Design complete (/plan command) - ✅ data-model.md, contracts/, quickstart.md, contract tests generated
+- [x] Phase 1.5: Setup complete (/implement command) - ✅ Dependencies installed, configs verified, clients created
+- [x] Phase 2: Task planning approach described (/plan command - approach only, not execution)
+- [x] Phase 3: Tasks generated (/tasks command - NOT YET EXECUTED)
+- [ ] Phase 4: Implementation complete
+- [ ] Phase 5: Validation passedom docs/architecture/
    → For shaliah-next changes: Read docs/architecture/shaliah-next.md
    → For ezer-bot changes: Read docs/architecture/ezer-bot.md
    → Document key architectural patterns to follow in Technical Context
