@@ -21,10 +21,6 @@
   "profile": {
     "changeLanguage": "Alterar Idioma"
   },
-  "HomePage": {
-    "title": "Shaliah Next",
-    "welcome": "Bem-vindo ao Shaliah Next com integração Supabase"
-  },
   "AuthForm": {
     "signIn": "Entrar",
     "signUp": "Criar Conta",

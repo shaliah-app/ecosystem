@@ -1,5 +1,6 @@
 import {getRequestConfig} from 'next-intl/server';
 import { headers } from 'next/headers';
+import { loadMessages, normalizeLocale } from './load-messages';
 
 async function getLocaleFromHeaders() {
   const headersList = await headers();
@@ -33,8 +34,11 @@ export default getRequestConfig(async ({requestLocale}) => {
     locale = await getLocaleFromHeaders();
   }
 
+  // Normalize the locale
+  const normalizedLocale = normalizeLocale(locale);
+
   return {
-    locale,
-    messages: (await import(`../../messages/${locale}.json`)).default
+    locale: normalizedLocale,
+    messages: await loadMessages(normalizedLocale)
   };
 });
