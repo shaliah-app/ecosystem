@@ -1,0 +1,12 @@
+{
+  "imports": {
+    "@yesod/logger": "../../packages/logger/src/index.ts",
+    "@yesod/shaliah-next/db/schema": "../../apps/shaliah-next/src/db/schema/index.ts",
+    "zod": "npm:zod@4.1.11",
+    "drizzle-orm": "npm:drizzle-orm@0.44.6",
+    "drizzle-orm/pg-core": "npm:drizzle-orm@0.44.6/pg-core",
+    "drizzle-orm/postgres-js": "npm:drizzle-orm@0.44.6/postgres-js",
+    "@supabase/supabase-js": "npm:@supabase/supabase-js@2.39.0",
+    "postgres": "npm:postgres@3.4.7"
+  }
+}

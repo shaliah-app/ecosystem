@@ -1,0 +1,16 @@
+{
+  "tasks": {
+    "start": "deno run --allow-env --allow-net --allow-read --unstable src/main.ts",
+    "start:local": "deno run --allow-env --allow-net --allow-read src/main.ts",
+    "test": "deno test --allow-env --allow-net",
+    "fmt": "deno fmt",
+    "lint": "deno lint"
+  },
+  "lint": {
+    "rules": {
+      "exclude": ["no-explicit-any", "no-import-prefix", "no-process-global"]
+    }
+  },
+  "importMap": "./import_map.json",
+  "allowImportingTsExtensions": true
+}
