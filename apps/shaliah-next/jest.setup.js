@@ -10,6 +10,10 @@ global.Request = Request
 global.Response = Response
 global.Headers = Headers
 
+// Polyfills for Node.js setImmediate/clearImmediate (needed by postgres package)
+global.setImmediate = global.setImmediate || ((fn, ...args) => setTimeout(fn, 0, ...args))
+global.clearImmediate = global.clearImmediate || clearTimeout
+
 // Mock next-intl
 const translations = {
   auth: {
