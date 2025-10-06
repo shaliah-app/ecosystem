@@ -147,7 +147,7 @@ This feature implements cross-application authentication linking between Shaliah
 
 ### Shaliah: Domain Layer
 
-- [ ] **T018** [P] Create AuthToken domain types and factories
+- [x] **T018** [P] Create AuthToken domain types and factories
   - File: `apps/shaliah-next/src/modules/ezer-auth/domain/types.ts`
   - Define: AuthToken, TokenStatus types
   - File: `apps/shaliah-next/src/modules/ezer-auth/domain/factories/token-factory.ts`
@@ -155,13 +155,13 @@ This feature implements cross-application authentication linking between Shaliah
   - Implement: `calculateExpiration()` (now + 15 minutes)
   - Reference: research.md Section 1
 
-- [ ] **T019** [P] Create AuthToken validators
+- [x] **T019** [P] Create AuthToken validators
   - File: `apps/shaliah-next/src/modules/ezer-auth/domain/validators.ts`
   - Implement: `isTokenValid()` checking is_active, used_at, expires_at
   - Implement: Zod schemas for token format validation
   - Reference: data-model.md validation rules
 
-- [ ] **T020** [P] Create deep link service
+- [x] **T020** [P] Create deep link service
   - File: `apps/shaliah-next/src/modules/ezer-auth/domain/services/deep-link-service.ts`
   - Implement: `generateDeepLink(token)` returning `https://t.me/{bot}?start={token}`
   - Use: `process.env.TELEGRAM_BOT_USERNAME` for bot username
