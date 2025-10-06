@@ -10,7 +10,6 @@
    → If not found: ERROR "No feature spec at {path}"
 2. Identify affected applications from feature spec
    → Read corresponding architecture guides from docs/architecture/
-   → For yesod-api changes: Read docs/architecture/yesod-api.md
    → For shaliah-next changes: Read docs/architecture/shaliah-next.md
    → For ezer-bot changes: Read docs/architecture/ezer-bot.md
    → Document key architectural patterns to follow in Technical Context
@@ -53,14 +52,14 @@
 ## Architecture Review
 *Required for features modifying existing applications. Document patterns from architecture guides.*
 
-**Affected Applications**: [e.g., yesod-api, shaliah-next, ezer-bot]  
-**Architecture Guide(s) Read**: [e.g., docs/architecture/yesod-api.md]
+**Affected Applications**: [e.g., shaliah-next, ezer-bot, worker]  
+**Architecture Guide(s) Read**: [e.g., docs/architecture/shaliah-next.md]
 
 **Key Architectural Patterns to Follow**:
-- [Pattern 1 from guide, e.g., "DDD layering with domain → application → infra → api"]
-- [Pattern 2 from guide, e.g., "Manual DI via composition root in handlers"]
-- [Pattern 3 from guide, e.g., "Use createFactory() for complex dependency wiring"]
-- [Testing approach from guide, e.g., "Use app.request() with transformer functions for integration tests"]
+- [Pattern 1 from guide, e.g., "DDD-inspired layering with domain → ports → adapters → use-cases → ui"]
+- [Pattern 2 from guide, e.g., "Manual DI via lib/di.ts composition root"]
+- [Pattern 3 from guide, e.g., "Server actions inject adapters into use-cases for mutations"]
+- [Testing approach from guide, e.g., "Unit tests for domain/use-cases, integration tests for server actions"]
 - [Module structure from guide, e.g., "One feature per composer in src/modules/"]
 
 **Relevant Conventions**:
@@ -71,10 +70,10 @@
 ## Constitution Check
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-- **Principle I: Domain-Centric Architecture**: Is code organized by business domain/features rather than technical layers? Does business logic remain independent of infrastructure? For yesod-api: Does the design use DDD layering with proper dependency direction? For ezer-bot: Does the design use feature-based composer modules?
+- **Principle I: Domain-Centric Architecture**: Is code organized by business domain/features rather than technical layers? Does business logic remain independent of infrastructure? For shaliah-next: Does the design use DDD-inspired layering with proper dependency direction? For ezer-bot: Does the design use feature-based composer modules?
 - **Principle II: Pragmatic, MVP-First Development**: Is the feature scoped as an MVP? Are complex features or optimizations deferred to a clear roadmap rather than built all at once?
-- **Principle III: Comprehensive Testing**: Does the plan account for the correct testing framework for the target application (Jest/RTL for web UI, Vitest for backend)? Is TDD applied to all new business logic? Are tests included for all new business logic (no PR may merge without tests)? Does the plan identify appropriate scenarios for MCP servers (Chrome DevTools, Supabase, Shadcn) when applicable for testing, debugging, and development workflows?
-- **Principle IV: Supabase-First Integration**: Does the feature leverage Supabase's built-in capabilities (auth, database, storage, realtime) as the primary backend? Is the Yesod API used only for complex business logic, custom integrations, or when Supabase cannot handle the requirement?
+- **Principle III: Comprehensive Testing**: Does the plan account for the correct testing framework for the target application (Jest/RTL for web UI, Vitest for server actions/use-cases and backend services)? Is TDD applied to all new business logic? Are tests included for all new business logic (no PR may merge without tests)? Does the plan identify appropriate scenarios for MCP servers (Chrome DevTools, Supabase, Shadcn) when applicable for testing, debugging, and development workflows?
+- **Principle IV: Supabase-First Integration**: Does the feature leverage Supabase's built-in capabilities (auth, database, storage, realtime) as the primary backend? Is complex business logic implemented via Next.js server actions and use-cases in shaliah-next when Supabase cannot handle the requirement directly?
 - **Principle V: Decoupled, Asynchronous Processing**: Are time-consuming tasks offloaded to the background worker via job queue rather than executed in the API request-response cycle?
 - **Principle VI: TypeScript-First Monorepo**: Is all new code planned to be written in TypeScript within the monorepo structure? Are shared packages and workspace references properly utilized?
 - **Principle VII (i18n)**: If the feature is user-facing (shaliah-next or ezer-bot), does it include plans for translation in both mandatory languages (pt-BR and en-US) using the appropriate tooling (next-intl or @grammyjs/i18n)? Are additional languages properly deferred to roadmap.md?
@@ -95,24 +94,7 @@ specs/[###-feature]/
 ### Source Code (repository root)
 ```
 apps/
-├── yesod-api/              # Backend API (Hono + DDD)
-│   ├── src/
-│   │   ├── contexts/       # DDD bounded contexts
-│   │   │   └── {context-name}/
-│   │   │       ├── domain/          # Pure business logic, interfaces
-│   │   │       ├── application/     # Use cases, orchestration
-│   │   │       ├── infra/           # DB repos, external APIs
-│   │   │       │   ├── repositories/
-│   │   │       │   └── external/
-│   │   │       ├── api/             # Hono sub-app routes
-│   │   │       ├── constants.ts     # Domain constants (TTLs, limits)
-│   │   │       └── factory.ts       # Optional: DI wiring
-│   │   ├── config/         # env.ts for environment variables
-│   │   ├── db/             # Drizzle schema and client
-│   │   ├── server.ts       # App composition
-│   │   └── index.ts        # Entry point
-│   └── __tests__/          
-├── shaliah-next/           # Web UI (Next.js 15 App Router)
+├── shaliah-next/           # Web Application (Next.js 15 App Router)
 │   ├── src/
 │   │   ├── app/            # Next.js App Router pages
 │   │   ├── modules/        # Feature modules (DDD-inspired)
@@ -162,8 +144,7 @@ packages/
 └── typescript-config/
 ```
 
-**Structure Decision**: [Document the selected structure and reference the real
-directories captured above]
+**Structure Decision**: [Document the selected structure - Primary changes in shaliah-next for web application features, ezer-bot for Telegram bot features, worker for background jobs. Reference the real directories captured above]
 
 ## Phase 0: Outline & Research
 1. **Extract unknowns from Technical Context** above:
@@ -279,4 +260,4 @@ directories captured above]
 - [ ] Complexity deviations documented
 
 ---
-*Based on Constitution v3.5.0 - See `.specify/memory/constitution.md`*
+*Based on Constitution v4.0.0 - See `.specify/memory/constitution.md`*

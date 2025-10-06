@@ -1,25 +1,36 @@
 <!--
 Sync Impact Report:
-- Version change: 3.4.0 → 3.5.0 (MINOR: Added architecture documentation review requirement)
-- Added Sections:
-    - **Architecture Documentation Review**: New mandatory step in Architecture & Code Organization workflow requiring LLMs to read app-specific architecture guides before planning
+- Version change: 3.5.0 → 4.0.0 (MAJOR: Architectural change - removed yesod-api backend)
+- Removed Sections:
+    - **yesod-api (Hono + DDD)**: Backend API application removed from ecosystem
+    - **docs/architecture/yesod-api.md**: Architecture guide archived (functionality moved to shaliah-next)
 - Modified Sections:
-    - **Architecture & Code Organization**: Added architecture documentation review workflow with links to app-specific guides
+    - **Document Header**: Removed yesod-api from ecosystem description
+    - **Principle I (Domain-Centric Architecture)**: Removed yesod-api DDD pattern reference
+    - **Principle III (Comprehensive Testing)**: Removed yesod-api from backend testing framework list
+    - **Principle IV (Supabase-First Integration)**: Removed references to Yesod API as custom implementation layer; shaliah-next now handles complex business logic via server actions and use-cases
+    - **Technology Stack & Architecture**: Removed Backend API (yesod-api) entry
+    - **Application-Specific Architecture Patterns**: Removed yesod-api section entirely; shaliah-next patterns remain unchanged
+    - **Development Workflow - Architecture & Code Organization**: Removed yesod-api architecture review and code organization guidance
+    - **Development Workflow - Configuration Management**: Removed yesod-api env.ts reference
+    - **Development Workflow - Deployment & Release**: Removed yesod-api from independent deployment list
 - Templates synchronized:
-    - .specify/templates/plan-template.md (✅ v3.5.0 - Added architecture review step in execution flow)
-    - .specify/templates/tasks-template.md (✅ v3.5.0 - Updated version reference)
-    - .specify/templates/spec-template.md (✅ v3.5.0 - Updated version reference)
+    - .specify/templates/plan-template.md (✅ v4.0.0 - Removed yesod-api from architecture review, technical context, structure examples)
+    - .specify/templates/spec-template.md (✅ v4.0.0 - Updated version reference, removed yesod-api from constitution checks)
+    - .specify/templates/tasks-template.md (✅ v4.0.0 - Removed yesod-api from application list, examples, task patterns, validation checklist)
+- Documentation synchronized:
+    - docs/architecture/yesod-api.md (✅ Archived with migration note)
 - Rationale:
-    - Architecture documentation provides critical context for maintaining consistency across applications
-    - LLMs must understand established patterns before proposing modifications
-    - Improves code quality by ensuring adherence to application-specific best practices
-    - Prevents architectural drift by making guides authoritative references
-    - MINOR version bump: adds new mandatory workflow step (material expansion of guidance)
+    - shaliah-next Next.js application now handles all backend functionality via server actions, server components, and use-cases
+    - Consolidates backend logic into single application, reducing operational complexity
+    - Eliminates need for separate backend API deployment and maintenance
+    - Leverages Next.js server-side capabilities and Supabase direct integration
+    - MAJOR version bump: backward incompatible architectural change (removal of core application)
 -->
 
-# Yesod Ecosystem Constitution v3.5.0
+# Yesod Ecosystem Constitution v4.0.0
 
-This document outlines the core principles, architectural constraints, and development workflows for the Yesod project, which includes the Yesod API, the Shaliah application, the Ezer bot, and the asynchronous worker.
+This document outlines the core principles, architectural constraints, and development workflows for the Yesod project, which includes the Shaliah Next.js application, the Ezer bot, and the asynchronous worker.
 
 ## Core Principles
 
@@ -28,12 +39,12 @@ This document outlines the core principles, architectural constraints, and devel
 All applications MUST organize code by business domain or feature concerns, not by technical layers. Business logic MUST be independent of infrastructure details, enabling isolated testing and flexible implementation choices.
 
 **Key Rules:**
-- Code organization reflects business capabilities (e.g., `contexts/users/`, `modules/welcome/`), not technical roles (e.g., `controllers/`, `services/`)
+- Code organization reflects business capabilities (e.g., `modules/onboarding/`, `modules/welcome/`), not technical roles (e.g., `controllers/`, `services/`)
 - Business logic layers define interfaces; infrastructure layers implement them
 - Dependencies flow inward: infrastructure depends on domain, never the reverse
-- Each application follows framework-appropriate patterns (DDD for APIs, composer modules for bots)
+- Each application follows framework-appropriate patterns (DDD-inspired modules for Next.js, composer modules for bots)
 
-**Implementation patterns:** See Technology Stack & Architecture section for framework-specific guidance (yesod-api: DDD layering; ezer-bot: grammY composers).
+**Implementation patterns:** See Technology Stack & Architecture section for framework-specific guidance (shaliah-next: DDD-inspired layering; ezer-bot: grammY composers).
 
 ### II. Pragmatic, MVP-First Development
 Features should be planned and developed in phases. The primary goal is to ship a valuable Minimum Viable Product (MVP) quickly. More complex features or optimizations should be placed on a clear roadmap and built upon a solid foundation, rather than attempting to build everything at once. This principle prioritizes delivering value to users over premature optimization.
@@ -41,8 +52,8 @@ Features should be planned and developed in phases. The primary goal is to ship 
 ### III. Reliability Through Comprehensive Testing
 
 All applications MUST be accompanied by a robust testing suite to ensure correctness and reliability. Testing frameworks are standardized by application type:
-- **Web Interface (`shaliah-next`):** Jest + React Testing Library
-- **Backend APIs (`yesod-api`, `ezer-bot`, `worker`):** Vitest
+- **Web Application (`shaliah-next`):** Jest + React Testing Library for UI components; Vitest for server actions and use-cases
+- **Backend Services (`ezer-bot`, `worker`):** Vitest
 
 **Test-Driven Development (TDD):** For all new business logic (domain operations, use cases, data transformations, auth flows), tests MUST precede implementation to ensure correctness and resilience. No PR may merge without tests covering new business logic.
 
@@ -50,9 +61,9 @@ All applications MUST be accompanied by a robust testing suite to ensure correct
 
 ### IV. Supabase-First Integration
 
-All backend functionality MUST leverage Supabase's built-in capabilities (auth, database, storage, realtime) as the primary backend service before considering custom implementation. The Yesod API serves ONLY for complex business logic orchestration, custom integrations with external services, or computational tasks that Supabase cannot handle directly.
+All backend functionality MUST leverage Supabase's built-in capabilities (auth, database, storage, realtime) as the primary backend service before considering custom implementation. Complex business logic orchestration, custom integrations with external services, or computational tasks that Supabase cannot handle directly are implemented via Next.js server actions and use-cases in `shaliah-next`.
 
-**Rationale:** Supabase provides battle-tested infrastructure for common backend needs. Maximizing its use reduces maintenance burden, improves security, and accelerates development while keeping the Yesod API focused on domain-specific logic.
+**Rationale:** Supabase provides battle-tested infrastructure for common backend needs. Maximizing its use reduces maintenance burden, improves security, and accelerates development. Custom backend logic is implemented using Next.js server-side capabilities (server actions, server components, route handlers) keeping all functionality within the web application.
 
 ### V. Decoupled, Asynchronous Processing
 Time-consuming and resource-intensive tasks are **never** executed in the main API request-response cycle. Operations exceeding 1 second, processing files >1MB, calling external APIs, or requiring significant CPU (e.g., audio fingerprinting, stem separation, transcription) MUST be offloaded to a persistent background **worker** via a robust job queue, ensuring the API remains fast and responsive.
@@ -61,7 +72,7 @@ Time-consuming and resource-intensive tasks are **never** executed in the main A
 
 All packages and applications in the Yesod ecosystem MUST use TypeScript as the authoritative source language within a modular monorepo architecture. This ensures type safety, code sharing, and consistency across the entire system.
 - **TypeScript Requirement:** New packages are authored in TypeScript and provide type declarations. Applications should consume packages with TypeScript typings and prefer workspace references.
-- **Monorepo Structure:** All code resides in a single `pnpm` + `Turborepo` monorepo composed of independent `apps` (e.g., `yesod-api`, `ezer-bot`, `worker`) and shared `packages` (e.g., `logger`, `db-types`). This structure promotes code sharing, consistency, and simplified dependency management.
+- **Monorepo Structure:** All code resides in a single `pnpm` + `Turborepo` monorepo composed of independent `apps` (e.g., `shaliah-next`, `ezer-bot`, `worker`) and shared `packages` (e.g., `logger`, `db-types`). This structure promotes code sharing, consistency, and simplified dependency management.
 - **Amendment Requirement:** Any deviation from TypeScript-first must be explicitly approved in a constitution amendment.
 
 ### VII. Internationalization (i18n) for User-Facing Applications
@@ -76,13 +87,12 @@ This section defines the non-negotiable technology stack for the ecosystem. Any 
 
 - **Database:** Supabase (PostgreSQL)
 - **Database Migrations & ORM:** `Drizzle ORM` (Schema defined in TypeScript)
-- **Backend API (`yesod-api`):** `Hono` framework on a Node.js runtime.
-- **Web Application (`shaliah-next`):** `Next.js` (React framework) with `shadcn/ui` for UI components.
+- **Web Application (`shaliah-next`):** `Next.js` (React framework) with `shadcn/ui` for UI components. Server actions and server components handle backend logic.
 - **Telegram Bot (`ezer-bot`):** `grammY` framework.
 - **Job Queue:** `pg-boss` with a persistent TypeScript worker.
 - **Testing:**
     - **Web UI:** `Jest` + `React Testing Library`
-    - **Backend/API:** `Vitest`
+    - **Backend/Server:** `Vitest` (for server actions, use-cases, and backend services)
 - **Internationalization:**
     - **`shaliah-next`:** `next-intl`
     - **`ezer-bot`:** `@grammyjs/i18n`
@@ -93,7 +103,7 @@ This section defines the non-negotiable technology stack for the ecosystem. Any 
 - **Observability:**
     - **Structured Logging:** shared `packages/logger` module.
     - **Error Tracking:** `Sentry`.
-    - **Sentry SDK Requirement:** Each application (`yesod-api`, `ezer-bot`, `worker`, `shaliah-next`) **must** include and initialize its own environment-specific Sentry SDK (e.g., `@sentry/node`, `@sentry/nextjs`) to ensure proper context is captured for all error reports.
+    - **Sentry SDK Requirement:** Each application (`ezer-bot`, `worker`, `shaliah-next`) **must** include and initialize its own environment-specific Sentry SDK (e.g., `@sentry/node`, `@sentry/nextjs`) to ensure proper context is captured for all error reports.
 - **Authentication:** Supabase Auth, supporting Google OAuth and Email Magic Links.
 - **Code Quality:**
     - **Linting:** ESLint with shared configuration (`packages/eslint-config-custom`).
@@ -101,11 +111,6 @@ This section defines the non-negotiable technology stack for the ecosystem. Any 
     - **Type Checking:** TypeScript strict mode enabled across all packages and applications.
 
 ### Application-Specific Architecture Patterns
-
-**yesod-api (Hono + DDD):**
-- **Layer Structure:** `domain/` → `application/` → `infra/` → `api/`
-- **Dependency Injection:** Manual DI; composable factories per bounded context when complexity justifies
-- **Bounded Contexts:** Each context exports Hono sub-app, mounted in `server.ts`
 
 **shaliah-next (Next.js 15 App Router + DDD-inspired):**
 - **Module Structure:** Feature modules in `src/modules/{feature}/` with DDD-inspired layering
@@ -141,18 +146,10 @@ This section defines practical workflows grouped by development concerns, not ma
 
 **Architecture Documentation Review:**
 Before planning features that modify existing applications, MUST read the application-specific architecture guide in `docs/architecture/` to understand established patterns, conventions, and best practices:
-- `docs/architecture/yesod-api.md`: Backend API architecture (Hono + DDD)
-- `docs/architecture/shaliah-next.md`: Frontend architecture (Next.js + DDD-inspired)
+- `docs/architecture/shaliah-next.md`: Frontend and backend architecture (Next.js + DDD-inspired)
 - `docs/architecture/ezer-bot.md`: Telegram bot architecture (grammY + composers)
 
 These guides provide detailed patterns for module structure, testing strategies, middleware ordering, and integration approaches that MUST be followed to maintain consistency across the codebase.
-
-**yesod-api:**
-- Organize by bounded contexts in `src/contexts/{context-name}/`
-- Follow DDD layering: `domain/` → `application/` → `infra/` → `api/`
-- Wire dependencies explicitly in `server.ts` or per-context `factory.ts`
-- Each context exports a Hono sub-app mounted in main `server.ts`
-- See Technology Stack & Architecture section for detailed layer structure
 
 **shaliah-next:**
 - Organize by feature modules in `src/modules/{feature}/`
@@ -170,9 +167,8 @@ These guides provide detailed patterns for module structure, testing strategies,
 - Reference: `apps/ezer-bot/src/bot.ts` and [grammY structuring guide](https://grammy.dev/advanced/structuring)
 
 **Configuration Management:**
-- **Environment Variables:** Centralized in `lib/env.ts` (shaliah-next) or `config/env.ts` (yesod-api) with Zod validation; never use `process.env` directly in business logic
-- **Domain Constants:** Per context/feature in `contexts/{context}/constants.ts` (yesod-api) or `modules/{feature}/config.ts` (shaliah-next) for feature-specific values (TTLs, limits, formats, thresholds)
-- **Factory Pattern:** Optional per bounded context (`factory.ts`) for environment-based implementation selection when complexity justifies
+- **Environment Variables:** Centralized in `lib/env.ts` (shaliah-next) with Zod validation; never use `process.env` directly in business logic
+- **Domain Constants:** Per feature in `modules/{feature}/config.ts` (shaliah-next) for feature-specific values (TTLs, limits, formats, thresholds)
 - **Component Reuse (shaliah-next only):** Before creating new UI components, MUST audit existing components in `src/components/` (shared) and `src/modules/*/ui/components/` (feature-scoped); reuse atomic components (shadcn/ui wrappers) and composed components when they satisfy requirements; document evaluated components explicitly in planning phase
 
 ### Planning & Specification
@@ -256,7 +252,7 @@ These guides provide detailed patterns for module structure, testing strategies,
 
 ### Deployment & Release
 
-- Independent deployment: `yesod-api`, `ezer-bot`, `worker`, `shaliah-next` deploy separately
+- Independent deployment: `ezer-bot`, `worker`, `shaliah-next` deploy separately
 - Database migrations: backwards-compatible (add → migrate data → remove)
 - Validate in staging before production
 - grammY bot: use `@grammyjs/runner` for long polling, handle SIGTERM/SIGINT gracefully
@@ -267,4 +263,4 @@ This constitution is the supreme source of truth for the project's architecture 
 - All Pull Requests and code reviews must verify compliance with the principles and constraints outlined in this document.
 - Any proposal to amend this constitution must be documented, reviewed, and approved. A clear migration plan must be provided if the change affects existing architecture.
 
-**Version**: 3.5.0 | **Ratified**: 2025-01-15 | **Last Amended**: 2025-10-04
+**Version**: 4.0.0 | **Ratified**: 2025-01-15 | **Last Amended**: 2025-10-06

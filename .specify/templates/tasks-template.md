@@ -2,7 +2,7 @@
 
 **Input**: Design documents from `/specs/[###-feature-name]/`
 **Prerequisites**: plan.md (required), research.md, data-model.md, contracts/
-**Application(s):** [yesod-api | shaliah-next | ezer-bot | worker]
+**Application(s):** [shaliah-next | ezer-bot | worker]
 
 ## Execution Flow (main)
 ```
@@ -38,7 +38,7 @@
 - Include exact file paths in descriptions
 
 ## Path Conventions (TypeScript Monorepo)
-- **Apps**: `apps/{yesod-api|shaliah-next|ezer-bot|worker}/src/`
+- **Apps**: `apps/{shaliah-next|ezer-bot|worker}/src/`
 - **Tests (backend)**: colocated or `apps/<app>/__tests__/` with Vitest
 - **Tests (web UI)**: `apps/shaliah-next/__tests__/` with Jest + RTL
 - **Packages**: `packages/<name>/src/`
@@ -55,9 +55,9 @@
 **IMPORTANT GUIDELINE:**
 - These tests MUST be written and MUST FAIL before ANY implementation
 
-- [ ] T006 [P] Contract test POST /api/users in apps/yesod-api/__tests__/contract/users.post.test.ts (Vitest)
-- [ ] T007 [P] Contract test GET /api/users/{id} in apps/yesod-api/__tests__/contract/users.get.test.ts (Vitest)
-- [ ] T008 [P] Integration test auth flow in apps/yesod-api/__tests__/integration/auth.test.ts (Vitest)
+- [ ] T006 [P] Contract test POST /api/users in apps/shaliah-next/__tests__/contract/users.post.test.ts (Vitest)
+- [ ] T007 [P] Contract test GET /api/users/{id} in apps/shaliah-next/__tests__/contract/users.get.test.ts (Vitest)
+- [ ] T008 [P] Integration test auth flow in apps/shaliah-next/__tests__/integration/auth.test.ts (Vitest)
 - [ ] T009 [P] Web UI component test in apps/shaliah-next/__tests__/components/Example.test.tsx (Jest+RTL)
 - [ ] T010 [P] Bot command behavior test in apps/ezer-bot/__tests__/commands/start.test.ts (Vitest)
 
@@ -65,15 +65,6 @@
 **IMPORTANT GUIDELINES:**
 - Follow architecture pattern for target app
 - Each implementation task includes testing iteration until tests pass
-
-**For yesod-api (DDD layered):**
-- [ ] T011 [P] Domain entities in apps/yesod-api/src/contexts/{context}/domain/entities.ts
-- [ ] T012 [P] Domain interfaces in apps/yesod-api/src/contexts/{context}/domain/interfaces.ts
-- [ ] T013 [P] Application use cases in apps/yesod-api/src/contexts/{context}/application/useCases.ts
-- [ ] T014 [P] Infrastructure repositories in apps/yesod-api/src/contexts/{context}/infra/repositories/
-- [ ] T015 Context factory in apps/yesod-api/src/contexts/{context}/factory.ts (if complex wiring needed)
-- [ ] T016 [P] API routes (Hono sub-app) in apps/yesod-api/src/contexts/{context}/api/routes.ts
-- [ ] T017 Wire context in apps/yesod-api/src/server.ts using app.route()
 
 **For shaliah-next (DDD-inspired modules):**
 - [ ] T011 [P] Domain types and validators in apps/shaliah-next/src/modules/{feature}/domain/
@@ -101,7 +92,7 @@
 
 **Testing & Validation (after implementation complete):**
 - [ ] T023 Run all related tests for implemented features (unit, integration, component)
-- [ ] T024 [when appropriate] Use Supabase MCP to inspect DB state and validate data operations (yesod-api, shaliah-next adapters)
+- [ ] T024 [when appropriate] Use Supabase MCP to inspect DB state and validate data operations (shaliah-next adapters, worker)
 - [ ] T025 [when appropriate] Use Chrome DevTools MCP for browser testing and UI validation (shaliah-next components/pages)
 - [ ] T026 Iterate on failures: analyze → fix implementation (or test if requirements misunderstood) → retest
 - [ ] T027 Verify all Phase 3 implementation complete before proceeding to integration
@@ -146,9 +137,9 @@
 ## Parallel Example
 ```
 # Launch T006-T009 together (Phase 2: Tests First):
-Task: "Contract test POST /api/users in apps/yesod-api/__tests__/contract/users.post.test.ts (Vitest)"
-Task: "Contract test GET /api/users/{id} in apps/yesod-api/__tests__/contract/users.get.test.ts (Vitest)"
-Task: "Integration test auth flow in apps/yesod-api/__tests__/integration/auth.test.ts (Vitest)"
+Task: "Contract test POST /api/users in apps/shaliah-next/__tests__/contract/users.post.test.ts (Vitest)"
+Task: "Contract test GET /api/users/{id} in apps/shaliah-next/__tests__/contract/users.get.test.ts (Vitest)"
+Task: "Integration test auth flow in apps/shaliah-next/__tests__/integration/auth.test.ts (Vitest)"
 Task: "Web UI component test in apps/shaliah-next/__tests__/components/UserProfile.test.tsx (Jest+RTL)"
 ```
 
@@ -201,5 +192,5 @@ Task: "Web UI component test in apps/shaliah-next/__tests__/components/UserProfi
 
 ---
 
-*Based on Constitution v3.5.0 — see `.specify/memory/constitution.md`*
+*Based on Constitution v4.0.0 — see `.specify/memory/constitution.md`*
 ````
