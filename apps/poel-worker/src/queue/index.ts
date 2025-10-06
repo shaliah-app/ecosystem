@@ -1,26 +1,39 @@
-import { drizzle } from "drizzle-orm/postgres-js";
-import postgres from "postgres";
-import { jobQueue } from "@yesod/shaliah-next/db/schema";
-import { eq } from "drizzle-orm";
-import type { Job } from "../types/job.ts";
-import { config } from "../config.ts";
+import { supabase } from "../supabase.ts";
 import { logger } from "../utils/logger.ts";
 
-// Create database connection
-const client = postgres(config.databaseUrl);
-const db = drizzle(client);
+// PGMQ message structure from Supabase Queues
+interface PGMQMessage {
+  msg_id: number;
+  message: any;
+  read_ct: number;
+  enqueued_at: string;
+  vt: string; // visibility timeout
+}
 
-export class QueueManager {
+// Job queue interface for the worker
+export interface JobMessage {
+  id: string; // msg_id as string for compatibility
+  type: string;
+  payload: any;
+  readCount: number;
+}
+
+export class SupabaseQueueManager {
   private isRunning = false;
   private pollInterval: number;
+  private queueName: string;
 
-  constructor(pollIntervalMs: number = 5000) {
+  constructor(queueName: string = 'background_tasks', pollIntervalMs: number = 5000) {
+    this.queueName = queueName;
     this.pollInterval = pollIntervalMs;
   }
 
   async start() {
     this.isRunning = true;
-    logger.info("Starting queue manager", { pollInterval: this.pollInterval });
+    logger.info("Starting Supabase Queues consumer", {
+      queueName: this.queueName,
+      pollInterval: this.pollInterval
+    });
 
     while (this.isRunning) {
       try {
@@ -37,97 +50,70 @@ export class QueueManager {
     }
   }
 
-  async stop() {
+  stop() {
     this.isRunning = false;
-    logger.info("Stopping queue manager");
-    await client.end();
+    logger.info("Stopping Supabase Queues consumer", { queueName: this.queueName });
   }
 
   private async processNextJob() {
-    // Use FOR UPDATE SKIP LOCKED to safely get next job
-    const query = `
-      SELECT id, type, payload, status, attempts, priority, run_at, created_at, updated_at
-      FROM job_queue
-      WHERE status = 'pending'
-        AND (run_at IS NULL OR run_at <= NOW())
-      ORDER BY priority DESC, created_at ASC
-      LIMIT 1
-      FOR UPDATE SKIP LOCKED
-    `;
+    // Pop message from Supabase Queues (PGMQ)
+    const { data, error } = await supabase
+      .schema('pgmq_public')
+      .rpc('pop', { queue_name: this.queueName });
 
-    const result = await client.unsafe(query);
-
-    if (result.length === 0) {
-      return; // No jobs available
+    if (error) {
+      logger.error("Failed to pop message from queue", {
+        queueName: this.queueName,
+        error: error.message
+      });
+      return;
     }
 
-    const job = result[0] as unknown as Job;
+    if (!data || data.length === 0) {
+      return; // No messages available
+    }
+
+    const pgmqMessage = data[0] as PGMQMessage;
+
+    // Transform PGMQ message to our JobMessage format
+    const jobMessage: JobMessage = {
+      id: pgmqMessage.msg_id.toString(),
+      type: pgmqMessage.message.type,
+      payload: pgmqMessage.message.payload,
+      readCount: pgmqMessage.read_ct,
+    };
 
     try {
-      // Mark job as processing
-      await db
-        .update(jobQueue)
-        .set({
-          status: "processing",
-          updatedAt: new Date(),
-        })
-        .where(eq(jobQueue.id, job.id));
-
-      logger.info("Job marked as processing", {
-        jobId: job.id,
-        type: job.type,
+      logger.info("Processing job", {
+        msgId: jobMessage.id,
+        type: jobMessage.type,
+        readCount: jobMessage.readCount
       });
 
-      // Here we would dispatch to the appropriate handler
-      // This will be implemented in the jobs dispatcher
+      // Dispatch to job handler
       const { dispatchJob } = await import("../jobs/index.ts");
 
       try {
-        await dispatchJob(job.id, job.type, job.payload);
+        await dispatchJob(jobMessage.id, jobMessage.type, jobMessage.payload);
 
-        // Mark job as done
-        await db
-          .update(jobQueue)
-          .set({
-            status: "done",
-            updatedAt: new Date(),
-          })
-          .where(eq(jobQueue.id, job.id));
-
+        // Message is automatically removed by pop() on success
         logger.info("Job completed successfully", {
-          jobId: job.id,
-          type: job.type,
+          msgId: jobMessage.id,
+          type: jobMessage.type,
         });
+
       } catch (error) {
         const errorMessage = error instanceof Error
           ? error.message
           : String(error);
 
-        // Increment attempts and decide next status
-        const newAttempts = job.attempts + 1;
-        const maxAttempts = 3; // Configure this
-        const nextStatus = newAttempts >= maxAttempts ? "failed" : "retrying";
+        // Handle job failure with retry logic
+        await this.handleJobFailure(jobMessage, errorMessage);
 
-        // Calculate backoff delay (exponential backoff)
-        const backoffMs = Math.pow(2, newAttempts) * 1000; // 2^attempts seconds
-        const runAt = new Date(Date.now() + backoffMs);
-
-        await db
-          .update(jobQueue)
-          .set({
-            status: nextStatus,
-            attempts: newAttempts,
-            runAt: nextStatus === "retrying" ? runAt : null,
-            updatedAt: new Date(),
-          })
-          .where(eq(jobQueue.id, job.id));
-
-        logger.warn("Job failed, scheduled for retry", {
-          jobId: job.id,
-          type: job.type,
-          attempts: newAttempts,
-          nextStatus,
-          runAt: runAt.toISOString(),
+        logger.warn("Job failed, retry scheduled", {
+          msgId: jobMessage.id,
+          type: jobMessage.type,
+          readCount: jobMessage.readCount,
           error: errorMessage,
         });
       }
@@ -136,34 +122,98 @@ export class QueueManager {
         ? error.message
         : String(error);
       logger.error("Error processing job", {
-        jobId: job.id,
-        type: job.type,
+        msgId: jobMessage.id,
+        type: jobMessage.type,
         error: errorMessage,
       });
     }
   }
 
-  // Method to enqueue a new job
+  private async handleJobFailure(jobMessage: JobMessage, errorMessage: string) {
+    const maxRetries = 5;
+    const currentReadCount = jobMessage.readCount;
+
+    if (currentReadCount >= maxRetries) {
+      // Archive failed message after max retries
+      const { error: archiveError } = await supabase
+        .schema('pgmq_public')
+        .rpc('archive', {
+          queue_name: this.queueName,
+          msg_id: parseInt(jobMessage.id)
+        });
+
+      if (archiveError) {
+        logger.error("Failed to archive message", {
+          msgId: jobMessage.id,
+          error: archiveError.message
+        });
+      } else {
+        logger.warn("Job archived after max retries", {
+          msgId: jobMessage.id,
+          type: jobMessage.type,
+          maxRetries,
+          finalError: errorMessage,
+        });
+      }
+    } else {
+      // Re-queue with exponential backoff
+      const backoffSeconds = this.calculateBackoff(currentReadCount);
+      const runAt = new Date(Date.now() + backoffSeconds * 1000);
+
+      const { error: sendError } = await supabase
+        .schema('pgmq_public')
+        .rpc('send', {
+          queue_name: this.queueName,
+          message: {
+            type: jobMessage.type,
+            payload: jobMessage.payload,
+          },
+          sleep_seconds: backoffSeconds,
+        });
+
+      if (sendError) {
+        logger.error("Failed to re-queue message", {
+          msgId: jobMessage.id,
+          error: sendError.message
+        });
+      } else {
+        logger.info("Job re-queued with backoff", {
+          msgId: jobMessage.id,
+          type: jobMessage.type,
+          readCount: currentReadCount,
+          backoffSeconds,
+          nextRunAt: runAt.toISOString(),
+        });
+      }
+    }
+  }
+
+  private calculateBackoff(readCount: number): number {
+    // Exponential backoff: 2^readCount seconds, capped at 1 hour
+    return Math.min(Math.pow(2, readCount), 3600);
+  }
+
+  // Method to enqueue a new job (for testing or manual enqueueing)
   async enqueueJob(type: string, payload: any, options: {
-    priority?: number;
-    runAt?: Date;
+    sleepSeconds?: number;
   } = {}) {
-    const newJob = {
-      type,
-      payload,
-      priority: options.priority || 0,
-      runAt: options.runAt,
-    };
+    const { data, error } = await supabase
+      .schema('pgmq_public')
+      .rpc('send', {
+        queue_name: this.queueName,
+        message: { type, payload },
+        sleep_seconds: options.sleepSeconds || 0,
+      });
 
-    const result = await db
-      .insert(jobQueue)
-      .values(newJob)
-      .returning();
+    if (error) {
+      logger.error("Failed to enqueue job", { type, error: error.message });
+      throw error;
+    }
 
-    logger.info("Job enqueued", { jobId: result[0].id, type });
-    return result[0];
+    logger.info("Job enqueued", { msgId: data?.[0]?.msg_id, type });
+    return { msgId: data?.[0]?.msg_id };
   }
 }
 
 // Export singleton instance
-export const queueManager = new QueueManager();
+export const queueManager = new SupabaseQueueManager();

@@ -7,10 +7,7 @@ const cleanupAuthTokensSchema = z.object({});
 export const jobType = "cleanup_auth_tokens" as const;
 export const schema = cleanupAuthTokensSchema;
 
-export async function process(
-  payload: z.infer<typeof schema>,
-  ctx: JobContext,
-) {
+export async function process(_payload: z.infer<typeof schema>, ctx: JobContext) {
   ctx.logger.info("Starting cleanup of expired auth tokens");
 
   try {

@@ -1,7 +1,7 @@
 import { config } from "./config.ts";
 import { logger } from "./utils/logger.ts";
 import { queueManager } from "./queue/index.ts";
-import { dispatchJob, registerJobHandler } from "./jobs/index.ts";
+import { registerJobHandler } from "./jobs/index.ts";
 import {
   jobType as processNewRecordType,
   process,
@@ -29,7 +29,7 @@ registerJobHandler({
 // Health check server
 let healthServer: { shutdown: () => Promise<void> } | null = null;
 
-async function startHealthServer() {
+function startHealthServer() {
   healthServer = Deno.serve(
     { port: config.healthCheckPort },
     (req: Request) => {
@@ -59,7 +59,7 @@ async function gracefulShutdown(signal: string) {
   logger.info(`Received ${signal}, initiating graceful shutdown...`);
 
   try {
-    await queueManager.stop();
+    queueManager.stop();
     logger.info("Queue manager stopped");
 
     // Close health server if it exists
@@ -98,7 +98,7 @@ async function main() {
     logger.info("🚀 Starting Poel Worker...");
 
     // Start health check server
-    const healthServer = await startHealthServer();
+    const _healthServer = startHealthServer();
 
     // Start queue processing
     await queueManager.start();
