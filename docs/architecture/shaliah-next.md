@@ -99,8 +99,8 @@ App Router** applications, using `next-intl`, Zustand, Supabase, Drizzle ORM, an
         job-queue.ts               # Background job queue table
       migrations/                  # Drizzle-generated migrations
     drizzle.config.ts              # Drizzle Kit configuration
-    messages/                      # i18n translation files (project root)
-      en.json
+    messages/                      # Shared i18n translations (project root)
+      en.json                      # Common/shared translations
       pt-BR.json
     middleware.ts                  # Next.js middleware (auth, i18n)
     src/
@@ -128,6 +128,9 @@ App Router** applications, using `next-intl`, Zustand, Supabase, Drizzle ORM, an
               OnboardingForm.tsx
             server/
               actions.ts           # Server actions
+          messages/                # Feature-specific translations
+            en.json
+            pt-BR.json
           config.ts                # Module constants (TTLs, limits)
         auth/
           domain/
@@ -142,6 +145,9 @@ App Router** applications, using `next-intl`, Zustand, Supabase, Drizzle ORM, an
               CooldownTimer.tsx
             server/
               actions.ts
+          messages/                # Feature-specific translations
+            en.json
+            pt-BR.json
           config.ts                # Rate limits, cooldown periods
         # Additional modules follow same pattern
 
@@ -180,6 +186,7 @@ App Router** applications, using `next-intl`, Zustand, Supabase, Drizzle ORM, an
       i18n/                        # next-intl configuration
         request.ts                 # Server-side i18n setup
         routing.ts                 # Routing configuration
+        load-messages.ts           # Dynamic message loader (merges common + feature messages)
 
 ------------------------------------------------------------------------
 
@@ -332,14 +339,119 @@ See `drizzle.config.ts` at project root for connection and migration settings.
 
 # i18n specifics (next-intl)
 
--   **Translation Files**: Located in `messages/` at project root (e.g., `messages/en.json`, `messages/pt-BR.json`).
+## File Organization
+
+-   **Common Translations**: `messages/` at project root for shared UI copy (buttons, errors, common labels).
+-   **Feature Translations**: `modules/<feature>/messages/` for feature-specific strings.
 -   **Supported Locales**: pt-BR (primary) and en-US. Both must be updated together per constitution.
+
+## Structure Pattern
+
+```
+messages/
+  en.json          # Shared: { "common": { "save": "Save", "cancel": "Cancel" } }
+  pt-BR.json       # Shared: { "common": { "save": "Salvar", "cancel": "Cancelar" } }
+
+modules/
+  onboarding/
+    messages/
+      en.json      # Feature: { "title": "Welcome", "steps": { ... } }
+      pt-BR.json   # Feature: { "title": "Bem-vindo", "steps": { ... } }
+  auth/
+    messages/
+      en.json      # Feature: { "magicLink": { "title": "Sign in" } }
+      pt-BR.json   # Feature: { "magicLink": { "title": "Entrar" } }
+```
+
+## Dynamic Message Loading
+
+Create `src/i18n/load-messages.ts` to merge common + feature messages:
+
+```typescript
+// src/i18n/load-messages.ts
+export async function loadMessages(locale: string) {
+  // Load common translations
+  const common = await import(`../../messages/${locale}.json`).then(m => m.default)
+  
+  // Load feature translations (add new features here)
+  const [onboarding, auth, profile] = await Promise.all([
+    import(`../modules/onboarding/messages/${locale}.json`).then(m => m.default).catch(() => ({})),
+    import(`../modules/auth/messages/${locale}.json`).then(m => m.default).catch(() => ({})),
+    import(`../modules/profile/messages/${locale}.json`).then(m => m.default).catch(() => ({})),
+  ])
+  
+  // Return namespaced structure to avoid key collisions
+  return {
+    common,
+    onboarding,
+    auth,
+    profile,
+  }
+}
+```
+
+## Usage in App Router
+
+Wire the loader in your root layout:
+
+```typescript
+// src/app/[locale]/layout.tsx
+import { NextIntlClientProvider } from 'next-intl'
+import { loadMessages } from '@/i18n/load-messages'
+
+export default async function RootLayout({ 
+  params: { locale },
+  children 
+}: { 
+  params: { locale: string }
+  children: React.Node 
+}) {
+  const messages = await loadMessages(locale)
+  
+  return (
+    <html lang={locale}>
+      <body>
+        <NextIntlClientProvider locale={locale} messages={messages}>
+          {children}
+        </NextIntlClientProvider>
+      </body>
+    </html>
+  )
+}
+```
+
+## Component Usage
+
+```typescript
+// Server Component
+import { useTranslations } from 'next-intl'
+
+export default function OnboardingPage() {
+  const t = useTranslations('onboarding')
+  return <h1>{t('title')}</h1>
+}
+
+// Client Component
+'use client'
+import { useTranslations } from 'next-intl'
+
+export function SaveButton() {
+  const t = useTranslations('common')
+  return <button>{t('save')}</button>
+}
+```
+
+## Practical Guidelines
+
+-   **Namespace by feature**: Use `t('feature.key')` or structure messages as `{ feature: { ... } }`.
+-   **Keep lean**: Small, focused translation files per feature.
+-   **Nested keys**: Use dot notation (e.g., `auth.magicLink.title`).
+-   **CI validation**: Add script to ensure all features have both pt-BR and en-US files.
+-   **No collisions**: Namespace prevents key conflicts between features.
 -   **Server Components**: Load translations using `getTranslations()` from `next-intl/server`.
 -   **Client Components**: Use `useTranslations()` hook; pass namespace from parent.
 -   **Routing**: Locale-based routes via `src/i18n/routing.ts` configuration.
 -   **Middleware**: Language detection and cookie management in `middleware.ts`.
--   **Keep Lean**: Small, feature-focused translation files; avoid massive monolithic files.
--   **Nested Keys**: Use dot notation for nested keys (e.g., `auth.magicLink.title`).
 -   **Reference**: [next-intl App Router Guide](https://next-intl.dev/docs/getting-started/app-router)
 
 ------------------------------------------------------------------------
@@ -526,10 +638,18 @@ See `drizzle.config.ts` at project root for connection and migration settings.
 9.  **i18n**: Update `messages/en.json` and `messages/pt-BR.json` with new keys.
     ```json
     {
-      "profile": {
-        "changeLanguage": "Change Language",
-        "languageSaved": "Language preference saved"
+      "common": {
+        "save": "Save",
+        "cancel": "Cancel"
       }
+    }
+    ```
+    
+    And `modules/profile/messages/en.json`:
+    ```json
+    {
+      "changeLanguage": "Change Language",
+      "languageSaved": "Language preference saved"
     }
     ```
 
@@ -547,7 +667,10 @@ See `drizzle.config.ts` at project root for connection and migration settings.
 -   [ ] Server-only code protected (never imported in client components)
 -   [ ] Zustand stores scoped and minimal (ephemeral state only)
 -   [ ] Presentational UI is pure (shadcn/ui + props)
--   [ ] i18n handled via `next-intl` with messages/ files (pt-BR and en-US)
+-   [ ] i18n handled via `next-intl` with feature-based messages/ structure
+-   [ ] Common translations in root `messages/`, feature translations in `modules/<feature>/messages/`
+-   [ ] Both pt-BR and en-US files present for all features
+-   [ ] Message loader merges common + feature translations with namespaces
 -   [ ] Supabase separated into server and browser clients
 -   [ ] Drizzle ORM used for type-safe database queries
 -   [ ] Server actions for mutations, API routes for external consumers
