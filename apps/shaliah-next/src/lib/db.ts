@@ -1,10 +1,10 @@
 import { drizzle } from 'drizzle-orm/postgres-js'
 import postgres from 'postgres'
+import { env } from './env'
 import * as schema from '@/db/schema'
 
 // Create the connection
-const connectionString = process.env.DATABASE_URL!
-const client = postgres(connectionString, { prepare: false })
+const client = postgres(env.database.url, { prepare: false })
 
 // Create the Drizzle instance
 export const db = drizzle(client, { schema })

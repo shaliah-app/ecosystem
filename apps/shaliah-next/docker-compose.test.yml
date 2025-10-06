@@ -1,0 +1,15 @@
+# Local Test Database Setup
+services:
+  postgres-test:
+    image: postgres:15
+    environment:
+      POSTGRES_PASSWORD: testpassword
+      POSTGRES_DB: shaliah_test
+      POSTGRES_USER: testuser
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U testuser -d shaliah_test"]
+      interval: 5s
+      timeout: 5s
+      retries: 5

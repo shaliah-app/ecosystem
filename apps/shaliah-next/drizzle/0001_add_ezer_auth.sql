@@ -24,7 +24,5 @@ CREATE TABLE "user_profiles" (
 CREATE INDEX "idx_auth_tokens_token" ON "auth_tokens" USING btree ("token");--> statement-breakpoint
 CREATE INDEX "idx_auth_tokens_user_id" ON "auth_tokens" USING btree ("user_id");--> statement-breakpoint
 CREATE INDEX "idx_auth_tokens_expires_at" ON "auth_tokens" USING btree ("expires_at") WHERE "auth_tokens"."is_active" = true;--> statement-breakpoint
-CREATE INDEX "idx_user_profiles_user_id" ON "user_profiles" USING btree ("user_id");--> statement-breakpoint
+CREATE INDEX "idx_user_profiles_user_id" ON "user_profiles" USING btree ("id");--> statement-breakpoint
 CREATE INDEX "idx_user_profiles_telegram_user_id" ON "user_profiles" USING btree ("telegram_user_id");--> statement-breakpoint
-ALTER TABLE "auth_tokens" ADD CONSTRAINT "auth_tokens_user_id_auth_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "auth"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "user_profiles" ADD CONSTRAINT "user_profiles_user_id_auth_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "auth"."users"("id") ON DELETE cascade ON UPDATE no action;

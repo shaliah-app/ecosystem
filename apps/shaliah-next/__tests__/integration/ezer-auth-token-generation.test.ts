@@ -13,18 +13,17 @@ import { describe, it, expect, beforeEach, afterEach, beforeAll, afterAll } from
 import { db } from '@/lib/db'
 import { authTokens, userProfiles } from '@/db/schema'
 import { eq, and, isNull } from 'drizzle-orm'
-
-// Test user ID (should exist in test database)
-const TEST_USER_ID = 'test-user-uuid' // TODO: Set up test user
+import { setupTestUsers, cleanupTestUsers, TEST_USER_1 as TEST_USER_ID } from './test-helpers'
 
 describe('POST /api/ezer-auth/token - Integration Test', () => {
   beforeAll(async () => {
-    // TODO: Set up test database connection
-    // Ensure we have a test user in the database
+    // Set up test users in database
+    await setupTestUsers()
   })
 
   afterAll(async () => {
-    // TODO: Clean up test database
+    // Clean up test users
+    await cleanupTestUsers()
   })
 
   beforeEach(async () => {

@@ -120,27 +120,27 @@ This feature implements cross-application authentication linking between Shaliah
 
 ### Database Schema (Priority: First)
 
-- [ ] **T014** Create Drizzle schema for auth_tokens table
+- [x] **T014** Create Drizzle schema for auth_tokens table
   - File: `apps/shaliah-next/src/db/schema/auth-tokens.ts`
   - Define: AuthToken schema with all fields (id, token, user_id, created_at, expires_at, used_at, is_active)
   - Add indexes: token, user_id, expires_at
   - Export: from `apps/shaliah-next/src/db/schema/index.ts`
   - Reference: research.md Section 4, data-model.md AuthToken entity
 
-- [ ] **T015** Extend user_profiles schema with telegram_user_id
+- [x] **T015** Extend user_profiles schema with telegram_user_id
   - File: `apps/shaliah-next/src/db/schema/user-profiles.ts` (modify existing)
   - Add: `telegramUserId: bigint('telegram_user_id', { mode: 'bigint' }).unique()`
   - Add index: `telegram_user_id`
   - Reference: data-model.md UserProfile extension
 
-- [ ] **T016** Generate and apply Drizzle migration
+- [x] **T016** Generate and apply Drizzle migration
   - Run: `cd apps/shaliah-next && pnpm drizzle-kit generate:pg --name add_ezer_auth`
   - Review: Generated SQL in `apps/shaliah-next/drizzle/XXXX_add_ezer_auth.sql`
   - Apply: `pnpm drizzle-kit push:pg`
   - Verify: Check Supabase Dashboard for new table and columns
   - Add RLS policies as documented in research.md Section 4
 
-- [ ] **T017** Test database schema
+- [x] **T017** Test database schema
   - Run integration tests T007-T010 to verify schema
   - Use Supabase MCP to inspect table structure and indexes
   - Expected: Tests should start passing for database operations

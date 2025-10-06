@@ -13,19 +13,16 @@ import { describe, it, expect, beforeEach, afterEach, beforeAll, afterAll } from
 import { db } from '@/lib/db'
 import { authTokens, userProfiles } from '@/db/schema'
 import { eq, and, isNull, isNotNull } from 'drizzle-orm'
-
-// Test user ID (should exist in test database)
-const TEST_USER_ID = 'test-user-uuid' // TODO: Set up test user
+import { setupTestUsers, cleanupTestUsers, TEST_USER_1 as TEST_USER_ID, TEST_USER_2 } from './test-helpers'
 const TEST_TELEGRAM_ID = 123456789
 
 describe('Sign-out Propagation - Integration Test', () => {
   beforeAll(async () => {
-    // TODO: Set up test database connection
-    // Ensure we have a test user in the database
+    await setupTestUsers()
   })
 
   afterAll(async () => {
-    // TODO: Clean up test database
+    await cleanupTestUsers()
   })
 
   beforeEach(async () => {
@@ -164,7 +161,7 @@ describe('Sign-out Propagation - Integration Test', () => {
 
     it('should unlink correct user when multiple users exist', async () => {
       // Arrange - Set up multiple users
-      const user2Id = 'test-user-2-uuid'
+      const user2Id = TEST_USER_2
       const user2TelegramId = 987654321
 
       // Link both users
@@ -342,7 +339,7 @@ describe('Sign-out Propagation - Integration Test', () => {
   describe('Data Integrity', () => {
     it('should only unlink the correct Telegram account', async () => {
       // Arrange - Multiple users with different Telegram IDs
-      const user2Id = 'test-user-2-uuid'
+      const user2Id = TEST_USER_2
       const user2TelegramId = 987654321
 
       await db.update(userProfiles)
