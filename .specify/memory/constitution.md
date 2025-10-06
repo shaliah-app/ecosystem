@@ -221,7 +221,7 @@ These guides provide detailed patterns for module structure, testing strategies,
 - Operations >1s, large files (>1MB), external APIs, CPU-intensive tasks
 
 **Pattern:**
-1. Define job handler in `apps/worker/src/handlers/`
+1. Define job handler in `apps/worker/src/jobs/`
 2. Queue via `pg-boss` from API
 3. Return job ID to client for polling
 4. Never block API request/response cycle

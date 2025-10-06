@@ -569,7 +569,7 @@
   **Reference**: spec.md NFR-001
 
 - [ ] **T062d** [P] Implement IP address nullification job  
-  **Path**: `apps/worker/src/handlers/gdpr-cleanup.ts` (new)  
+  **Path**: `apps/worker/src/jobs/gdpr-cleanup.ts` (new)  
   **Description**: Create scheduled job (pg-boss) to nullify IP addresses in magic_link_attempts table after 24 hours. Query: UPDATE magic_link_attempts SET ip_address = NULL WHERE attempted_at < NOW() - INTERVAL '24 hours' AND ip_address IS NOT NULL. Log cleanup count.  
   **Reference**: spec.md FR-015 (GDPR compliance)
 
