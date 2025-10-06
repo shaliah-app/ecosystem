@@ -85,7 +85,7 @@ App Router** applications, using `next-intl`, Zustand, Supabase, Drizzle ORM, an
 
 # Repo layout
 
-    __tests__/                     # Jest + RTL + Vitest tests
+    __tests__/                     # Jest + RTL tests
       unit/                        # Domain, use-case, factory tests
       integration/                 # Server action, adapter tests
       components/                  # Component tests (RTL)
@@ -282,8 +282,8 @@ See `drizzle.config.ts` at project root for connection and migration settings.
 # Testing (TDD) recommendations
 
 -   **Unit tests**: domain entities, validators, factories, and
-    use-cases with Vitest.\
--   **Integration tests**: server actions with Supabase test client (Vitest).\
+    use-cases with Jest.\
+-   **Integration tests**: server actions with Supabase test client (Jest).\
 -   **Component tests**: presentational UI with Jest + React Testing Library.\
 -   **Store tests**: Zustand store actions and state transitions.\
 -   **E2E tests** (optional): full user flows with Playwright or Cypress.

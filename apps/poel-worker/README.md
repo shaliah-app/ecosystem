@@ -121,7 +121,7 @@ poel-worker/
 │   └── utils/
 │       ├── logger.ts        # Structured logging
 │       └── metrics.ts       # Basic metrics collection
-├── tests/
+├── __tests__/
 │   └── *.test.ts            # Unit tests
 ├── deno.json                # Deno configuration and tasks
 ├── import_map.json          # Import map for workspace packages

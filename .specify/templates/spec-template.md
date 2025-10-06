@@ -105,7 +105,7 @@ When creating this spec from a user prompt:
 - [ ] **Principle II (MVP-First)**: Scope is limited to MVP; advanced features marked for future roadmap
 - [ ] **Principle III (Testing & MCP)**: Acceptance scenarios are testable and measurable; appropriate use cases for MCP servers (Chrome DevTools, Supabase, Shadcn) identified for testing/debugging workflows when applicable
 - [ ] **Principle IV (Supabase-First)**: If feature requires database, auth, storage, or realtime capabilities, it leverages Supabase's built-in features; complex business logic implemented via Next.js server actions (mutations), server components (data fetching), and API routes (external integrations) with Drizzle ORM for type-safe schema management when Supabase cannot handle the requirement directly
-- [ ] **Principle V (Async via poel-worker)**: Long-running operations identified for background processing via poel-worker (Deno + pg-boss)
+- [ ] **Principle V (Async via poel-worker)**: Long-running operations identified for background processing via poel-worker (Deno + Supabase Queues)
 - [ ] **Principle VI (TypeScript-First Monorepo)**: New code written in TypeScript within monorepo; shared packages properly utilized
 - [ ] **Principle VII (i18n)**: User-facing text identified for translation in both mandatory languages (pt-BR and en-US); additional languages deferred to roadmap.md; feature-based organization with common translations in messages/ and feature-specific translations in modules/<feature>/messages/
 
@@ -124,7 +124,7 @@ When creating this spec from a user prompt:
 
 ---
 
-*Based on Constitution v4.1.0 - See `.specify/memory/constitution.md`*
+*Based on Constitution v4.2.0 - See `.specify/memory/constitution.md`*
 
 ````
 

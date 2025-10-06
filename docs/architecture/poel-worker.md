@@ -1,6 +1,6 @@
 
 # Poel Worker — Architecture & Best Practices
-**Poel (poel-worker)** — Deno + TypeScript background worker that consumes jobs from Supabase (Postgres queue) and integrates with other apps (Next.js server, Telegram bot). 
+**Poel (poel-worker)** — Deno + TypeScript background worker that consumes jobs from Supabase Queues (native Postgres-based job queue) and integrates with other apps (Next.js server, Telegram bot). 
 This document follows the structure and conventions used in your example guides. See the Telegram Bot Architecture Guide and Frontend Architecture Guide for layout and tone. 
 
 ---
@@ -25,7 +25,7 @@ This document follows the structure and conventions used in your example guides.
 
 ## 1. Overview
 Poel is a small, focused background worker service implemented with **Deno + TypeScript**. Its responsibilities:
-- Consume jobs produced by two producers (Next.js server + Telegram bot) via a Supabase/Postgres queue.
+- Consume jobs produced by two producers (Next.js server + Telegram bot) via Supabase Queues (native Postgres-based job queue).
 - Validate job payloads, process jobs (I/O or CPU-bound), update job status in DB.
 - Be horizontally scalable (multiple worker instances) and observable.
 
@@ -48,14 +48,14 @@ This approach mirrors the pragmatic, module-based style used in your other proje
 
 ## 3. Tech stack
 - **Runtime**: Deno (TypeScript first)
-- **DB / Queue**: Supabase (Postgres) — queue table + optionally LISTEN/NOTIFY or `SELECT ... FOR UPDATE SKIP LOCKED` patterns. Postgres-based queues are common and pragmatic for modest throughput systems.
+- **DB / Queue**: Supabase Queues — native Postgres-based job queue with built-in retry logic, scheduling, and monitoring
 - **Database Schema**: Consumes Drizzle ORM types from `@yesod/shaliah-next` workspace package (single source of truth for all database schema)
 - **Validation**: `zod` for runtime schema parsing & type inference. 
 - **Logging**: project logger (structured JSON) — keep interface small (`info`, `warn`, `error`, `child`).
 - **Deno built-ins**: `fetch`, `Worker` (if using internal multi-threading), `Deno.tasks` for helper scripts. Use `deno task` for project commands. 
 - **Testing**: `deno test`
 - **Formatting & linting**: `deno fmt`, `deno lint`
-- **Optional scheduling**: cron-like using `croner` or external scheduler / Deno Deploy scheduled triggers. 
+- **Optional scheduling**: Supabase Queues supports cron-like scheduling natively 
 
 ---
 
@@ -79,7 +79,7 @@ poel-worker/
 │ │ ├── logger.ts
 │ │ └── metrics.ts
 │ └── workers/ # optional: Deno Worker thread code for CPU-bound tasks
-├── tests/
+├── __tests__/
 │ └── *.test.ts
 ├── deno.json # tasks, importMap, lint/format config
 ├── README.md
@@ -143,30 +143,132 @@ Expected fields:
 
 ---
 
-# 6. Queue Consumption Patterns
+## 6. Supabase Queues — patterns & best practices
 
-### 6. Queue Consumption Patterns
-1. **Polling with SKIP LOCKED** (recommended for reliability & portability) 
- Worker transaction:
- - `BEGIN`
- - `SELECT id FROM job_queue WHERE status='pending' AND (run_at IS NULL OR run_at <= now()) ORDER BY priority ASC, created_at ASC FOR UPDATE SKIP LOCKED LIMIT 1`
- - update to `processing` and commit
- - process job
- - update to `done`/`failed` outside transaction
+Supabase Queues is a pull-based message queue built on PostgreSQL using the [PGMQ extension](https://supabase.com/docs/guides/queues/pgmq). It provides durable, FIFO message processing with native Postgres reliability.
 
- Use advisory locks or `FOR UPDATE SKIP LOCKED` to avoid duplicate processing across instances. This is a standard pattern used for Postgres-backed queues. 
+### Key Concepts
 
-2. **LISTEN / NOTIFY** to reduce empty polls 
- - Producers `NOTIFY channel, payload` after inserting job row.
- - Workers `LISTEN` on channel and wake up to fetch and `FOR UPDATE SKIP LOCKED` the row.
- - Caveats: Notifications can be lost on DB failover and are advisory — design your consumer to always reconcile (periodic sweeps). Use LISTEN/NOTIFY to reduce latency, not as the sole source of truth. (See Postgres queue discussions.) 
+**Pull-Based Queue**: Consumers actively fetch messages when ready to process them (FIFO, no priority levels)
 
-### Retry & backoff
-- `attempts` column + `run_at = now() + (attempts ^ 2) * interval '1 second'` (example quadratic backoff).
-- Move failed jobs to a `failed_jobs` table (or mark and keep for manual inspection).
+**Message**: JSON object stored until explicitly processed and removed
+
+**Queue Types**:
+- **Basic Queue**: Durable, logged tables (recommended for production)
+- **Unlogged Queue**: Higher performance, transient (may lose messages on crash)
+- **Partitioned Queue**: Coming soon (scalable, multi-partition storage)
+
+### Queue Infrastructure
+
+Each queue creates two tables in the `pgmq` schema:
+- `pgmq.q_<queue_name>`: Active messages
+- `pgmq.a_<queue_name>`: Archived messages
+
+### Consumer Implementation (TypeScript/Deno)
+
+```typescript
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient(supabaseUrl, supabaseKey)
+
+// Poll for messages
+async function processQueue(queueName: string) {
+  // Pop message from queue (atomic operation)
+  const { data, error } = await supabase
+    .schema('pgmq_public')
+    .rpc('pop', { queue_name: queueName })
+  
+  if (error || !data) return null
+  
+  const message = data[0] // First message in FIFO order
+  
+  try {
+    // Process message
+    await handleMessage(message)
+    
+    // Message automatically removed after pop
+    logger.info('Message processed', { msgId: message.msg_id })
+  } catch (err) {
+    // Re-queue with delay (manual retry pattern)
+    await supabase.schema('pgmq_public').rpc('send', {
+      queue_name: queueName,
+      message: message.message,
+      sleep_seconds: calculateBackoff(message.read_ct)
+    })
+  }
+}
+
+// Continuous polling loop
+async function startWorker(queueName: string) {
+  while (true) {
+    await processQueue(queueName)
+    await new Promise(resolve => setTimeout(resolve, 1000)) // Poll interval
+  }
+}
+```
+
+### Producer Pattern (Next.js Server Action)
+
+```typescript
+// In shaliah-next server action
+import { createClient } from '@/lib/supabase/server'
+
+export async function enqueueLongRunningTask(payload: TaskPayload) {
+  const supabase = await createClient()
+  
+  const { data, error } = await supabase
+    .schema('pgmq_public')
+    .rpc('send', {
+      queue_name: 'background_tasks',
+      message: payload,
+      sleep_seconds: 0 // Process immediately
+    })
+  
+  if (error) throw new Error('Failed to enqueue task')
+  
+  return { taskId: data.msg_id }
+}
+```
+
+### Retry & Backoff
+
+Implement manual retry logic using `read_ct` (read count) from message metadata:
+
+```typescript
+function calculateBackoff(readCount: number): number {
+  // Exponential backoff: 2^readCount seconds
+  return Math.min(Math.pow(2, readCount), 3600) // Cap at 1 hour
+}
+
+const maxRetries = 5
+if (message.read_ct >= maxRetries) {
+  // Archive failed message
+  await supabase.schema('pgmq_public').rpc('archive', {
+    queue_name: queueName,
+    msg_id: message.msg_id
+  })
+}
+```
 
 ### Idempotency
-- Ensure handlers are idempotent — record side-effects (e.g., external uploads, DB writes) with dedupe keys.
+
+- Supabase Queues provides **at-least-once delivery**
+- Implement idempotency keys in your message payload
+- Store processing records with dedupe keys to prevent duplicate side-effects
+
+### Security (Client-Side Access)
+
+If exposing queues via PostgREST (not recommended for poel-worker):
+1. Enable RLS on `pgmq.q_*` tables
+2. Grant permissions to `pgmq_public` functions per role
+3. Never expose `postgres` or `service_role` client-side
+
+**For poel-worker**: Use `service_role` key server-side (no RLS needed)
+
+### References
+- [Supabase Queues Quickstart](https://supabase.com/docs/guides/queues/quickstart)
+- [Queues API Reference](https://supabase.com/docs/guides/queues/api)
+- [PGMQ Extension](https://supabase.com/docs/guides/queues/pgmq)
 
 ---
 
@@ -179,19 +281,18 @@ export const jobType = "process_song" as const;
 export const schema = z.object({ /* ... */ });
 
 export async function process(payload: z.infer<typeof schema>, ctx: JobContext) {
- // validate (schema.parse) — catch and set job as failed if invalid
+ // validate (schema.parse) — catch and archive if invalid
  // do the job
 }
 ```
 
-### Dispatcher logic (pseudo)
-- Fetch job (see queue patterns)
-- Validate with Zod: `const data = schema.safeParse(job.payload)`
-- If invalid → mark `failed` and include validation errors
-- Set status `processing`, update `attempts += 1`
-- Execute handler with timeout and cancellation support
-- On success → `done`
-- On failure → increment `attempts`, set `run_at` for retry or mark `failed`
+### Dispatcher logic with PGMQ
+1. **Poll queue**: Use `pgmq_public.pop()` to atomically fetch and lock message
+2. **Validate**: `const data = schema.safeParse(message.message)`
+   - If invalid → archive message with error details
+3. **Execute handler** with timeout and cancellation support
+4. **On success**: Message automatically removed by `pop()`
+5. **On failure**: Re-queue with `send()` using backoff delay, or archive after max retries
 
 ### Timeouts & cancellation
 - Use `AbortController` + `Promise.race` to enforce timeouts per job.
@@ -200,7 +301,13 @@ export async function process(payload: z.infer<typeof schema>, ctx: JobContext) 
 ---
 
 ## 8. Validation with Zod
-- Validate payload at the boundary (right after reading the DB row).
+- Validate payload at the boundary (right after popping from queue).
+- Keep Zod schemas colocated with handlers for clarity.
+- Use `safeParse` to capture and archive validation errors gracefully.
+- Use schema `transform()` to normalize shapes when necessary.
+- Leverage `z.infer<typeof schema>` to get compile-time payload types.
+
+Reference: Zod docs.
 - Keep Zod schemas colocated with handlers for clarity.
 - Use `safeParse` in dispatch to capture and persist validation errors instead of throwing.
 - Use schema `transform()` to normalize shapes when necessary.
@@ -211,10 +318,11 @@ Reference: Zod docs.
 ---
 
 ## 9. Logging & observability
-- Structured logger with JSON output (timestamp, job_id, type, attempts, duration_ms, error).
-- Minimal fields: `level`, `ts`, `job_id`, `type`, `msg`, `meta`.
-- Capture traces/spans around job execution if you use APM (optional).
+- Structured logger with JSON output (timestamp, msg_id, queue_name, read_ct, duration_ms, error).
+- Minimal fields: `level`, `ts`, `msg_id`, `queue_name`, `msg`, `meta`.
+- Track message `read_ct` to monitor retry patterns
 - Expose a small HTTP `/health` endpoint to check DB connectivity and worker loop status (useful in container orchestration).
+- Monitor archived messages table (`pgmq.a_*`) for failed job analysis
 
 ---
 
@@ -247,10 +355,11 @@ Use `deno task start` to centralize flags. `deno task` is cross-platform and rec
 
 ## 11. Scheduling (optional)
 - For recurring jobs, prefer:
+ - Supabase Queues native cron scheduling (recommended), **or**
  - External scheduler (Cron in Kubernetes, GitHub Actions, Cloud Scheduler), **or**
  - Deno Deploy scheduled triggers / webhook + small trigger service. Deno Deploy has patterns for scheduled webhooks. 
 
-If you implement an internal scheduler, persist scheduled runs in the queue table (`run_at`) and have workers check `run_at <= now()`.
+Supabase Queues supports cron-like scheduling natively, making it the preferred choice for recurring job patterns within the ecosystem.
 
 ---
 
@@ -297,12 +406,12 @@ For authoritative reference see Deno security docs.
 - [ ] `deno.json` with `tasks` defined
 - [ ] Workspace reference to `@yesod/shaliah-next` configured
 - [ ] Job queue types imported from shaliah-next schema
-- [ ] Polling implemented with `FOR UPDATE SKIP LOCKED` (and optional LISTEN/NOTIFY)
+- [ ] Supabase Queues integration configured
 - [ ] Job handlers colocated with Zod schemas
 - [ ] Structured logger and `/health` endpoint
 - [ ] CI: `deno fmt`, `deno lint`, `deno test`
 - [ ] Production run command uses least-privilege (`--allow-net` scoped)
-- [ ] Retries, backoff, and dead-letter handling implemented
+- [ ] Retries, backoff, and dead-letter handling via Supabase Queues
 - [ ] Tests for handlers and queue adapter
 
 ---
@@ -310,7 +419,7 @@ For authoritative reference see Deno security docs.
 ## References & further reading
 - Deno security & permissions. 
 - Zod documentation. 
-- Postgres queue patterns (FOR UPDATE SKIP LOCKED, advisory locks, LISTEN/NOTIFY discussions). 
+- Supabase Queues documentation.
 - Deno `deno task` guide. 
 - Deno Workers (multi-threading) overview. 
 

@@ -1,34 +1,27 @@
 <!--
 Sync Impact Report:
-- Version change: 4.0.0 → 4.1.0 (MINOR: Feature-based i18n, Drizzle centralization, poel-worker naming)
-- Added Sections:
-    - **Technology Stack - Database Schema**: Added Drizzle ORM as centralized schema management with shaliah-next as single source of truth
+- Version change: 4.1.0 → 4.2.0 (MINOR: Job queue technology change, testing framework clarifications)
 - Modified Sections:
-    - **Document Header**: Updated worker naming from "asynchronous worker" to "poel-worker" for clarity
-    - **Principle IV (Supabase-First Integration)**: Expanded to include Next.js API routes alongside server actions
-    - **Principle VII (Internationalization)**: Kept clean as principle statute (implementation details in Application Patterns and Development Workflow sections)
-    - **Technology Stack - Database**: Added Drizzle ORM schema centralization details
-    - **Technology Stack - Web Application**: Expanded to clarify full-stack nature (server actions + API routes for backend)
-    - **Application-Specific Architecture Patterns - shaliah-next**: Added Drizzle ORM schema management, feature-based i18n organization with dynamic loader, API route patterns
-    - **Development Workflow - Database & Schema Management**: Added Drizzle ORM migration workflow and type sharing patterns
-    - **Development Workflow - Internationalization**: Added feature-based translation file organization (common + feature-specific) with detailed structure
-- Templates synchronized:
-    - .specify/templates/plan-template.md (✅ v4.1.0 - Added feature-based i18n, Drizzle schema, poel-worker references)
-    - .specify/templates/spec-template.md (✅ v4.1.0 - Updated version, added i18n structure requirements)
-    - .specify/templates/tasks-template.md (✅ v4.1.0 - Added Drizzle migration tasks, feature-based i18n validation)
-- Documentation synchronized:
-    - docs/architecture/shaliah-next.md (✅ Updated with feature-based i18n, Drizzle schema management, full-stack patterns)
-    - docs/architecture/poel-worker.md (✅ Updated with schema consumption from shaliah-next)
+    - **Technology Stack - Job Queue**: Changed from pg-boss to Supabase Queues (native Supabase feature)
+    - **Technology Stack - Testing**: Clarified per-application testing frameworks (shaliah-next: Jest+RTL only, ezer-bot: Vitest, poel-worker: Deno test)
+    - **Principle III (Testing)**: Removed Vitest requirement for shaliah-next server-side code (Jest handles all shaliah-next testing)
+    - **Application-Specific Architecture Patterns - shaliah-next**: Removed Vitest references, clarified Jest for all testing (unit, integration, component)
+    - **Development Workflow - Async Work & Background Jobs**: Updated job queue references from pg-boss to Supabase Queues
+- Templates requiring updates:
+    - .specify/templates/plan-template.md (⚠ pending - update job queue references)
+    - .specify/templates/spec-template.md (⚠ pending - update testing framework guidance)
+    - .specify/templates/tasks-template.md (⚠ pending - update job queue and testing tasks)
+- Documentation requiring updates:
+    - docs/architecture/poel-worker.md (⚠ pending - update job queue implementation details)
+    - docs/architecture/shaliah-next.md (⚠ pending - clarify Jest-only testing approach)
 - Rationale:
-    - Feature-based i18n improves modularity and maintainability for DDD/feature-driven architecture
-    - Drizzle ORM centralization ensures type safety across ecosystem
-    - poel-worker naming clarifies specific application identity
-    - API routes documented alongside server actions for complete backend picture
-    - Clean principle statutes with implementation details in appropriate workflow sections
-    - MINOR version bump: new guidance and expanded patterns (backward compatible)
+    - Supabase Queues provides native job queue functionality integrated with existing Supabase infrastructure
+    - Removes external dependency (pg-boss) and simplifies deployment
+    - Testing framework clarification aligns with actual implementation (each app uses one framework consistently)
+    - MINOR version bump: technology change is backward compatible (queue interface remains similar)
 -->
 
-# Yesod Ecosystem Constitution v4.1.0
+# Yesod Ecosystem Constitution v4.2.0
 
 This document outlines the core principles, architectural constraints, and development workflows for the Yesod project, which includes the Shaliah Next.js full-stack application, the Ezer Telegram bot, and the poel-worker background job processor.
 
@@ -52,8 +45,9 @@ Features should be planned and developed in phases. The primary goal is to ship 
 ### III. Reliability Through Comprehensive Testing
 
 All applications MUST be accompanied by a robust testing suite to ensure correctness and reliability. Testing frameworks are standardized by application type:
-- **Web Application (`shaliah-next`):** Jest + React Testing Library for UI components; Vitest for server actions and use-cases
-- **Backend Services (`ezer-bot`, `worker`):** Vitest
+- **Web Application (`shaliah-next`):** Jest + React Testing Library (for all testing: UI components, server actions, use-cases, integration tests)
+- **Telegram Bot (`ezer-bot`):** Vitest
+- **Background Worker (`poel-worker`):** Deno test
 
 **Test-Driven Development (TDD):** For all new business logic (domain operations, use cases, data transformations, auth flows), tests MUST precede implementation to ensure correctness and resilience. No PR may merge without tests covering new business logic.
 
@@ -92,10 +86,11 @@ This section defines the non-negotiable technology stack for the ecosystem. Any 
   - **Migration Workflow**: Schema changes in `shaliah-next` → generate migration → commit together
 - **Web Application (`shaliah-next`):** `Next.js` (React framework) with `shadcn/ui` for UI components. Full-stack application with server actions (mutations), server components (data fetching), and API routes (external integrations).
 - **Telegram Bot (`ezer-bot`):** `grammY` framework.
-- **Job Queue:** `pg-boss` with a persistent TypeScript worker.
+- **Job Queue:** Supabase Queues (native Supabase background job processing)
 - **Testing:**
-    - **Web UI:** `Jest` + `React Testing Library`
-    - **Backend/Server:** `Vitest` (for server actions, use-cases, and backend services)
+    - **`shaliah-next`:** Jest + React Testing Library (all testing: UI, server actions, use-cases, integration)
+    - **`ezer-bot`:** Vitest
+    - **`poel-worker`:** Deno test
 - **Internationalization:**
     - **`shaliah-next`:** `next-intl`
     - **`ezer-bot`:** `@grammyjs/i18n`
@@ -133,7 +128,7 @@ This section defines the non-negotiable technology stack for the ecosystem. Any 
 - **Server vs Client:** Server components fetch data and orchestrate use-cases; client components handle interactivity; server actions for mutations; API routes for external integrations
 - **i18n (next-intl):** Common translations in `messages/{locale}.json`; feature translations in `modules/<feature>/messages/{locale}.json`; dynamic loader (`src/i18n/load-messages.ts`) merges with namespaces
 - **Supabase & Drizzle:** Server-side Supabase client (`lib/supabase/server.ts`) for auth; Drizzle ORM (`lib/db.ts`) for type-safe queries; browser client only for realtime/uploads
-- **Testing:** Unit tests (domain, validators, use-cases with Vitest), integration tests (server actions with Vitest), component tests (Jest + RTL), store tests (Zustand)
+- **Testing:** Jest + React Testing Library for all testing needs (unit tests for domain/validators/use-cases, integration tests for server actions, component tests, store tests)
 
 **ezer-bot (grammY):**
 - **Module Structure:** Feature composers in `src/modules/` ([structuring guide](https://grammy.dev/advanced/structuring))
@@ -197,8 +192,9 @@ These guides provide detailed patterns for module structure, testing strategies,
 
 **Testing Patterns:**
 - Web UI: Component testing with Jest + RTL
-- Backend/API: Unit and integration tests with Vitest
-- grammY Bot: Mock context pattern (see `apps/ezer-bot/__tests__/welcome.test.ts`)
+- shaliah-next Server-Side: Jest for server actions, use-cases, and integration tests
+- ezer-bot: Vitest with mock context pattern (see `apps/ezer-bot/__tests__/welcome.test.ts`)
+- poel-worker: Deno test
 - See Principle III for framework requirements per application
 
 **Code Quality Validation:**
@@ -221,8 +217,8 @@ These guides provide detailed patterns for module structure, testing strategies,
 - Operations >1s, large files (>1MB), external APIs, CPU-intensive tasks
 
 **Pattern:**
-1. Define job handler in `apps/worker/src/jobs/`
-2. Queue via `pg-boss` from API
+1. Define job handler in `apps/poel-worker/src/jobs/`
+2. Queue via Supabase Queues from API
 3. Return job ID to client for polling
 4. Never block API request/response cycle
 
@@ -302,4 +298,4 @@ This constitution is the supreme source of truth for the project's architecture 
 - All Pull Requests and code reviews must verify compliance with the principles and constraints outlined in this document.
 - Any proposal to amend this constitution must be documented, reviewed, and approved. A clear migration plan must be provided if the change affects existing architecture.
 
-**Version**: 4.1.0 | **Ratified**: 2025-01-15 | **Last Amended**: 2025-10-06
+**Version**: 4.2.0 | **Ratified**: 2025-01-15 | **Last Amended**: 2025-10-06

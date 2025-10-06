@@ -2,7 +2,7 @@
 # Implementation Plan: [FEATURE]
 
 **Branch**: `[###-feature-name]` | **Date**: [DATE] | **Spec**: [link]
-**Constitution Version**: 4.1.0
+**Constitution Version**: 4.2.0
 **Input**: Feature specification from `/specs/[###-feature-name]/spec.md`
 
 ## Execution Flow (/plan command scope)
@@ -73,7 +73,7 @@
 
 - **Principle I: Domain-Centric Architecture**: Is code organized by business domain/features rather than technical layers? Does business logic remain independent of infrastructure? For shaliah-next: Does the design use DDD-inspired layering with proper dependency direction? For ezer-bot: Does the design use feature-based composer modules?
 - **Principle II: Pragmatic, MVP-First Development**: Is the feature scoped as an MVP? Are complex features or optimizations deferred to a clear roadmap rather than built all at once?
-- **Principle III: Comprehensive Testing**: Does the plan account for the correct testing framework for the target application (Jest/RTL for shaliah-next UI components, Vitest for shaliah-next server actions/use-cases and backend services like poel-worker/ezer-bot)? Is TDD applied to all new business logic? Are tests included for all new business logic (no PR may merge without tests)? Does the plan identify appropriate scenarios for MCP servers (Chrome DevTools, Supabase, Shadcn) when applicable for testing, debugging, and development workflows?
+- **Principle III: Comprehensive Testing**: Does the plan account for the correct testing framework for the target application (Jest+RTL for all shaliah-next testing, Vitest for ezer-bot, Deno test for poel-worker)? Is TDD applied to all new business logic? Are tests included for all new business logic (no PR may merge without tests)? Does the plan identify appropriate scenarios for MCP servers (Chrome DevTools, Supabase, Shadcn) when applicable for testing, debugging, and development workflows?
 - **Principle IV: Supabase-First Integration**: Does the feature leverage Supabase's built-in capabilities (auth, database, storage, realtime) as the primary backend? Is complex business logic implemented via Next.js server actions, server components, and API routes in shaliah-next when Supabase cannot handle the requirement directly? Does the plan use Drizzle ORM for type-safe database queries?
 - **Principle V: Decoupled, Asynchronous Processing**: Are time-consuming tasks (>1s, >1MB files, external APIs, CPU-intensive) offloaded to poel-worker via job queue rather than executed in the API request-response cycle?
 - **Principle VI: TypeScript-First Monorepo**: Is all new code planned to be written in TypeScript within the monorepo structure? Are shared packages and workspace references properly utilized?
@@ -132,7 +132,7 @@ apps/
 │   │   └── types/          
 │   ├── messages/           # Common translations (pt-BR.json, en.json)
 │   ├── public/             
-│   └── __tests__/          # Jest + RTL + Vitest
+│   └── __tests__/          # Jest + RTL
 ├── ezer-bot/               # Telegram Bot (grammY)
 │   ├── src/
 │   │   ├── modules/        # Feature composers (welcome.ts, etc.)
@@ -142,11 +142,11 @@ apps/
 │   │   ├── bot.ts          # Bot composition (middleware + composers)
 │   │   └── logger.ts       # Logger package instance
 │   └── __tests__/          # Vitest
-└── poel-worker/            # Background job processor (Deno + pg-boss)
+└── poel-worker/            # Background job processor (Deno + Supabase Queues)
     ├── src/
-    │   ├── handlers/       # Job handlers (cleanupAuthTokens.ts, etc.)
-    │   ├── boss.ts         # pg-boss client
-    │   ├── index.ts        # Worker entry point
+    │   ├── jobs/           # Job handlers (cleanupAuthTokens.ts, etc.)
+    │   ├── queue/          # Queue manager
+    │   ├── main.ts         # Worker entry point
     │   └── logger.ts       # Logger package instance
     └── __tests__/          # Deno test          
 packages/
@@ -271,4 +271,4 @@ packages/
 - [ ] Complexity deviations documented
 
 ---
-*Based on Constitution v4.0.0 - See `.specify/memory/constitution.md`*
+*Based on Constitution v4.2.0 - See `.specify/memory/constitution.md`*

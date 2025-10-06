@@ -39,7 +39,7 @@
 
 ## Path Conventions (TypeScript Monorepo)
 - **Apps**: `apps/{shaliah-next|ezer-bot|poel-worker}/src/`
-- **Tests (backend)**: colocated or `apps/<app>/__tests__/` with Vitest
+- **Tests (backend)**: colocated or `apps/<app>/__tests__/` (shaliah-next: Jest, ezer-bot: Vitest, poel-worker: Deno test)
 - **Tests (web UI)**: `apps/shaliah-next/__tests__/` with Jest + RTL
 - **Packages**: `packages/<name>/src/`
 - Adjust exact paths based on plan.md structure
@@ -55,9 +55,9 @@
 **IMPORTANT GUIDELINE:**
 - These tests MUST be written and MUST FAIL before ANY implementation
 
-- [ ] T006 [P] Contract test POST /api/users in apps/shaliah-next/__tests__/contract/users.post.test.ts (Vitest)
-- [ ] T007 [P] Contract test GET /api/users/{id} in apps/shaliah-next/__tests__/contract/users.get.test.ts (Vitest)
-- [ ] T008 [P] Integration test auth flow in apps/shaliah-next/__tests__/integration/auth.test.ts (Vitest)
+- [ ] T006 [P] Contract test POST /api/users in apps/shaliah-next/__tests__/contract/users.post.test.ts (Jest)
+- [ ] T007 [P] Contract test GET /api/users/{id} in apps/shaliah-next/__tests__/contract/users.get.test.ts (Jest)
+- [ ] T008 [P] Integration test auth flow in apps/shaliah-next/__tests__/integration/auth.test.ts (Jest)
 - [ ] T009 [P] Web UI component test in apps/shaliah-next/__tests__/components/Example.test.tsx (Jest+RTL)
 - [ ] T010 [P] Bot command behavior test in apps/ezer-bot/__tests__/commands/start.test.ts (Vitest)
 
@@ -105,7 +105,7 @@
 - [ ] T032 Auth middleware integrated with Supabase Auth
 - [ ] T033 Request/response logging (consistent fields) via packages/logger
 - [ ] T034 CORS and security headers
-- [ ] T035 Queue integration (pg-boss) for long-running tasks (poel-worker)
+- [ ] T035 Queue integration (Supabase Queues) for long-running tasks (poel-worker)
 
 **Integration Testing & Validation:**
 - [ ] T036 Run integration tests for database connections and Supabase operations
@@ -142,9 +142,9 @@
 ## Parallel Example
 ```
 # Launch T006-T009 together (Phase 2: Tests First):
-Task: "Contract test POST /api/users in apps/shaliah-next/__tests__/contract/users.post.test.ts (Vitest)"
-Task: "Contract test GET /api/users/{id} in apps/shaliah-next/__tests__/contract/users.get.test.ts (Vitest)"
-Task: "Integration test auth flow in apps/shaliah-next/__tests__/integration/auth.test.ts (Vitest)"
+Task: "Contract test POST /api/users in apps/shaliah-next/__tests__/contract/users.post.test.ts (Jest)"
+Task: "Contract test GET /api/users/{id} in apps/shaliah-next/__tests__/contract/users.get.test.ts (Jest)"
+Task: "Integration test auth flow in apps/shaliah-next/__tests__/integration/auth.test.ts (Jest)"
 Task: "Web UI component test in apps/shaliah-next/__tests__/components/UserProfile.test.tsx (Jest+RTL)"
 ```
 
@@ -195,9 +195,9 @@ Task: "Web UI component test in apps/shaliah-next/__tests__/components/UserProfi
 - [ ] MCP servers (Chrome DevTools, Supabase, Shadcn) identified for use in testing tasks when appropriate and available
 - [ ] For shaliah-next: existing components audited and reusable components explicitly listed in plan.md
 - [ ] Observability wired (logger + Sentry) in every app touched
-- [ ] Long-running work queued via pg-boss to poel-worker (no blocking API requests)
+- [ ] Long-running work queued via Supabase Queues to poel-worker (no blocking API requests)
 
 ---
 
-*Based on Constitution v4.1.0 — see `.specify/memory/constitution.md`*
+*Based on Constitution v4.2.0 — see `.specify/memory/constitution.md`*
 ````
