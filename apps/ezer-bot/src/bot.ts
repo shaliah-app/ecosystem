@@ -4,7 +4,7 @@ import { config } from 'dotenv'
 import { I18n } from '@grammyjs/i18n'
 import type { Context, SessionData } from './types/context.js'
 import welcomeComposer from './modules/welcome.js'
-import authLinkComposer from './modules/auth-link.js'
+import authLinkComposer, { unlinkedDetectionComposer } from './modules/auth-link.js'
 import { logger, logBotError } from './logger.js'
 
 // Load environment variables
@@ -47,6 +47,7 @@ bot.use(sequentialize((ctx) => ctx.chat?.id.toString()))
 
 // Register modules in order: sequentialize → session → i18n → auth-link → others
 bot.use(authLinkComposer)
+bot.use(unlinkedDetectionComposer)
 bot.use(welcomeComposer)
 
 // Global error handler

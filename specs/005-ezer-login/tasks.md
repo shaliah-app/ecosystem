@@ -292,14 +292,14 @@ This feature implements cross-application authentication linking between Shaliah
 
 ### Ezer Bot: Middleware for Unlinked Detection
 
-- [ ] **T038** Create middleware to detect unlinked accounts
+- [x] **T038** Create middleware to detect unlinked accounts
   - File: `apps/ezer-bot/src/modules/auth-link.ts` (add middleware)
   - Implement: Check if telegram_user_id exists in user_profiles
   - If unlinked: Set session flag, send prompt message once
   - Mount: After auth-link composer in bot.ts
   - Reference: research.md Section 7
 
-- [ ] **T039** Test unlinked account detection
+- [x] **T039** Test unlinked account detection
   - Manual: Use quickstart.md scenario 5 (unlinked user attempts to use bot)
   - Verify: Bot sends authentication prompt
   - Expected: Correct behavior for unlinked users

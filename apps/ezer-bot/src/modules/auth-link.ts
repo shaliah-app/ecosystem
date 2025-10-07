@@ -3,6 +3,9 @@ import type { Context } from '../types/context.js'
 import { supabase } from '../lib/supabase.js'
 import { logger } from '../logger.js'
 
+// Global constants for easy maintenance
+const SHALIAH_BASE_URL = process.env.SHALIAH_BASE_URL || 'https://shaliah.app'
+
 type AuthTokenRow = {
   id: string
   token: string
@@ -73,26 +76,44 @@ async function findProfileByUserId(userId: string): Promise<UserProfileRow | nul
 
 export const authLinkComposer = new Composer<Context>()
 
+async function replySafe(
+  ctx: Context,
+  text: string,
+  extra?: Parameters<Context['reply']>[1]
+): Promise<void> {
+  try {
+    await ctx.reply(text, extra as any)
+  } catch (err: any) {
+    logger.error('telegram.sendMessage_failed', {
+      method: 'sendMessage',
+      error: err?.message ?? String(err),
+      description: err?.description,
+      parameters: err?.parameters,
+    })
+    throw err
+  }
+}
+
 export async function handleStart(ctx: Context): Promise<void> {
   try {
     const token = (ctx as any).match as string | undefined
 
     // No token: show regular welcome
     if (!token || token.trim().length === 0) {
-      await ctx.reply(ctx.t('welcome-message'), { parse_mode: 'Markdown' })
+      await replySafe(ctx, ctx.t('welcome-message'), { parse_mode: 'Markdown' })
       return
     }
 
     // Basic token format guard (32+ alphanumeric)
     if (!/^[a-zA-Z0-9]{32,}$/.test(token)) {
-      await ctx.reply('❌ Link inválido. Gere um novo no seu perfil Shaliah.')
+      await replySafe(ctx, '❌ Link inválido. Gere um novo no seu perfil Shaliah.')
       return
     }
 
     // Validate token
     const authToken = await fetchValidToken(token)
     if (!authToken) {
-      await ctx.reply('❌ Link inválido. Gere um novo no seu perfil Shaliah.')
+      await replySafe(ctx, '❌ Link inválido. Gere um novo no seu perfil Shaliah.')
       return
     }
 
@@ -101,25 +122,25 @@ export async function handleStart(ctx: Context): Promise<void> {
       const isExpired = new Date(authToken.expires_at) <= new Date()
       const isUsed = authToken.used_at != null
       if (isExpired) {
-        await ctx.reply('⏰ Link expirado. O link é válido por 15 minutos. Gere um novo.')
+        await replySafe(ctx, '⏰ Link expirado. O link é válido por 15 minutos. Gere um novo.')
       } else if (isUsed) {
-        await ctx.reply('🔒 Link já utilizado. Faça logout e gere um novo link.')
+        await replySafe(ctx, '🔒 Link já utilizado. Faça logout e gere um novo link.')
       } else {
-        await ctx.reply('⚠️ Este link foi cancelado. Gere um novo no seu perfil.')
+        await replySafe(ctx, '⚠️ Este link foi cancelado. Gere um novo no seu perfil.')
       }
       return
     }
 
     const telegramId = ctx.from?.id
     if (!telegramId) {
-      await ctx.reply('❌ Erro ao processar sua solicitação. Tente novamente.')
+      await replySafe(ctx, '❌ Erro ao processar sua solicitação. Tente novamente.')
       return
     }
 
     // Collision check: is this Telegram ID linked to a different user?
     const existingByTelegram = await findProfileByTelegramId(telegramId)
     if (existingByTelegram && existingByTelegram.user_id !== authToken.user_id) {
-      await ctx.reply('⚠️ Esta conta do Telegram já está vinculada a outro usuário. Faça logout primeiro.')
+      await replySafe(ctx, '⚠️ Esta conta do Telegram já está vinculada a outro usuário. Faça logout primeiro.')
       return
     }
 
@@ -131,7 +152,7 @@ export async function handleStart(ctx: Context): Promise<void> {
 
     if (linkErr) {
       logger.error('Failed to link telegram_user_id', { userId: authToken.user_id, telegramId })
-      await ctx.reply('❌ Erro ao processar sua solicitação. Tente novamente.')
+      await replySafe(ctx, '❌ Erro ao processar sua solicitação. Tente novamente.')
       return
     }
 
@@ -142,7 +163,7 @@ export async function handleStart(ctx: Context): Promise<void> {
 
     if (usedErr) {
       logger.error('Failed to mark token used', { tokenId: authToken.id })
-      await ctx.reply('❌ Erro ao processar sua solicitação. Tente novamente.')
+      await replySafe(ctx, '❌ Erro ao processar sua solicitação. Tente novamente.')
       return
     }
 
@@ -174,7 +195,7 @@ export async function handleStart(ctx: Context): Promise<void> {
     const successText = prefersPt
       ? '✅ Conta vinculada com sucesso! Seu Telegram agora está conectado.'
       : '✅ Account linked successfully! Your Telegram is now connected.'
-    await ctx.reply(successText)
+    await replySafe(ctx, successText)
 
     // Optionally set session flags
     if (ctx.session) {
@@ -189,7 +210,11 @@ export async function handleStart(ctx: Context): Promise<void> {
     })
   } catch (err) {
     logger.error('ezer.auth.token_used_failure', { error: err instanceof Error ? err.message : String(err) })
-    await ctx.reply('❌ Erro ao processar sua solicitação. Tente novamente.')
+    try {
+      await replySafe(ctx, '❌ Erro ao processar sua solicitação. Tente novamente.')
+    } catch {
+      // already logged by replySafe
+    }
   }
 }
 
@@ -197,4 +222,52 @@ authLinkComposer.command('start', handleStart)
 
 export default authLinkComposer
 
+
+// Middleware: Detect unlinked accounts and gently prompt once
+export const unlinkedDetectionComposer = new Composer<Context>()
+
+unlinkedDetectionComposer.use(async (ctx, next) => {
+  try {
+    const telegramId = ctx.from?.id
+    if (!telegramId) {
+      return next()
+    }
+
+    const profile = await findProfileByTelegramId(telegramId)
+    const isLinked = !!profile?.telegram_user_id
+
+    // Persist lightweight session flags if session is available
+    if (ctx.session) {
+      ;(ctx.session as any).isLinked = isLinked
+    }
+
+    if (!isLinked) {
+      const alreadyWarned = Boolean((ctx.session as any)?.unlinkedPromptShown)
+      if (!alreadyWarned) {
+        const text = `⚠️ Sua conta Shaliah não está vinculada. Abra seu perfil no Shaliah e gere um QR para conectar.
+
+⚠️ Your Shaliah account is not linked. Open your Shaliah profile and generate a QR to connect.`
+        await replySafe(ctx, text, { 
+          reply_markup: {
+            inline_keyboard: [[
+              { text: 'Open Shaliah', url: `${SHALIAH_BASE_URL}/profile` }
+            ]]
+          }
+        })
+        if (ctx.session) {
+          ;(ctx.session as any).unlinkedPromptShown = true
+        }
+      }
+    } else {
+      // Reset the one-time prompt flag after successful link
+      if (ctx.session && (ctx.session as any).unlinkedPromptShown) {
+        (ctx.session as any).unlinkedPromptShown = false
+      }
+    }
+  } catch (err) {
+    logger.warn('ezer.auth.unlinked_detection_failed', { error: err instanceof Error ? err.message : String(err) })
+  }
+
+  await next()
+})
 
