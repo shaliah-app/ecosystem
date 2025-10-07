@@ -14,7 +14,9 @@ const EnvironmentSchema = z.object({
  * Zod schema for dependency configuration validation
  */
 const DependencyConfigSchema = z.object({
-  shaliahHealthUrl: z.string().url("Health URL must be a valid URL"),
+  shaliahHealthUrl: z.string().refine((val) => val === "" || z.string().url().safeParse(val).success, {
+    message: "Health URL must be a valid URL or empty string"
+  }),
   dependencyCheckTimeout: z.number().int().min(1000, "Timeout must be at least 1000ms").max(30000, "Timeout must be at most 30000ms"),
   nodeEnv: z.enum(["production", "development", "test"]),
   dependencyChecksEnabled: z.boolean(),
@@ -118,8 +120,17 @@ export function loadDependencyConfig(): DependencyConfig {
 
 /**
  * Get the current dependency configuration
+ * This is loaded once at module import time
  */
 export const dependencyConfig = loadDependencyConfig();
+
+/**
+ * Reload dependency configuration (for testing)
+ * This function allows tests to reload configuration when environment changes
+ */
+export function reloadDependencyConfig(): DependencyConfig {
+  return loadDependencyConfig();
+}
 
 /**
  * Check if the application is in development mode

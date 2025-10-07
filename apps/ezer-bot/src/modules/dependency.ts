@@ -1,7 +1,7 @@
 import { Composer } from "grammy";
 import { Context } from "../types/context";
 import { logger } from "../logger";
-import { dependencyConfig } from "../lib/config";
+import { dependencyConfig, reloadDependencyConfig } from "../lib/config";
 import { createHealthCheckClient } from "../lib/health-check";
 
 /**
@@ -23,11 +23,14 @@ export const dependencyMiddleware = async (ctx: Context, next: () => Promise<voi
   const messageId = ctx.message?.message_id;
 
   try {
+    // Load current configuration (always reload to support dynamic environment changes in tests)
+    const config = reloadDependencyConfig();
+    
     // Skip dependency check if disabled or in development/test mode
-    if (!dependencyConfig.dependencyChecksEnabled) {
+    if (!config.dependencyChecksEnabled) {
       logger.info("Dependency checks disabled, bypassing check", { 
-        nodeEnv: dependencyConfig.nodeEnv,
-        dependencyChecksEnabled: dependencyConfig.dependencyChecksEnabled,
+        nodeEnv: config.nodeEnv,
+        dependencyChecksEnabled: config.dependencyChecksEnabled,
         userId,
         username,
         messageId,
@@ -39,11 +42,12 @@ export const dependencyMiddleware = async (ctx: Context, next: () => Promise<voi
       userId,
       username,
       messageId,
-      healthUrl: dependencyConfig.shaliahHealthUrl,
-      timeout: dependencyConfig.dependencyCheckTimeout,
+      healthUrl: config.shaliahHealthUrl,
+      timeout: config.dependencyCheckTimeout,
     });
 
     // Check if Shaliah is online
+    const healthCheckClient = createHealthCheckClient();
     const healthResult = await healthCheckClient.checkHealth();
     const checkDuration = Date.now() - startTime;
     
@@ -55,12 +59,13 @@ export const dependencyMiddleware = async (ctx: Context, next: () => Promise<voi
         error: healthResult.error,
         responseTime: healthResult.responseTime,
         checkDuration,
-        healthUrl: dependencyConfig.shaliahHealthUrl,
+        healthUrl: config.shaliahHealthUrl,
       });
 
       try {
         // Send offline message to user
-        await ctx.reply(ctx.t("shaliah-offline-message"));
+        const offlineMessage = ctx.t ? ctx.t("shaliah-offline-message") : "🔧 Shaliah is currently offline. Please try again later.";
+        await ctx.reply(offlineMessage);
         logger.info("Offline message sent to user", {
           userId,
           username,
@@ -97,12 +102,13 @@ export const dependencyMiddleware = async (ctx: Context, next: () => Promise<voi
       messageId,
       error: errorMessage,
       checkDuration,
-      healthUrl: dependencyConfig.shaliahHealthUrl,
+      healthUrl: config.shaliahHealthUrl,
     });
 
     try {
       // Send error message to user
-      await ctx.reply(ctx.t("shaliah-offline-message"));
+      const offlineMessage = ctx.t ? ctx.t("shaliah-offline-message") : "🔧 Shaliah is currently offline. Please try again later.";
+      await ctx.reply(offlineMessage);
       logger.info("Error fallback message sent to user", {
         userId,
         username,
@@ -120,9 +126,6 @@ export const dependencyMiddleware = async (ctx: Context, next: () => Promise<voi
     return; // Don't call next() - stop processing
   }
 };
-
-// Create health check client
-const healthCheckClient = createHealthCheckClient();
 
 /**
  * Dependency middleware that checks Shaliah availability before processing messages

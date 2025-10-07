@@ -1,5 +1,5 @@
 import { logger } from "../logger";
-import { dependencyConfig } from "./config";
+import { dependencyConfig, reloadDependencyConfig } from "./config";
 import { z } from "zod";
 
 /**
@@ -117,6 +117,8 @@ export class HealthCheckClient {
             responseTime,
             status: response.status,
           });
+          // If JSON parsing fails, still consider it online if status is 200
+          // This handles cases where the response is not JSON but still indicates health
         }
 
         logger.info("Shaliah health check successful", {
@@ -236,9 +238,12 @@ export class HealthCheckClient {
  * Create a health check client with current configuration
  */
 export function createHealthCheckClient(): HealthCheckClient {
+  // Always reload configuration to support dynamic environment changes in tests
+  const config = reloadDependencyConfig();
+    
   return new HealthCheckClient(
-    dependencyConfig.shaliahHealthUrl,
-    dependencyConfig.dependencyCheckTimeout
+    config.shaliahHealthUrl,
+    config.dependencyCheckTimeout
   );
 }
 

@@ -75,9 +75,9 @@
 - [x] T018 Error handling and logging via packages/logger
 
 **Testing & Validation (after implementation complete):**
-- [ ] T019 Run all related tests for implemented features (unit, integration)
-- [ ] T020 Iterate on failures: analyze → fix implementation (or test if requirements misunderstood) → retest
-- [ ] T021 Verify all Phase 3 implementation complete before proceeding to integration
+- [x] T019 Run all related tests for implemented features (unit, integration)
+- [x] T020 Iterate on failures: analyze → fix implementation (or test if requirements misunderstood) → retest
+- [x] T021 Verify all Phase 3 implementation complete before proceeding to integration
 
 ## Phase 4: Integration
 - [ ] T022 Connect dependency middleware to grammY bot instance
