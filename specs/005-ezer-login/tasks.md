@@ -460,7 +460,7 @@ This feature implements cross-application authentication linking between Shaliah
 
 ### Roadmap & Documentation
 
-- [ ] **T059** [P] Document additional planned languages in roadmap.md
+- [x] **T059** [P] Document additional planned languages in roadmap.md
   - File: `specs/005-ezer-login/roadmap.md` (create if doesn't exist)
   - Add: List of future language support (es, fr, de, etc.)
   - Note: "Do NOT add partial translations"
