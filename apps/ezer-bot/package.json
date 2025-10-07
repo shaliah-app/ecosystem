@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "tsx watch --import ./src/instrument.ts src/bot.ts",
+    "dev": "tsx --import ./src/instrument.ts src/bot.ts",
     "build": "tsc",
     "start": "node --import ./dist/instrument.js dist/bot.js",
     "lint": "eslint src/**/*.ts",
@@ -30,6 +30,7 @@
     "eslint": "^8.57.1",
     "eslint-config-custom": "workspace:*",
     "eslint-plugin-promise": "^6.0.0",
+    "nodemon": "^3.1.10",
     "tsx": "^4.0.0",
     "typescript": "^5.9.2",
     "typescript-config": "workspace:*",

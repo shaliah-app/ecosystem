@@ -4,8 +4,12 @@ import { I18nFlavor } from "@grammyjs/i18n";
 
 // Define the session data structure
 export interface SessionData {
-  // Add session properties here as needed
-  // For example:
+  // Authentication state
+  isLinked?: boolean
+  shaliahUserId?: string
+  unlinkedPromptShown?: boolean
+  
+  // User interaction state
   // userState: 'idle' | 'searching' | 'matching'
   // searchQuery?: string
   // currentPlaylist?: string

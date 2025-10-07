@@ -89,3 +89,38 @@ health-check-success-log = ✅ Shaliah health check successful (response time: {
 health-check-failure-log = ❌ Shaliah health check failed: { $error }
 health-check-timeout-log = ⏰ Shaliah health check timed out after { $timeout }ms
 health-check-config-error-log = ⚠️ Health check configuration error: { $error }
+
+# Unlink account messages
+unlink-success = ✅ Account unlinked successfully!
+
+    Your Telegram account has been disconnected from your Shaliah account.
+
+    To link again, visit your Shaliah profile and generate a new QR code.
+
+unlink-error-not-linked = ⚠️ Account not linked
+
+    Your Telegram account is not currently linked to any Shaliah account.
+
+unlink-error-no-user = ❌ Unable to identify user
+
+    There was an error identifying your Telegram account. Please try again.
+
+unlink-error-generic = ❌ Unlink failed
+
+    An error occurred while unlinking your account. Please try again later.
+
+link-account-button = 🔗 Link Account
+
+# Unlink confirmation flow
+unlink-button = 🔗 Unlink Account
+unlink-confirmation = ⚠️ *Confirm Account Unlink*
+
+    Are you sure you want to unlink your Telegram account from your Shaliah account?
+
+    This will disconnect your accounts and you'll need to link them again to use the bot.
+
+confirm-unlink-button = ✅ Yes, Unlink
+cancel-button = ❌ Cancel
+unlink-cancelled = ✅ Unlink cancelled
+
+    Your account remains linked.

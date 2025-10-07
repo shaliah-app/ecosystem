@@ -5,6 +5,7 @@ import { I18n } from '@grammyjs/i18n'
 import type { Context, SessionData } from './types/context.js'
 import welcomeComposer from './modules/welcome.js'
 import authLinkComposer, { unlinkedDetectionComposer } from './modules/auth-link.js'
+import unlinkComposer from './modules/unlink.js'
 import { dependencyComposer } from './modules/dependency.js'
 import { logger, logBotError } from './logger.js'
 
@@ -43,6 +44,7 @@ bot.use(sequentialize((ctx) => ctx.chat?.id.toString()))
 bot.use(dependencyComposer)
 bot.use(authLinkComposer)
 bot.use(unlinkedDetectionComposer)
+bot.use(unlinkComposer)
 bot.use(welcomeComposer)
 
 // Global error handler

@@ -7,7 +7,7 @@ const composer = new Composer<Context>();
 // Handle the /start command
 composer.command("start", async (ctx) => {
   // Check if user is linked (from session or database)
-  const isLinked = (ctx.session as any)?.isLinked;
+  const isLinked = ctx.session?.isLinked;
 
   if (isLinked) {
     // Show main menu for authenticated users
@@ -19,7 +19,10 @@ composer.command("start", async (ctx) => {
             { text: ctx.t("search-button"), callback_data: "search" },
             { text: ctx.t("playlists-button"), callback_data: "playlists" },
           ],
-          [{ text: ctx.t("help-button"), callback_data: "help" }],
+          [
+            { text: ctx.t("help-button"), callback_data: "help" },
+            { text: ctx.t("unlink-button"), callback_data: "unlink" }
+          ],
         ],
       },
     });
@@ -66,10 +69,28 @@ composer.callbackQuery("help", async (ctx) => {
   });
 });
 
+// Handle unlink callback with confirmation
+composer.callbackQuery("unlink", async (ctx) => {
+  await ctx.answerCallbackQuery();
+  
+  // Show confirmation dialog
+  await ctx.reply(ctx.t("unlink-confirmation"), {
+    parse_mode: "Markdown",
+    reply_markup: {
+      inline_keyboard: [
+        [
+          { text: ctx.t("confirm-unlink-button"), callback_data: "confirm-unlink" },
+          { text: ctx.t("cancel-button"), callback_data: "cancel-unlink" }
+        ]
+      ]
+    }
+  });
+});
+
 // Fallback handler for unrecognized messages
 composer.on("message", async (ctx) => {
   // Check if user is linked (from session or database)
-  const isLinked = (ctx.session as any)?.isLinked;
+  const isLinked = ctx.session?.isLinked;
 
   if (isLinked) {
     // Show main menu for authenticated users
@@ -81,7 +102,10 @@ composer.on("message", async (ctx) => {
             { text: ctx.t("search-button"), callback_data: "search" },
             { text: ctx.t("playlists-button"), callback_data: "playlists" },
           ],
-          [{ text: ctx.t("help-button"), callback_data: "help" }],
+          [
+            { text: ctx.t("help-button"), callback_data: "help" },
+            { text: ctx.t("unlink-button"), callback_data: "unlink" }
+          ],
         ],
       },
     });

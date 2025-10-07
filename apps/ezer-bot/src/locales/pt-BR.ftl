@@ -90,3 +90,38 @@ health-check-failure-log = ❌ Verificação de saúde do Shaliah falhou: { $err
 health-check-timeout-log = ⏰ Verificação de saúde do Shaliah expirou após { $timeout }ms
 health-check-config-error-log = ⚠️ Erro de configuração da verificação de saúde: { $error }
 
+# Unlink account messages
+unlink-success = ✅ Conta desvinculada com sucesso!
+
+    Sua conta do Telegram foi desconectada da sua conta Shaliah.
+
+    Para vincular novamente, visite seu perfil no Shaliah e gere um novo código QR.
+
+unlink-error-not-linked = ⚠️ Conta não vinculada
+
+    Sua conta do Telegram não está atualmente vinculada a nenhuma conta Shaliah.
+
+unlink-error-no-user = ❌ Não foi possível identificar o usuário
+
+    Houve um erro ao identificar sua conta do Telegram. Tente novamente.
+
+unlink-error-generic = ❌ Falha ao desvincular
+
+    Ocorreu um erro ao desvincular sua conta. Tente novamente mais tarde.
+
+link-account-button = 🔗 Vincular Conta
+
+# Unlink confirmation flow
+unlink-button = 🔗 Desvincular Conta
+unlink-confirmation = ⚠️ *Confirmar Desvinculação da Conta*
+
+    Tem certeza de que deseja desvincular sua conta do Telegram da sua conta Shaliah?
+
+    Isso desconectará suas contas e você precisará vinculá-las novamente para usar o bot.
+
+confirm-unlink-button = ✅ Sim, Desvincular
+cancel-button = ❌ Cancelar
+unlink-cancelled = ✅ Desvinculação cancelada
+
+    Sua conta permanece vinculada.
+
