@@ -4,6 +4,7 @@
 **Branch**: `[###-feature-name]` | **Date**: [DATE] | **Spec**: [link]
 **Constitution Version**: 4.2.0
 **Input**: Feature specification from `/specs/[###-feature-name]/spec.md`
+**Application(s):** [shaliah-next | ezer-bot | poel-worker]
 
 ## Execution Flow (/plan command scope)
 ```
@@ -13,6 +14,7 @@
    → Read corresponding architecture guides from docs/architecture/
    → For shaliah-next changes: Read docs/architecture/shaliah-next.md
    → For ezer-bot changes: Read docs/architecture/ezer-bot.md
+   → For poel-worker changes: Read docs/architecture/poel-worker.md
    → Document key architectural patterns to follow in Technical Context
 3. Fill Technical Context (scan for NEEDS CLARIFICATION)
    → Detect Project Type from file system structure or context (web=frontend+backend, mobile=app+api)
