@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Rubik } from "next/font/google";
 import {NextIntlClientProvider} from 'next-intl';
+import { AuthProvider } from '@/lib/auth';
 import "./globals.css";
 
 const rubik = Rubik({
@@ -24,7 +25,9 @@ export default function RootLayout({children}: Props) {
         className={`${rubik.variable} font-sans antialiased`}
       >
         <NextIntlClientProvider>
-          {children}
+          <AuthProvider>
+            {children}
+          </AuthProvider>
         </NextIntlClientProvider>
       </body>
     </html>

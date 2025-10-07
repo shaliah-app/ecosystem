@@ -1,4 +1,6 @@
 /**
+ * @jest-environment node
+ *
  * Integration Test: Sign-out propagates to Ezer (unlinks account)
  *
  * Feature: 005-ezer-login
@@ -10,10 +12,12 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, beforeAll, afterAll } from '@jest/globals'
-import { db } from '@/lib/db'
+import { getTestDb } from './test-db'
 import { authTokens, userProfiles } from '@/db/schema'
 import { eq, and, isNull, isNotNull } from 'drizzle-orm'
 import { setupTestUsers, cleanupTestUsers, TEST_USER_1 as TEST_USER_ID, TEST_USER_2 } from './test-helpers'
+
+const db = getTestDb()
 const TEST_TELEGRAM_ID = 123456789
 
 describe('Sign-out Propagation - Integration Test', () => {

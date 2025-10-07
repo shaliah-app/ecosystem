@@ -9,10 +9,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { userProfiles } from '@/db/schema'
-import { eq } from 'drizzle-orm'
 import { logger } from '@/lib/logger'
-import { getDatabaseInstance } from '@/lib/database-injection'
 
 /**
  * Sign out user from Supabase and unlink Telegram account
@@ -28,30 +25,9 @@ export async function signOutAction() {
     // Get current user before signing out
     const { data: { user } } = await supabase.auth.getUser()
     
-    if (user) {
-      try {
-        // Get database instance (allows injection for testing)
-        const database = getDatabaseInstance('sign-out')
-        
-        // Unlink Telegram account by setting telegram_user_id to NULL
-        await database
-          .update(userProfiles)
-          .set({ telegramUserId: null })
-          .where(eq(userProfiles.userId, user.id))
-
-        logger.info('ezer.auth.signout_propagated', {
-          userId: user.id,
-          action: 'telegram_unlinked',
-        })
-      } catch (dbError) {
-        // Log the error but don't block sign-out
-        // Sign-out should succeed even if Telegram unlinking fails
-        logger.error('ezer.auth.signout_unlink_failed', {
-          userId: user.id,
-          error: dbError instanceof Error ? dbError.message : 'Unknown database error',
-        })
-      }
-    }
+    // Note: We don't unlink Telegram on Shaliah logout
+    // Telegram and Shaliah are separate systems that can work independently
+    // Unlinking should be done through the Ezer bot if needed
 
     // Proceed with standard Supabase sign-out
     const { error } = await supabase.auth.signOut()

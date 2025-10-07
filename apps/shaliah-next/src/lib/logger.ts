@@ -1,9 +1,12 @@
 import { createLogger } from '@yesod/logger'
-import { env } from './env'
+import { getEnv } from './env'
+
+// Get server-side environment variables
+const serverEnv = getEnv()
 
 // Initialize the shared logger for web app operations
 export const logger = createLogger({
   serviceName: 'shaliah-next',
-  environment: env.app.environment,
-  sentryDsn: env.sentry.dsn,
+  environment: serverEnv.app.environment,
+  sentryDsn: serverEnv.sentry.dsn,
 })

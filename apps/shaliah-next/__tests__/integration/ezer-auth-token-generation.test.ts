@@ -1,4 +1,6 @@
 /**
+ * @jest-environment node
+ *
  * Integration Test: Generate token and verify database state
  *
  * Feature: 005-ezer-login
@@ -10,10 +12,12 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, beforeAll, afterAll } from '@jest/globals'
-import { db } from '@/lib/db'
+import { getTestDb } from './test-db'
 import { authTokens, userProfiles } from '@/db/schema'
 import { eq, and, isNull } from 'drizzle-orm'
 import { setupTestUsers, cleanupTestUsers, TEST_USER_1 as TEST_USER_ID } from './test-helpers'
+
+const db = getTestDb()
 
 describe('POST /api/ezer-auth/token - Integration Test', () => {
   beforeAll(async () => {

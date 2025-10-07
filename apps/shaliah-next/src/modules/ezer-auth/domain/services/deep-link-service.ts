@@ -3,6 +3,8 @@
  * Feature: 005-ezer-login
  */
 
+import { getEnv } from '@/lib/env'
+
 /**
  * Generates a deep link URL for the Telegram bot
  * Format: https://t.me/{bot_username}?start={token}
@@ -12,11 +14,8 @@
  * @throws Error if TELEGRAM_BOT_USERNAME environment variable is not set
  */
 export function generateDeepLink(token: string): string {
-  const botUsername = process.env.TELEGRAM_BOT_USERNAME
-
-  if (!botUsername) {
-    throw new Error('TELEGRAM_BOT_USERNAME environment variable is required')
-  }
+  const serverEnv = getEnv()
+  const botUsername = serverEnv.telegram.botUsername
 
   // Validate token format (should be 32 alphanumeric characters)
   if (!/^[a-zA-Z0-9]{32}$/.test(token)) {

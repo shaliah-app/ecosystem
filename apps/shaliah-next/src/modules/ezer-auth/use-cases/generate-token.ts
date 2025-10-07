@@ -6,12 +6,19 @@
  * Invalidates any existing active tokens for the user before creating new one.
  */
 
-import { authTokens } from '@/db/schema'
-import { eq, and, isNull } from 'drizzle-orm'
+'use server'
+
+import { createClient } from '@supabase/supabase-js'
 import { generateAuthToken as generateTokenValue, calculateExpiration } from '../domain/factories/token-factory'
 import { generateDeepLink } from '../domain/services/deep-link-service'
 import { logger } from '@/lib/logger'
-import { getDatabaseInstance } from '@/lib/database-injection'
+
+// Initialize Supabase client
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!,
+  { auth: { persistSession: false } }
+)
 
 export interface GenerateTokenResult {
   token: string
@@ -28,9 +35,6 @@ export interface GenerateTokenResult {
  */
 export async function generateAuthTokenUseCase(userId: string): Promise<GenerateTokenResult> {
   try {
-    // Get database instance (allows injection for testing)
-    const database = getDatabaseInstance('generate-token')
-    
     // Step 1: Generate new token value and calculate expiration
     const token = generateTokenValue()
     const expiresAt = calculateExpiration()
@@ -42,24 +46,24 @@ export async function generateAuthTokenUseCase(userId: string): Promise<Generate
 
     // Step 2: Invalidate all existing active, unused tokens for this user
     // This ensures only one active token per user at a time
-    await database
-      .update(authTokens)
-      .set({ isActive: false })
-      .where(
-        and(
-          eq(authTokens.userId, userId),
-          eq(authTokens.isActive, true),
-          isNull(authTokens.usedAt)
-        )
-      )
+    await supabase
+      .from('auth_tokens')
+      .update({ is_active: false })
+      .eq('user_id', userId)
+      .eq('is_active', true)
+      .is('used_at', null)
 
     // Step 3: Insert the new token record
-    await database.insert(authTokens).values({
-      token,
-      userId,
-      expiresAt,
-      isActive: true,
-    })
+    const { error: insertError } = await supabase
+      .from('auth_tokens')
+      .insert({
+        token,
+        user_id: userId,
+        expires_at: expiresAt.toISOString(),
+        is_active: true,
+      })
+
+    if (insertError) throw insertError
 
     // Step 4: Generate deep link for Telegram bot
     const deepLink = generateDeepLink(token)

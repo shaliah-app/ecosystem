@@ -51,12 +51,21 @@ async function fetchValidToken(token: string): Promise<AuthTokenRow | null> {
 }
 
 async function findProfileByTelegramId(telegramUserId: number): Promise<UserProfileRow | null> {
+  logger.info('findProfileByTelegramId called', { telegramUserId })
+  
   const { data, error } = await supabase
     .from('user_profiles')
     .select('*')
     .eq('telegram_user_id', telegramUserId)
     .limit(1)
     .maybeSingle()
+
+  logger.info('findProfileByTelegramId result', { 
+    telegramUserId, 
+    data, 
+    error: error?.message,
+    hasData: !!data 
+  })
 
   if (error) throw error
   return (data as unknown as UserProfileRow | null) ?? null
@@ -76,13 +85,39 @@ async function findProfileByUserId(userId: string): Promise<UserProfileRow | nul
 
 export const authLinkComposer = new Composer<Context>()
 
+// Helper function to show main menu
+async function showMainMenu(ctx: Context): Promise<void> {
+  try {
+    await replySafe(ctx, ctx.t('welcome-message'), {
+      parse_mode: 'Markdown',
+      reply_markup: {
+        inline_keyboard: [
+          [
+            { text: ctx.t('search-button'), callback_data: 'search' },
+            { text: ctx.t('playlists-button'), callback_data: 'playlists' }
+          ],
+          [
+            { text: ctx.t('help-button'), callback_data: 'help' }
+          ]
+        ]
+      }
+    })
+  } catch (err) {
+    logger.warn('Failed to show main menu', {
+      error: err instanceof Error ? err.message : 'Unknown error',
+      userId: ctx.from?.id
+    })
+  }
+}
+
 async function replySafe(
   ctx: Context,
   text: string,
   extra?: Parameters<Context['reply']>[1]
-): Promise<void> {
+): Promise<boolean> {
   try {
     await ctx.reply(text, extra as any)
+    return true
   } catch (err: any) {
     logger.error('telegram.sendMessage_failed', {
       method: 'sendMessage',
@@ -90,11 +125,13 @@ async function replySafe(
       description: err?.description,
       parameters: err?.parameters,
     })
-    throw err
+    return false
   }
 }
 
 export async function handleStart(ctx: Context): Promise<void> {
+  let authToken: any = null
+  
   try {
     const token = (ctx as any).match as string | undefined
 
@@ -111,7 +148,7 @@ export async function handleStart(ctx: Context): Promise<void> {
     }
 
     // Validate token
-    const authToken = await fetchValidToken(token)
+    authToken = await fetchValidToken(token)
     if (!authToken) {
       await replySafe(ctx, '❌ Link inválido. Gere um novo no seu perfil Shaliah.')
       return
@@ -137,34 +174,84 @@ export async function handleStart(ctx: Context): Promise<void> {
       return
     }
 
-    // Collision check: is this Telegram ID linked to a different user?
+    // Check if this Telegram account is already linked
     const existingByTelegram = await findProfileByTelegramId(telegramId)
-    if (existingByTelegram && existingByTelegram.user_id !== authToken.user_id) {
+    
+    logger.info('Checking Telegram account status', {
+      telegramId,
+      authTokenUserId: authToken.user_id,
+      existingUserId: existingByTelegram?.id,
+      isLinked: !!existingByTelegram
+    })
+    
+    // If already linked to the same user, just send success message and show main menu
+    if (existingByTelegram && existingByTelegram.id === authToken.user_id) {
+      logger.info('Telegram account already linked to same user - showing main menu', {
+        telegramId,
+        userId: authToken.user_id
+      })
+      await replySafe(ctx, '✅ Sua conta já está vinculada! Você pode usar o Ezer bot normalmente.')
+      
+      // Show main menu for already linked users
+      await showMainMenu(ctx)
+      return
+    }
+
+    // If linked to a different user, prevent linking
+    if (existingByTelegram && existingByTelegram.id !== authToken.user_id) {
+      logger.warn('Telegram account linked to different user', {
+        telegramId,
+        authTokenUserId: authToken.user_id,
+        existingUserId: existingByTelegram.id
+      })
       await replySafe(ctx, '⚠️ Esta conta do Telegram já está vinculada a outro usuário. Faça logout primeiro.')
       return
     }
 
     // Perform updates (best-effort atomicity; Supabase JS lacks multi-update tx here)
+    logger.info('Attempting to link Telegram account', {
+      userId: authToken.user_id,
+      telegramId,
+      tokenId: authToken.id
+    })
+
     const { error: linkErr } = await supabase
       .from('user_profiles')
       .update({ telegram_user_id: telegramId })
-      .eq('user_id', authToken.user_id)
+      .eq('id', authToken.user_id)
 
     if (linkErr) {
-      logger.error('Failed to link telegram_user_id', { userId: authToken.user_id, telegramId })
+      logger.error('Failed to link telegram_user_id', { 
+        userId: authToken.user_id, 
+        telegramId,
+        error: linkErr.message,
+        details: linkErr.details,
+        hint: linkErr.hint,
+        code: linkErr.code
+      })
       await replySafe(ctx, '❌ Erro ao processar sua solicitação. Tente novamente.')
       return
     }
 
-    const { error: usedErr } = await supabase
-      .from('auth_tokens')
-      .update({ used_at: new Date().toISOString() })
-      .eq('id', authToken.id)
+    logger.info('Successfully linked Telegram account', {
+      userId: authToken.user_id,
+      telegramId
+    })
 
-    if (usedErr) {
-      logger.error('Failed to mark token used', { tokenId: authToken.id })
-      await replySafe(ctx, '❌ Erro ao processar sua solicitação. Tente novamente.')
-      return
+    // Mark token as used (best effort - don't fail if already used)
+    try {
+      await supabase
+        .from('auth_tokens')
+        .update({ used_at: new Date().toISOString() })
+        .eq('id', authToken.id)
+        .eq('is_active', true)
+        .is('used_at', null)
+    } catch (usedErr) {
+      // Don't fail the flow if token marking fails
+      logger.warn('Failed to mark token as used', { 
+        tokenId: authToken.id,
+        error: usedErr instanceof Error ? usedErr.message : 'Unknown error'
+      })
     }
 
     // Language sync
@@ -195,7 +282,11 @@ export async function handleStart(ctx: Context): Promise<void> {
     const successText = prefersPt
       ? '✅ Conta vinculada com sucesso! Seu Telegram agora está conectado.'
       : '✅ Account linked successfully! Your Telegram is now connected.'
+    
     await replySafe(ctx, successText)
+
+    // Show main menu after successful linking
+    await showMainMenu(ctx)
 
     // Optionally set session flags
     if (ctx.session) {
@@ -209,7 +300,12 @@ export async function handleStart(ctx: Context): Promise<void> {
       token_id: authToken.id,
     })
   } catch (err) {
-    logger.error('ezer.auth.token_used_failure', { error: err instanceof Error ? err.message : String(err) })
+    logger.error('ezer.auth.token_used_failure', { 
+      error: err instanceof Error ? err.message : String(err),
+      stack: err instanceof Error ? err.stack : undefined,
+      userId: authToken?.user_id,
+      telegramId: ctx.from?.id
+    })
     try {
       await replySafe(ctx, '❌ Erro ao processar sua solicitação. Tente novamente.')
     } catch {

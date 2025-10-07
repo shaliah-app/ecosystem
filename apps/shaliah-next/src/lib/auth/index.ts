@@ -1,18 +1,38 @@
-import { useEffect, useState } from 'react'
+/**
+ * Unified Authentication System
+ * 
+ * This provides a clean, consistent authentication interface across the app.
+ * Combines client-side state management with server-side operations.
+ */
+
+'use client'
+
+import { createContext, useContext, useEffect, useState } from 'react'
 import { User } from '@supabase/supabase-js'
 import { createClient } from '@/lib/supabase/client'
+import { signOutAction } from './actions'
 
-export interface UseAuthReturn {
+// Types
+export interface AuthState {
   user: User | null
   loading: boolean
-  signInWithOtp: (email: string) => Promise<{ error: any }>
-  signInWithOAuth: (provider: 'google') => Promise<{ error: any }>
-  signOut: () => Promise<{ error: any }>
-  getUser: () => Promise<User | null>
   storageBlocked: boolean
 }
 
-export function useAuth(): UseAuthReturn {
+export interface AuthActions {
+  signInWithOtp: (email: string) => Promise<{ error: any }>
+  signInWithOAuth: (provider: 'google') => Promise<{ error: any }>
+  signOut: () => Promise<void>
+  getUser: () => Promise<User | null>
+}
+
+export type AuthContextType = AuthState & AuthActions
+
+// Context
+const AuthContext = createContext<AuthContextType | undefined>(undefined)
+
+// Provider component
+export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
   const [storageBlocked, setStorageBlocked] = useState(false)
@@ -46,8 +66,9 @@ export function useAuth(): UseAuthReturn {
     )
 
     return () => subscription.unsubscribe()
-  }, [])
+  }, [supabase])
 
+  // Actions
   const signInWithOtp = async (email: string) => {
     const { error } = await supabase.auth.signInWithOtp({
       email,
@@ -69,8 +90,8 @@ export function useAuth(): UseAuthReturn {
   }
 
   const signOut = async () => {
-    const { error } = await supabase.auth.signOut()
-    return { error }
+    // Use server action for proper Telegram unlinking
+    await signOutAction()
   }
 
   const getUser = async () => {
@@ -78,13 +99,35 @@ export function useAuth(): UseAuthReturn {
     return user
   }
 
-  return {
+  const value: AuthContextType = {
     user,
     loading,
+    storageBlocked,
     signInWithOtp,
     signInWithOAuth,
     signOut,
     getUser,
-    storageBlocked,
   }
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
+}
+
+// Hook for using auth
+export function useAuth(): AuthContextType {
+  const context = useContext(AuthContext)
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider')
+  }
+  return context
+}
+
+// Convenience hooks for specific use cases
+export function useUser() {
+  const { user, loading } = useAuth()
+  return { user, loading }
+}
+
+export function useAuthActions() {
+  const { signInWithOtp, signInWithOAuth, signOut, getUser } = useAuth()
+  return { signInWithOtp, signInWithOAuth, signOut, getUser }
 }
