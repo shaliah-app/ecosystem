@@ -1,27 +1,21 @@
 <!--
 Sync Impact Report:
-- Version change: 4.1.0 → 4.2.0 (MINOR: Job queue technology change, testing framework clarifications)
+- Version change: 4.2.0 → 4.3.0 (MINOR: i18n phase separation and polish consolidation)
 - Modified Sections:
-    - **Technology Stack - Job Queue**: Changed from pg-boss to Supabase Queues (native Supabase feature)
-    - **Technology Stack - Testing**: Clarified per-application testing frameworks (shaliah-next: Jest+RTL only, ezer-bot: Vitest, poel-worker: Deno test)
-    - **Principle III (Testing)**: Removed Vitest requirement for shaliah-next server-side code (Jest handles all shaliah-next testing)
-    - **Application-Specific Architecture Patterns - shaliah-next**: Removed Vitest references, clarified Jest for all testing (unit, integration, component)
-    - **Development Workflow - Async Work & Background Jobs**: Updated job queue references from pg-boss to Supabase Queues
+    - **Development Workflow - Planning & Specification**: Updated phase structure to include optional i18n phase
+    - **Development Workflow - Testing Strategy**: Updated phase numbering to reflect new structure
 - Templates requiring updates:
-    - .specify/templates/plan-template.md (⚠ pending - update job queue references)
-    - .specify/templates/spec-template.md (⚠ pending - update testing framework guidance)
-    - .specify/templates/tasks-template.md (⚠ pending - update job queue and testing tasks)
-- Documentation requiring updates:
-    - docs/architecture/poel-worker.md (⚠ pending - update job queue implementation details)
-    - docs/architecture/shaliah-next.md (⚠ pending - clarify Jest-only testing approach)
+    - .specify/templates/plan-template.md (✅ updated - new i18n phase structure)
+    - .specify/templates/spec-template.md (✅ updated - no changes needed)
+    - .specify/templates/tasks-template.md (✅ updated - separated i18n as optional phase, merged polish into phase 6)
 - Rationale:
-    - Supabase Queues provides native job queue functionality integrated with existing Supabase infrastructure
-    - Removes external dependency (pg-boss) and simplifies deployment
-    - Testing framework clarification aligns with actual implementation (each app uses one framework consistently)
-    - MINOR version bump: technology change is backward compatible (queue interface remains similar)
+    - i18n phase separated as independent optional phase that can go between setup and TDD phases
+    - LLM can decide if i18n is relevant for the given implementation
+    - Remaining polish details merged into phase 6 (Code Quality & Polish)
+    - MINOR version bump: structural change to development workflow phases
 -->
 
-# Yesod Ecosystem Constitution v4.2.0
+# Yesod Ecosystem Constitution v4.3.0
 
 This document outlines the core principles, architectural constraints, and development workflows for the Yesod project, which includes the Shaliah Next.js full-stack application, the Ezer Telegram bot, and the poel-worker background job processor.
 
@@ -298,4 +292,4 @@ This constitution is the supreme source of truth for the project's architecture 
 - All Pull Requests and code reviews must verify compliance with the principles and constraints outlined in this document.
 - Any proposal to amend this constitution must be documented, reviewed, and approved. A clear migration plan must be provided if the change affects existing architecture.
 
-**Version**: 4.2.0 | **Ratified**: 2025-01-15 | **Last Amended**: 2025-10-06
+**Version**: 4.3.0 | **Ratified**: 2025-01-15 | **Last Amended**: 2025-01-15

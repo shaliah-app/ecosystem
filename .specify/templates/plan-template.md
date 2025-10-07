@@ -2,7 +2,7 @@
 # Implementation Plan: [FEATURE]
 
 **Branch**: `[###-feature-name]` | **Date**: [DATE] | **Spec**: [link]
-**Constitution Version**: 4.2.0
+**Constitution Version**: 4.3.0
 **Input**: Feature specification from `/specs/[###-feature-name]/spec.md`
 **Application(s):** [shaliah-next | ezer-bot | poel-worker]
 
@@ -34,9 +34,10 @@
 10. STOP - Ready for /tasks command
 ```
 
-**IMPORTANT**: The /plan command STOPS at step 7. Phases 2-4 are executed by other commands:
-- Phase 2: /tasks command creates tasks.md
-- Phase 3-4: Implementation execution (manual or via tools)
+**IMPORTANT**: The /plan command STOPS at step 7. Phases 2-6 are executed by other commands:
+- Phase 2: i18n (optional) - only if LLM determines i18n is relevant for the implementation
+- Phase 3: /tasks command creates tasks.md
+- Phase 4-6: Implementation execution (manual or via tools)
 
 ## Summary
 [Extract from feature spec: primary requirement + technical approach from research]
@@ -219,7 +220,18 @@ packages/
 
 **Output**: data-model.md, component reuse analysis (in plan.md for shaliah-next), /contracts/*, failing tests, quickstart.md, agent-specific file
 
-## Phase 2: Task Planning Approach
+## Phase 2: i18n (Optional)
+*This phase is OPTIONAL and should only be included if the LLM determines i18n is relevant for the given implementation. Skip this phase if the feature doesn't involve user-facing text or if i18n setup already exists.*
+
+**i18n Strategy**:
+- Determine if feature involves user-facing text that requires translation
+- If yes: Include i18n setup tasks (common translations, feature-specific translations, configuration)
+- If no: Skip this phase entirely
+- Always defer additional languages to roadmap.md
+
+**IMPORTANT**: This phase is executed by the /tasks command, NOT by /plan
+
+## Phase 3: Task Planning Approach
 *This section describes what the /tasks command will do - DO NOT execute during /plan*
 
 **Task Generation Strategy**:
@@ -239,12 +251,12 @@ packages/
 
 **IMPORTANT**: This phase is executed by the /tasks command, NOT by /plan
 
-## Phase 3+: Future Implementation
+## Phase 4+: Future Implementation
 *These phases are beyond the scope of the /plan command*
 
-**Phase 3**: Task execution (/tasks command creates tasks.md)  
-**Phase 4**: Implementation (execute tasks.md following constitutional principles)  
-**Phase 5**: Validation (run tests, execute quickstart.md, performance validation)
+**Phase 4**: Task execution (/tasks command creates tasks.md)  
+**Phase 5**: Implementation (execute tasks.md following constitutional principles)  
+**Phase 6**: Validation (run tests, execute quickstart.md, performance validation)
 
 ## Complexity Tracking
 *Fill ONLY if Constitution Check has violations that must be justified*
@@ -261,10 +273,11 @@ packages/
 **Phase Status**:
 - [ ] Phase 0: Research complete (/plan command)
 - [ ] Phase 1: Design complete (/plan command)
-- [ ] Phase 2: Task planning complete (/plan command - describe approach only)
-- [ ] Phase 3: Tasks generated (/tasks command)
-- [ ] Phase 4: Implementation complete
-- [ ] Phase 5: Validation passed
+- [ ] Phase 2: i18n planning complete (/plan command - describe approach only, optional)
+- [ ] Phase 3: Task planning complete (/plan command - describe approach only)
+- [ ] Phase 4: Tasks generated (/tasks command)
+- [ ] Phase 5: Implementation complete
+- [ ] Phase 6: Validation passed
 
 **Gate Status**:
 - [ ] Initial Constitution Check: PASS
@@ -273,4 +286,4 @@ packages/
 - [ ] Complexity deviations documented
 
 ---
-*Based on Constitution v4.2.0 - See `.specify/memory/constitution.md`*
+*Based on Constitution v4.3.0 - See `.specify/memory/constitution.md`*
