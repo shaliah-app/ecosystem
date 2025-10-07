@@ -17,39 +17,108 @@ export const dependencyComposer = new Composer<Context>();
  * Export the middleware function for testing
  */
 export const dependencyMiddleware = async (ctx: Context, next: () => Promise<void>) => {
-  // Skip dependency check if disabled or in development/test mode
-  if (!dependencyConfig.dependencyChecksEnabled) {
-    logger.info("Dependency checks disabled, bypassing check", { 
-      nodeEnv: dependencyConfig.nodeEnv,
-      dependencyChecksEnabled: dependencyConfig.dependencyChecksEnabled,
-    });
-    return next();
-  }
+  const startTime = Date.now();
+  const userId = ctx.from?.id;
+  const username = ctx.from?.username;
+  const messageId = ctx.message?.message_id;
 
-  // Check if Shaliah is online
-  const healthResult = await healthCheckClient.checkHealth();
-  
-  if (!healthResult.isOnline) {
-    logger.warn("Shaliah is offline, blocking user interaction", {
-      userId: ctx.from?.id,
-      username: ctx.from?.username,
-      error: healthResult.error,
+  try {
+    // Skip dependency check if disabled or in development/test mode
+    if (!dependencyConfig.dependencyChecksEnabled) {
+      logger.info("Dependency checks disabled, bypassing check", { 
+        nodeEnv: dependencyConfig.nodeEnv,
+        dependencyChecksEnabled: dependencyConfig.dependencyChecksEnabled,
+        userId,
+        username,
+        messageId,
+      });
+      return next();
+    }
+
+    logger.info("Starting dependency check", {
+      userId,
+      username,
+      messageId,
+      healthUrl: dependencyConfig.shaliahHealthUrl,
+      timeout: dependencyConfig.dependencyCheckTimeout,
+    });
+
+    // Check if Shaliah is online
+    const healthResult = await healthCheckClient.checkHealth();
+    const checkDuration = Date.now() - startTime;
+    
+    if (!healthResult.isOnline) {
+      logger.warn("Shaliah is offline, blocking user interaction", {
+        userId,
+        username,
+        messageId,
+        error: healthResult.error,
+        responseTime: healthResult.responseTime,
+        checkDuration,
+        healthUrl: dependencyConfig.shaliahHealthUrl,
+      });
+
+      try {
+        // Send offline message to user
+        await ctx.reply(ctx.t("shaliah-offline-message"));
+        logger.info("Offline message sent to user", {
+          userId,
+          username,
+          messageId,
+        });
+      } catch (replyError) {
+        logger.error("Failed to send offline message to user", {
+          userId,
+          username,
+          messageId,
+          error: replyError instanceof Error ? replyError.message : String(replyError),
+        });
+      }
+      return; // Don't call next() - stop processing
+    }
+
+    // Shaliah is online, continue processing
+    logger.info("Shaliah is online, processing message", {
+      userId,
+      username,
+      messageId,
       responseTime: healthResult.responseTime,
+      checkDuration,
+    });
+    
+    return next();
+  } catch (error) {
+    const checkDuration = Date.now() - startTime;
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    
+    logger.error("Dependency check failed with unexpected error", {
+      userId,
+      username,
+      messageId,
+      error: errorMessage,
+      checkDuration,
+      healthUrl: dependencyConfig.shaliahHealthUrl,
     });
 
-    // Send offline message to user
-    await ctx.reply(ctx.t("shaliah-offline-message"));
+    try {
+      // Send error message to user
+      await ctx.reply(ctx.t("shaliah-offline-message"));
+      logger.info("Error fallback message sent to user", {
+        userId,
+        username,
+        messageId,
+      });
+    } catch (replyError) {
+      logger.error("Failed to send error fallback message to user", {
+        userId,
+        username,
+        messageId,
+        error: replyError instanceof Error ? replyError.message : String(replyError),
+      });
+    }
+    
     return; // Don't call next() - stop processing
   }
-
-  // Shaliah is online, continue processing
-  logger.info("Shaliah is online, processing message", {
-    userId: ctx.from?.id,
-    username: ctx.from?.username,
-    responseTime: healthResult.responseTime,
-  });
-  
-  return next();
 };
 
 // Create health check client

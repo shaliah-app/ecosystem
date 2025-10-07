@@ -20,7 +20,8 @@
     "@supabase/supabase-js": "^2.39.0",
     "@yesod/logger": "workspace:*",
     "dotenv": "^16.3.0",
-    "grammy": "^1.21.0"
+    "grammy": "^1.21.0",
+    "zod": "^4.1.11"
   },
   "devDependencies": {
     "@types/node": "^20.19.15",

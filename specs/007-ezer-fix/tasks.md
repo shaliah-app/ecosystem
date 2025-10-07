@@ -71,8 +71,8 @@
 - [x] T016 Setup graceful shutdown (SIGTERM/SIGINT handlers)
 
 **Common to all:**
-- [ ] T017 Input validation with zod in dependency middleware
-- [ ] T018 Error handling and logging via packages/logger
+- [x] T017 Input validation with zod in dependency middleware
+- [x] T018 Error handling and logging via packages/logger
 
 **Testing & Validation (after implementation complete):**
 - [ ] T019 Run all related tests for implemented features (unit, integration)
