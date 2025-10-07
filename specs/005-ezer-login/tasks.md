@@ -192,21 +192,21 @@ This feature implements cross-application authentication linking between Shaliah
 
 ### Shaliah: UI Components
 
-- [ ] **T024** [P] Create QRCodeDisplay component
+- [x] **T024** [P] Create QRCodeDisplay component
   - File: `apps/shaliah-next/src/modules/ezer-auth/ui/components/QRCodeDisplay.tsx`
   - Implement: Wrap `next-qrcode` SVG component with loading/error states
   - Props: `deepLink: string`, `size?: number`, `className?: string`
   - Use: `useQRCode()` hook from next-qrcode
   - Reference: research.md Section 2
 
-- [ ] **T025** [P] Create EzerAuthSection component
+- [x] **T025** [P] Create EzerAuthSection component
   - File: `apps/shaliah-next/src/modules/ezer-auth/ui/components/EzerAuthSection.tsx`
   - Implement: Display QR code, "Or you might use this [link]" text, expiration countdown
   - State: Fetch token via server action, handle loading/error states
   - Integrate: QRCodeDisplay component, shadcn Card, Button, Alert
   - Reference: plan.md Component Reuse Analysis
 
-- [ ] **T026** Test UI components
+- [x] **T026** Test UI components
   - Run component tests T011-T012
   - Use Chrome DevTools MCP to visually inspect QR code rendering
   - Expected: Tests T011-T012 should pass

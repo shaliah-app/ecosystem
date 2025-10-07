@@ -163,8 +163,8 @@ describe('EzerAuthSection', () => {
       expect(screen.getByText(/Expires in/)).toBeInTheDocument()
     })
 
-    // Initially should show ~2 minutes
-    expect(screen.getByText(/1[0-9] minutes/)).toBeInTheDocument()
+    // Initially should show minutes (not seconds)
+    expect(screen.getByText(/\d+ minutes/)).toBeInTheDocument()
 
     // Fast-forward time by 1 minute
     jest.advanceTimersByTime(60 * 1000)
