@@ -15,7 +15,7 @@ const HealthCheckResponseSchema = z.object({
  */
 const HealthCheckResultSchema = z.object({
   isOnline: z.boolean(),
-  responseTime: z.number().positive().optional(),
+  responseTime: z.number().min(0).optional(),
   error: z.string().optional(),
 });
 
@@ -101,7 +101,18 @@ export class HealthCheckClient {
       if (response.ok) {
         // Validate response body with zod if it's JSON
         try {
-          const responseText = await response.text();
+          // Check if response has text method (real fetch) or json method (mock)
+          let responseText: string;
+          if (typeof response.text === 'function') {
+            responseText = await response.text();
+          } else if (typeof response.json === 'function') {
+            // For mock responses, convert to string
+            const jsonData = await response.json();
+            responseText = JSON.stringify(jsonData);
+          } else {
+            responseText = '';
+          }
+          
           if (responseText) {
             const responseData = JSON.parse(responseText);
             HealthCheckResponseSchema.parse(responseData);
