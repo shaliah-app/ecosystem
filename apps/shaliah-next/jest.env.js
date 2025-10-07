@@ -9,3 +9,8 @@ const envFiles = [
 ]
 
 loadEnvConfig(projectDir, true, { envFiles })
+
+// Set default test values for required environment variables if not present
+if (!process.env.TELEGRAM_BOT_USERNAME) {
+  process.env.TELEGRAM_BOT_USERNAME = 'test_ezer_bot'
+}

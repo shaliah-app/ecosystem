@@ -213,7 +213,7 @@ This feature implements cross-application authentication linking between Shaliah
 
 ### Shaliah: Server Actions & API
 
-- [ ] **T027** Create token generation server action
+- [x] **T027** Create token generation server action
   - File: `apps/shaliah-next/src/modules/ezer-auth/ui/server/actions.ts`
   - Implement: `generateAuthTokenAction()` calling generateToken use case
   - Authentication: Get user from Supabase session
@@ -221,14 +221,14 @@ This feature implements cross-application authentication linking between Shaliah
   - Mark: 'use server' directive
   - Reference: contracts/generate-token.md
 
-- [ ] **T028** Create API route for token generation
+- [x] **T028** Create API route for token generation
   - File: `apps/shaliah-next/src/app/api/ezer-auth/token/route.ts`
   - Implement: POST endpoint calling generateAuthTokenAction
   - Rate limiting: 5 requests per minute per user (use middleware or in-route check)
   - Response: JSON matching contract schema
   - Reference: contracts/generate-token.md
 
-- [ ] **T029** Test API endpoint
+- [x] **T029** Test API endpoint
   - Run contract test T005 (ezer-auth.contract.test.ts)
   - Test manually: `curl -X POST http://localhost:3000/api/ezer-auth/token -H "Cookie: ..."`
   - Expected: Test T005 should pass
