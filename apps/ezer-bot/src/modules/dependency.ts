@@ -1,14 +1,14 @@
 import { Composer } from "grammy";
 import { Context } from "../types/context";
 import { logger } from "../logger";
-import { dependencyConfig, reloadDependencyConfig } from "../lib/config";
+import { reloadDependencyConfig } from "../lib/config";
 import { createHealthCheckClient } from "../lib/health-check";
 
 /**
  * Dependency middleware for checking Shaliah availability
- * 
+ *
  * This middleware ensures that Ezer bot can only operate when Shaliah is online.
- * In development/test mode (NODE_ENV=development or NODE_ENV=test), 
+ * In development/test mode (NODE_ENV=development or NODE_ENV=test),
  * this check is bypassed.
  */
 export const dependencyComposer = new Composer<Context>();
@@ -16,7 +16,10 @@ export const dependencyComposer = new Composer<Context>();
 /**
  * Export the middleware function for testing
  */
-export const dependencyMiddleware = async (ctx: Context, next: () => Promise<void>) => {
+export const dependencyMiddleware = async (
+  ctx: Context,
+  next: () => Promise<void>,
+) => {
   const startTime = Date.now();
   const userId = ctx.from?.id;
   const username = ctx.from?.username;
@@ -25,10 +28,10 @@ export const dependencyMiddleware = async (ctx: Context, next: () => Promise<voi
   try {
     // Load current configuration (always reload to support dynamic environment changes in tests)
     const config = reloadDependencyConfig();
-    
+
     // Skip dependency check if disabled or in development/test mode
     if (!config.dependencyChecksEnabled) {
-      logger.info("Dependency checks disabled, bypassing check", { 
+      logger.info("Dependency checks disabled, bypassing check", {
         nodeEnv: config.nodeEnv,
         dependencyChecksEnabled: config.dependencyChecksEnabled,
         userId,
@@ -50,7 +53,7 @@ export const dependencyMiddleware = async (ctx: Context, next: () => Promise<voi
     const healthCheckClient = createHealthCheckClient();
     const healthResult = await healthCheckClient.checkHealth();
     const checkDuration = Date.now() - startTime;
-    
+
     if (!healthResult.isOnline) {
       logger.warn("Shaliah is offline, blocking user interaction", {
         userId,
@@ -64,7 +67,9 @@ export const dependencyMiddleware = async (ctx: Context, next: () => Promise<voi
 
       try {
         // Send offline message to user
-        const offlineMessage = ctx.t ? ctx.t("shaliah-offline-message") : "🔧 Shaliah is currently offline. Please try again later.";
+        const offlineMessage = ctx.t
+          ? ctx.t("shaliah-offline-message")
+          : "🔧 Shaliah is currently offline. Please try again later.";
         await ctx.reply(offlineMessage);
         logger.info("Offline message sent to user", {
           userId,
@@ -76,7 +81,10 @@ export const dependencyMiddleware = async (ctx: Context, next: () => Promise<voi
           userId,
           username,
           messageId,
-          error: replyError instanceof Error ? replyError.message : String(replyError),
+          error:
+            replyError instanceof Error
+              ? replyError.message
+              : String(replyError),
         });
       }
       return; // Don't call next() - stop processing
@@ -90,12 +98,15 @@ export const dependencyMiddleware = async (ctx: Context, next: () => Promise<voi
       responseTime: healthResult.responseTime,
       checkDuration,
     });
-    
+
     return next();
   } catch (error) {
     const checkDuration = Date.now() - startTime;
     const errorMessage = error instanceof Error ? error.message : String(error);
-    
+
+    // Reload config in case it was not loaded before the error
+    const config = reloadDependencyConfig();
+
     logger.error("Dependency check failed with unexpected error", {
       userId,
       username,
@@ -107,7 +118,9 @@ export const dependencyMiddleware = async (ctx: Context, next: () => Promise<voi
 
     try {
       // Send error message to user
-      const offlineMessage = ctx.t ? ctx.t("shaliah-offline-message") : "🔧 Shaliah is currently offline. Please try again later.";
+      const offlineMessage = ctx.t
+        ? ctx.t("shaliah-offline-message")
+        : "🔧 Shaliah is currently offline. Please try again later.";
       await ctx.reply(offlineMessage);
       logger.info("Error fallback message sent to user", {
         userId,
@@ -119,10 +132,11 @@ export const dependencyMiddleware = async (ctx: Context, next: () => Promise<voi
         userId,
         username,
         messageId,
-        error: replyError instanceof Error ? replyError.message : String(replyError),
+        error:
+          replyError instanceof Error ? replyError.message : String(replyError),
       });
     }
-    
+
     return; // Don't call next() - stop processing
   }
 };

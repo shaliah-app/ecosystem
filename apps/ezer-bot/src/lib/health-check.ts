@@ -1,5 +1,5 @@
 import { logger } from "../logger";
-import { dependencyConfig, reloadDependencyConfig } from "./config";
+import { reloadDependencyConfig } from "./config";
 import { z } from "zod";
 
 /**
@@ -45,7 +45,7 @@ export class HealthCheckClient {
    */
   async checkHealth(): Promise<HealthCheckResult> {
     const startTime = Date.now();
-    
+
     try {
       // Validate health URL with zod
       try {
@@ -58,7 +58,7 @@ export class HealthCheckClient {
         });
         return {
           isOnline: false,
-          error: "Invalid health URL configuration"
+          error: "Invalid health URL configuration",
         };
       }
 
@@ -68,7 +68,7 @@ export class HealthCheckClient {
         });
         return {
           isOnline: false,
-          error: "Health URL not configured"
+          error: "Health URL not configured",
         };
       }
 
@@ -91,7 +91,7 @@ export class HealthCheckClient {
         signal: controller.signal,
         headers: {
           "User-Agent": "EzerBot/1.0",
-          "Accept": "application/json",
+          Accept: "application/json",
         },
       });
 
@@ -103,16 +103,16 @@ export class HealthCheckClient {
         try {
           // Check if response has text method (real fetch) or json method (mock)
           let responseText: string;
-          if (typeof response.text === 'function') {
+          if (typeof response.text === "function") {
             responseText = await response.text();
-          } else if (typeof response.json === 'function') {
+          } else if (typeof response.json === "function") {
             // For mock responses, convert to string
             const jsonData = await response.json();
             responseText = JSON.stringify(jsonData);
           } else {
-            responseText = '';
+            responseText = "";
           }
-          
+
           if (responseText) {
             const responseData = JSON.parse(responseText);
             HealthCheckResponseSchema.parse(responseData);
@@ -123,7 +123,10 @@ export class HealthCheckClient {
           }
         } catch (parseError) {
           logger.warn("Health check response validation failed", {
-            error: parseError instanceof Error ? parseError.message : String(parseError),
+            error:
+              parseError instanceof Error
+                ? parseError.message
+                : String(parseError),
             url: this.healthUrl,
             responseTime,
             status: response.status,
@@ -186,7 +189,7 @@ export class HealthCheckClient {
       }
     } catch (error) {
       const responseTime = Date.now() - startTime;
-      
+
       if (error instanceof Error && error.name === "AbortError") {
         logger.warn("Shaliah health check timeout", {
           timeout: this.timeout,
@@ -213,10 +216,11 @@ export class HealthCheckClient {
 
         return result;
       } else {
-        const errorMessage = error instanceof Error ? error.message : String(error);
+        const errorMessage =
+          error instanceof Error ? error.message : String(error);
         logger.error("Shaliah health check failed with unexpected error", {
           error: errorMessage,
-          errorName: error instanceof Error ? error.name : 'Unknown',
+          errorName: error instanceof Error ? error.name : "Unknown",
           responseTime,
           url: this.healthUrl,
           timeout: this.timeout,
@@ -251,10 +255,10 @@ export class HealthCheckClient {
 export function createHealthCheckClient(): HealthCheckClient {
   // Always reload configuration to support dynamic environment changes in tests
   const config = reloadDependencyConfig();
-    
+
   return new HealthCheckClient(
     config.shaliahHealthUrl,
-    config.dependencyCheckTimeout
+    config.dependencyCheckTimeout,
   );
 }
 

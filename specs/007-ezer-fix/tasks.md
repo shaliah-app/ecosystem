@@ -93,11 +93,11 @@
 
 ## Phase 5: Code Quality Validation
 **CRITICAL: Run after all implementation + testing complete**
-- [ ] T030 Run ESLint across all modified files and fix violations
-- [ ] T031 Run TypeScript type check (tsc --noEmit) and resolve type errors
-- [ ] T032 For unavoidable ESLint/TS errors: add suppression comments (@ts-expect-error, eslint-disable-next-line) with detailed justification
-- [ ] T033 Run Prettier to ensure consistent formatting
-- [ ] T034 Verify no console.log statements remain (use logger package instead)
+- [x] T030 Run ESLint across all modified files and fix violations
+- [x] T031 Run TypeScript type check (tsc --noEmit) and resolve type errors
+- [x] T032 For unavoidable ESLint/TS errors: add suppression comments (@ts-expect-error, eslint-disable-next-line) with detailed justification
+- [x] T033 Run Prettier to ensure consistent formatting
+- [x] T034 Verify no console.log statements remain (use logger package instead)
 
 ## Phase 6: i18n & Polishing
 - [x] T035 [P] i18n (bot): Add translation keys for offline error message in both pt-BR.ftl and en.ftl in apps/ezer-bot/src/locales/ (MUST be complete before PR)

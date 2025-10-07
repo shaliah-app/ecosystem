@@ -5,8 +5,14 @@ import { z } from "zod";
  * Zod schema for environment variable validation
  */
 const EnvironmentSchema = z.object({
-  SHALIAH_HEALTH_URL: z.string().url("SHALIAH_HEALTH_URL must be a valid URL").optional(),
-  DEPENDENCY_CHECK_TIMEOUT: z.string().regex(/^\d+$/, "DEPENDENCY_CHECK_TIMEOUT must be a number").optional(),
+  SHALIAH_HEALTH_URL: z
+    .string()
+    .url("SHALIAH_HEALTH_URL must be a valid URL")
+    .optional(),
+  DEPENDENCY_CHECK_TIMEOUT: z
+    .string()
+    .regex(/^\d+$/, "DEPENDENCY_CHECK_TIMEOUT must be a number")
+    .optional(),
   NODE_ENV: z.enum(["production", "development", "test"]).optional(),
 });
 
@@ -14,10 +20,16 @@ const EnvironmentSchema = z.object({
  * Zod schema for dependency configuration validation
  */
 const DependencyConfigSchema = z.object({
-  shaliahHealthUrl: z.string().refine((val) => val === "" || z.string().url().safeParse(val).success, {
-    message: "Health URL must be a valid URL or empty string"
-  }),
-  dependencyCheckTimeout: z.number().int().min(1000, "Timeout must be at least 1000ms").max(30000, "Timeout must be at most 30000ms"),
+  shaliahHealthUrl: z
+    .string()
+    .refine((val) => val === "" || z.string().url().safeParse(val).success, {
+      message: "Health URL must be a valid URL or empty string",
+    }),
+  dependencyCheckTimeout: z
+    .number()
+    .int()
+    .min(1000, "Timeout must be at least 1000ms")
+    .max(30000, "Timeout must be at most 30000ms"),
   nodeEnv: z.enum(["production", "development", "test"]),
   dependencyChecksEnabled: z.boolean(),
 });
@@ -52,35 +64,49 @@ export function loadDependencyConfig(): DependencyConfig {
       logger.error("Environment variable validation failed", {
         errors: envResult.error.issues,
       });
-      throw new Error(`Environment validation failed: ${envResult.error.issues.map(e => e.message).join(", ")}`);
+      throw new Error(
+        `Environment validation failed: ${envResult.error.issues.map((e) => e.message).join(", ")}`,
+      );
     }
 
     const env = envResult.data;
     const shaliahHealthUrl = env.SHALIAH_HEALTH_URL;
-    const dependencyCheckTimeout = env.DEPENDENCY_CHECK_TIMEOUT ? parseInt(env.DEPENDENCY_CHECK_TIMEOUT, 10) : 5000;
+    const dependencyCheckTimeout = env.DEPENDENCY_CHECK_TIMEOUT
+      ? parseInt(env.DEPENDENCY_CHECK_TIMEOUT, 10)
+      : 5000;
     const nodeEnv = env.NODE_ENV || "production";
 
     // Validate required configuration
     if (!shaliahHealthUrl) {
-      logger.warn("SHALIAH_HEALTH_URL not configured - dependency checks will be disabled");
+      logger.warn(
+        "SHALIAH_HEALTH_URL not configured - dependency checks will be disabled",
+      );
     }
 
     // Validate timeout
-    if (isNaN(dependencyCheckTimeout) || dependencyCheckTimeout < 1000 || dependencyCheckTimeout > 30000) {
+    if (
+      isNaN(dependencyCheckTimeout) ||
+      dependencyCheckTimeout < 1000 ||
+      dependencyCheckTimeout > 30000
+    ) {
       logger.warn("Invalid DEPENDENCY_CHECK_TIMEOUT, using default 5000ms", {
         provided: process.env.DEPENDENCY_CHECK_TIMEOUT,
-        default: 5000
+        default: 5000,
       });
     }
 
     // Determine if dependency checks are enabled
-    const dependencyChecksEnabled = nodeEnv === "production" && !!shaliahHealthUrl;
+    const dependencyChecksEnabled =
+      nodeEnv === "production" && !!shaliahHealthUrl;
 
     const config: DependencyConfig = {
       shaliahHealthUrl: shaliahHealthUrl || "",
-      dependencyCheckTimeout: isNaN(dependencyCheckTimeout) || dependencyCheckTimeout < 1000 || dependencyCheckTimeout > 30000 
-        ? 5000 
-        : dependencyCheckTimeout,
+      dependencyCheckTimeout:
+        isNaN(dependencyCheckTimeout) ||
+        dependencyCheckTimeout < 1000 ||
+        dependencyCheckTimeout > 30000
+          ? 5000
+          : dependencyCheckTimeout,
       nodeEnv,
       dependencyChecksEnabled,
     };
@@ -92,7 +118,9 @@ export function loadDependencyConfig(): DependencyConfig {
         errors: configResult.error.issues,
         config,
       });
-      throw new Error(`Configuration validation failed: ${configResult.error.issues.map(e => e.message).join(", ")}`);
+      throw new Error(
+        `Configuration validation failed: ${configResult.error.issues.map((e) => e.message).join(", ")}`,
+      );
     }
 
     logger.info("Dependency configuration loaded and validated", {
@@ -107,7 +135,7 @@ export function loadDependencyConfig(): DependencyConfig {
     logger.error("Failed to load dependency configuration", {
       error: error instanceof Error ? error.message : String(error),
     });
-    
+
     // Return safe defaults
     return {
       shaliahHealthUrl: "",
@@ -137,6 +165,6 @@ export function reloadDependencyConfig(): DependencyConfig {
  * This function is used by tests
  */
 export function isDevelopmentMode(): boolean {
-  const nodeEnv = process.env.NODE_ENV || 'production';
-  return nodeEnv === 'development' || nodeEnv === 'test';
+  const nodeEnv = process.env.NODE_ENV || "production";
+  return nodeEnv === "development" || nodeEnv === "test";
 }
