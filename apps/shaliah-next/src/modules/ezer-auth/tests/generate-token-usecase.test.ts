@@ -10,8 +10,8 @@
 import { describe, it, expect, beforeEach, afterEach, beforeAll, afterAll } from '@jest/globals'
 import { authTokens } from '@/db/schema'
 import { eq } from 'drizzle-orm'
-import { TEST_USER_1 as TEST_USER_ID } from './test-helpers'
-import { setupTestDatabase, cleanupTestDatabase } from './test-database-setup'
+import { TEST_USER_1 as TEST_USER_ID } from '../../../__tests__/integration/test-helpers'
+import { setupTestDatabase, cleanupTestDatabase } from '../../../__tests__/integration/test-database-setup'
 
 describe('generateAuthTokenUseCase - Unit Test', () => {
   let db: any

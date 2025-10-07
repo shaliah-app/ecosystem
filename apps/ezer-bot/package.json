@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "tsx watch --import ./instrument.ts src/bot.ts",
+    "dev": "tsx watch --import ./src/instrument.ts src/bot.ts",
     "build": "tsc",
-    "start": "node --import ./instrument.ts dist/bot.js",
+    "start": "node --import ./dist/instrument.js dist/bot.js",
     "lint": "eslint src/**/*.ts",
     "lint:fix": "eslint src/**/*.ts --fix",
     "test": "vitest run",
@@ -20,7 +20,8 @@
     "@supabase/supabase-js": "^2.39.0",
     "@yesod/logger": "workspace:*",
     "dotenv": "^16.3.0",
-    "grammy": "^1.21.0"
+    "grammy": "^1.21.0",
+    "zod": "^4.1.11"
   },
   "devDependencies": {
     "@types/node": "^20.19.15",

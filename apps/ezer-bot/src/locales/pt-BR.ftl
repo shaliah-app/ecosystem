@@ -73,3 +73,20 @@ account-unlinked = ⚠️ Sua conta Shaliah não está mais vinculada
 
     Por favor, visite seu perfil no Shaliah e gere um novo código QR para conectar.
 
+# Dependency check messages (from 007-ezer-fix)
+shaliah-offline-message = 
+    🔧 *Shaliah está offline no momento*
+    
+    Preciso que o Shaliah esteja funcionando para te ajudar. Tente novamente mais tarde.
+
+# Development mode logging messages
+dev-mode-bypass-log = 🔧 Modo desenvolvimento: Ignorando verificação de dependência do Shaliah
+dev-mode-config-log = 🔧 Modo desenvolvimento: NODE_ENV={ $node_env } detectado, verificações de dependência desabilitadas
+
+# Health check logging messages
+health-check-start-log = 🔍 Iniciando verificação de saúde do Shaliah em { $url }
+health-check-success-log = ✅ Verificação de saúde do Shaliah bem-sucedida (tempo de resposta: { $response_time }ms)
+health-check-failure-log = ❌ Verificação de saúde do Shaliah falhou: { $error }
+health-check-timeout-log = ⏰ Verificação de saúde do Shaliah expirou após { $timeout }ms
+health-check-config-error-log = ⚠️ Erro de configuração da verificação de saúde: { $error }
+
