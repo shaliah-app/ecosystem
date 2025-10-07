@@ -1,7 +1,7 @@
 import { Composer } from "grammy";
 import { Context } from "../types/context";
 import { logger } from "../logger";
-import { reloadDependencyConfig } from "../lib/config";
+import { reloadDependencyConfig } from "../lib/env";
 import { createHealthCheckClient } from "../lib/health-check";
 
 /**

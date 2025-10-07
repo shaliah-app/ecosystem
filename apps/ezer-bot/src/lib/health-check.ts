@@ -1,5 +1,5 @@
 import { logger } from "../logger";
-import { reloadDependencyConfig } from "./config";
+import { reloadDependencyConfig } from "./env";
 import { z } from "zod";
 
 /**
