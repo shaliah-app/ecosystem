@@ -5,16 +5,27 @@ import { z } from "zod";
  * Zod schema for environment variable validation
  */
 const EnvironmentSchema = z.object({
-  SHALIAH_HEALTH_URL: z
-    .string()
-    .url("SHALIAH_HEALTH_URL must be a valid URL")
+  SHALIAH_BASE_URL: z
+    .url("SHALIAH_BASE_URL must be a valid URL")
     .optional(),
   DEPENDENCY_CHECK_TIMEOUT: z
     .string()
     .regex(/^\d+$/, "DEPENDENCY_CHECK_TIMEOUT must be a number")
     .optional(),
   NODE_ENV: z.enum(["production", "development", "test"]).optional(),
-});
+}).refine(
+  (data) => {
+    // SHALIAH_BASE_URL is required in production mode
+    if (data.NODE_ENV === "production") {
+      return data.SHALIAH_BASE_URL && data.SHALIAH_BASE_URL.trim() !== "";
+    }
+    return true;
+  },
+  {
+    message: "SHALIAH_BASE_URL environment variable is required in production mode",
+    path: ["SHALIAH_BASE_URL"],
+  }
+);
 
 /**
  * Zod schema for dependency configuration validation
@@ -55,7 +66,7 @@ export function loadDependencyConfig(): DependencyConfig {
   try {
     // Validate environment variables with zod
     const envResult = EnvironmentSchema.safeParse({
-      SHALIAH_HEALTH_URL: process.env.SHALIAH_HEALTH_URL,
+      SHALIAH_BASE_URL: process.env.SHALIAH_BASE_URL,
       DEPENDENCY_CHECK_TIMEOUT: process.env.DEPENDENCY_CHECK_TIMEOUT,
       NODE_ENV: process.env.NODE_ENV,
     });
@@ -70,17 +81,23 @@ export function loadDependencyConfig(): DependencyConfig {
     }
 
     const env = envResult.data;
-    const shaliahHealthUrl = env.SHALIAH_HEALTH_URL;
+    const shaliahBaseUrl = env.SHALIAH_BASE_URL;
     const dependencyCheckTimeout = env.DEPENDENCY_CHECK_TIMEOUT
       ? parseInt(env.DEPENDENCY_CHECK_TIMEOUT, 10)
       : 2000;
     const nodeEnv = env.NODE_ENV || "production";
 
-    // Validate required configuration
-    if (!shaliahHealthUrl) {
-      logger.warn(
-        "SHALIAH_HEALTH_URL not configured - dependency checks will be disabled",
-      );
+    // Construct health URL from base URL
+    const shaliahHealthUrl = shaliahBaseUrl ? `${shaliahBaseUrl}/api/health` : "";
+
+    // Validate required configuration (handled by Zod refinement)
+    if (!shaliahBaseUrl || shaliahBaseUrl.trim() === "") {
+      if (nodeEnv !== "production") {
+        logger.warn(
+          "SHALIAH_BASE_URL not configured - dependency checks will be disabled",
+          { nodeEnv }
+        );
+      }
     }
 
     // Validate timeout
