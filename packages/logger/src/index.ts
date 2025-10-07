@@ -1,5 +1,5 @@
 import pino from 'pino';
-import { LoggerConfig, validateConfig } from './types';
+import { LoggerConfig, validateConfig } from './types.js';
 
 export interface Logger {
   info(message: string, context?: object): void;
@@ -11,14 +11,30 @@ export interface Logger {
 export function createLogger(config?: Partial<LoggerConfig>): Logger {
   const cfg = validateConfig(config || { serviceName: 'default' });
 
-  // Create Pino logger
-  const pinoLogger = pino({
+  // Create Pino logger with pretty printing for development
+  const pinoOptions: any = {
     level: cfg.level || 'info',
     base: {
       service: cfg.serviceName,
       environment: cfg.environment,
     },
-  });
+  };
+
+  // Add transport for development environment
+  if (cfg.environment === 'development') {
+    pinoOptions.transport = {
+      target: 'pino-pretty',
+      options: {
+        colorize: true,
+        translateTime: 'SYS:standard',
+        ignore: 'pid,hostname',
+        messageFormat: '{msg}',
+        singleLine: false,
+      }
+    };
+  }
+
+  const pinoLogger = pino(pinoOptions);
 
   const logger: Logger = {
     info: (message: string, context?: object) => {
