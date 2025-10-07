@@ -1,5 +1,7 @@
 import { z } from 'zod'
 import { logger } from '../logger'
+import { config } from 'dotenv'
+config()
 
 // Environment variables schema
 const envSchema = z.object({

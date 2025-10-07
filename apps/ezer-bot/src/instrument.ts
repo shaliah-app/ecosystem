@@ -1,10 +1,11 @@
 import * as Sentry from "@sentry/node";
 import { nodeProfilingIntegration } from "@sentry/profiling-node";
+import { env } from "./lib/env";
 
 // Ensure to call this before requiring any other modules!
-if (process.env.SENTRY_DSN) {
+if (env.sentry.dsn) {
   Sentry.init({
-    dsn: process.env.SENTRY_DSN,
+    dsn: env.sentry.dsn,
 
     // Adds request headers and IP for users, for more info visit:
     // https://docs.sentry.io/platforms/javascript/guides/node/configuration/options/#sendDefaultPii
@@ -25,6 +26,6 @@ if (process.env.SENTRY_DSN) {
     // This is relative to tracesSampleRate
     profilesSampleRate: 1.0,
 
-    environment: process.env.NODE_ENV || 'development',
+    environment: env.app.environment || 'development',
   });
 }

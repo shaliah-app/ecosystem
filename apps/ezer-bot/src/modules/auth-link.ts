@@ -2,9 +2,7 @@ import { Composer } from "grammy";
 import type { Context } from "../types/context.js";
 import { supabase } from "../lib/supabase.js";
 import { logger } from "../logger.js";
-
-// Global constants for easy maintenance
-const SHALIAH_BASE_URL = process.env.SHALIAH_BASE_URL || "https://shaliah.app";
+import { env } from "../lib/env.js";
 
 type AuthTokenRow = {
   id: string;
@@ -92,29 +90,6 @@ async function findProfileByUserId(
 
 export const authLinkComposer = new Composer<Context>();
 
-// Helper function to show main menu
-async function showMainMenu(ctx: Context): Promise<void> {
-  try {
-    await replySafe(ctx, ctx.t("welcome-message"), {
-      parse_mode: "Markdown",
-      reply_markup: {
-        inline_keyboard: [
-          [
-            { text: ctx.t("search-button"), callback_data: "search" },
-            { text: ctx.t("playlists-button"), callback_data: "playlists" },
-          ],
-          [{ text: ctx.t("help-button"), callback_data: "help" }],
-        ],
-      },
-    });
-  } catch (err) {
-    logger.warn("Failed to show main menu", {
-      error: err instanceof Error ? err.message : "Unknown error",
-      userId: ctx.from?.id,
-    });
-  }
-}
-
 async function replySafe(
   ctx: Context,
   text: string,
@@ -140,11 +115,8 @@ export async function handleStart(ctx: Context): Promise<void> {
   try {
     const token = (ctx as any).match as string | undefined;
 
-    // No token: show regular welcome
+    // No token: let other handlers (welcome.ts) handle this case
     if (!token || token.trim().length === 0) {
-      await replySafe(ctx, ctx.t("welcome-message"), {
-        parse_mode: "Markdown",
-      });
       return;
     }
 
@@ -224,13 +196,23 @@ export async function handleStart(ctx: Context): Promise<void> {
           userId: authToken.user_id,
         },
       );
+      // Show already linked message with main menu
       await replySafe(
         ctx,
         "✅ Sua conta já está vinculada! Você pode usar o Ezer bot normalmente.",
+        {
+          parse_mode: "Markdown",
+          reply_markup: {
+            inline_keyboard: [
+              [
+                { text: ctx.t("search-button"), callback_data: "search" },
+                { text: ctx.t("playlists-button"), callback_data: "playlists" },
+              ],
+              [{ text: ctx.t("help-button"), callback_data: "help" }],
+            ],
+          },
+        },
       );
-
-      // Show main menu for already linked users
-      await showMainMenu(ctx);
       return;
     }
 
@@ -328,10 +310,19 @@ export async function handleStart(ctx: Context): Promise<void> {
       ? "✅ Conta vinculada com sucesso! Seu Telegram agora está conectado."
       : "✅ Account linked successfully! Your Telegram is now connected.";
 
-    await replySafe(ctx, successText);
-
-    // Show main menu after successful linking
-    await showMainMenu(ctx);
+    // Show success message with main menu
+    await replySafe(ctx, successText, {
+      parse_mode: "Markdown",
+      reply_markup: {
+        inline_keyboard: [
+          [
+            { text: ctx.t("search-button"), callback_data: "search" },
+            { text: ctx.t("playlists-button"), callback_data: "playlists" },
+          ],
+          [{ text: ctx.t("help-button"), callback_data: "help" }],
+        ],
+      },
+    });
 
     // Optionally set session flags
     if (ctx.session) {
@@ -398,7 +389,7 @@ unlinkedDetectionComposer.use(async (ctx, next) => {
         await replySafe(ctx, text, {
           reply_markup: {
             inline_keyboard: [
-              [{ text: "Open Shaliah", url: `${SHALIAH_BASE_URL}/profile` }],
+              [{ text: "Open Shaliah", url: `${env.shaliah.baseUrl}/profile` }],
             ],
           },
         });

@@ -1,5 +1,6 @@
 import { Composer } from "grammy";
 import type { Context } from "../types/context.js";
+import { env } from "../lib/env.js";
 
 const composer = new Composer<Context>();
 
@@ -34,7 +35,7 @@ composer.command("start", async (ctx) => {
           [
             {
               text: "Open Shaliah",
-              url: `${process.env.SHALIAH_BASE_URL || "https://shaliah.app"}/profile`,
+              url: `${env.shaliah.baseUrl || "https://shaliah.app"}/profile`,
             },
           ],
         ],
@@ -96,7 +97,7 @@ composer.on("message", async (ctx) => {
           [
             {
               text: "Open Shaliah",
-              url: `${process.env.SHALIAH_BASE_URL || "https://shaliah.app"}/profile`,
+              url: `${env.shaliah.baseUrl || "https://shaliah.app"}/profile`,
             },
           ],
         ],

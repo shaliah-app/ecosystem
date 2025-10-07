@@ -1,7 +1,4 @@
-// Load environment variables FIRST - before any other imports
-import { config } from 'dotenv'
-config()
-
+import { env } from './lib/env.js'
 import { Bot, session } from 'grammy'
 import { run, sequentialize } from '@grammyjs/runner'
 import { I18n } from '@grammyjs/i18n'
@@ -10,7 +7,6 @@ import welcomeComposer from './modules/welcome.js'
 import authLinkComposer, { unlinkedDetectionComposer } from './modules/auth-link.js'
 import { dependencyComposer } from './modules/dependency.js'
 import { logger, logBotError } from './logger.js'
-import { env } from './lib/env.js'
 
 // Environment configuration is validated and loaded in env.ts
 // All environment variables are validated at import time
