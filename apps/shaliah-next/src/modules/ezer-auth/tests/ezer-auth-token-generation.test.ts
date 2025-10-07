@@ -12,10 +12,10 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, beforeAll, afterAll } from '@jest/globals'
-import { getTestDb } from './test-db'
+import { getTestDb } from '../../../__tests__/integration/test-db'
 import { authTokens, userProfiles } from '@/db/schema'
 import { eq, and, isNull } from 'drizzle-orm'
-import { setupTestUsers, cleanupTestUsers, TEST_USER_1 as TEST_USER_ID } from './test-helpers'
+import { setupTestUsers, cleanupTestUsers, TEST_USER_1 as TEST_USER_ID } from '../../../__tests__/integration/test-helpers'
 
 const db = getTestDb()
 

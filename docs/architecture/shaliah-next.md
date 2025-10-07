@@ -85,10 +85,9 @@ App Router** applications, using `next-intl`, Zustand, Supabase, Drizzle ORM, an
 
 # Repo layout
 
-    __tests__/                     # Jest + RTL tests
-      unit/                        # Domain, use-case, factory tests
-      integration/                 # Server action, adapter tests
-      components/                  # Component tests (RTL)
+    __tests__/                     # Jest + RTL tests (cross-module and general tests)
+      integration/                 # Cross-module integration tests
+      components/                  # General component tests (RTL)
       contract/                    # API contract tests
     db/
       schema/                      # Drizzle ORM schema (single source of truth)
@@ -128,6 +127,9 @@ App Router** applications, using `next-intl`, Zustand, Supabase, Drizzle ORM, an
               OnboardingForm.tsx
             server/
               actions.ts           # Server actions
+          tests/                   # Module-specific tests
+            onboarding.test.tsx
+            complete-onboarding.test.ts
           messages/                # Feature-specific translations
             en.json
             pt-BR.json
@@ -145,6 +147,9 @@ App Router** applications, using `next-intl`, Zustand, Supabase, Drizzle ORM, an
               CooldownTimer.tsx
             server/
               actions.ts
+          tests/                   # Module-specific tests
+            auth-form.test.tsx
+            magic-link.test.ts
           messages/                # Feature-specific translations
             en.json
             pt-BR.json
@@ -290,7 +295,9 @@ See `drizzle.config.ts` at project root for connection and migration settings.
 
 ## Test Structure & Patterns
 
--   **Colocate when possible**: Keep tests close to implementation or in `__tests__/`
+-   **Module-specific tests**: Place tests related to specific modules in `src/modules/<module>/tests/` directory
+-   **General tests**: Keep cross-module integration tests, contract tests, and general component tests in `__tests__/`
+-   **Colocate when possible**: Keep tests close to implementation or in module-specific `tests/` folders
 -   **Mock Supabase**: Use `createClient` mock in tests
 -   **Mock next-intl**: Mock `useTranslations` for component tests
 -   **Test isolation**: Each test should clean up after itself
