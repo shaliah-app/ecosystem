@@ -7,7 +7,7 @@ const withNextIntl = createNextIntlPlugin();
 
 const nextConfig: NextConfig = {
   /* config options here */
-  outputFileTracingRoot: path.join(__dirname, './'),
+  outputFileTracingRoot: path.join(__dirname, '../../'),
 };
 
 export default withSentryConfig(withNextIntl(nextConfig), {
