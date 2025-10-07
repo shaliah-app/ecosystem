@@ -1,0 +1,22 @@
+{
+  "ezer-auth": {
+    "connect-to-bot": "Conectar ao Bot Ezer",
+    "generating-token": "Gerando token de autenticação...",
+    "token-generated": "Token de autenticação gerado com sucesso",
+    "token-error": "Falha ao gerar token de autenticação",
+    "qr-code-alt": "Código QR para autenticação do Bot Ezer",
+    "deep-link-text": "Ou você pode usar este link",
+    "expires-in": "Expira em",
+    "minutes": "minutos",
+    "seconds": "segundos",
+    "linked-status": "Vinculado ao Telegram",
+    "unlinked-status": "Não vinculado ao Telegram",
+    "generate-new-token": "Gerar novo link de autenticação",
+    "copy-link": "Copiar link",
+    "link-copied": "Link copiado para a área de transferência",
+    "token-expired": "Token de autenticação expirou",
+    "token-invalid": "Token de autenticação inválido",
+    "account-linked": "Sua conta do Telegram agora está vinculada ao Shaliah",
+    "account-unlinked": "Sua conta do Telegram foi desvinculada do Shaliah"
+  }
+}

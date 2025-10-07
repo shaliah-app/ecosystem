@@ -30,7 +30,9 @@
     "link": "link",
     "expires-in": "Expires in",
     "minutes": "minutes",
-    "seconds": "seconds"
+    "seconds": "seconds",
+    "linked": "Linked",
+    "generate-new-link": "Generate new link"
   },
   "AuthForm": {
     "signIn": "Sign In",

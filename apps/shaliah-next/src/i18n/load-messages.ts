@@ -47,14 +47,30 @@ export function normalizeLocale(locale: string): SupportedLocale {
 /**
  * Dynamically loads messages for a given locale
  * This function is used by next-intl for server-side rendering
+ * Merges common messages with feature-specific messages
  */
 export async function loadMessages(locale: string): Promise<Record<string, any>> {
   const normalizedLocale = normalizeLocale(locale)
 
   try {
-    // Dynamic import of the messages file
-    const messages = await import(`../../messages/${normalizedLocale}.json`)
-    return messages.default
+    // Load common messages
+    const commonMessages = await import(`../../messages/${normalizedLocale}.json`)
+    let messages = commonMessages.default
+
+    // Load feature-specific messages from modules
+    try {
+      // Load ezer-auth module messages
+      const ezerAuthMessages = await import(`../modules/ezer-auth/messages/${normalizedLocale}.json`)
+      messages = {
+        ...messages,
+        ...ezerAuthMessages.default
+      }
+    } catch (featureError) {
+      // Feature messages are optional, continue without them
+      console.warn(`Feature messages not found for locale ${normalizedLocale}:`, featureError)
+    }
+
+    return messages
   } catch (error) {
     console.error(`Failed to load messages for locale ${normalizedLocale}:`, error)
 

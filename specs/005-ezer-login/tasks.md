@@ -421,21 +421,21 @@ This feature implements cross-application authentication linking between Shaliah
 
 ### Shaliah i18n
 
-- [ ] **T053** [P] Add common i18n keys
+- [x] **T053** [P] Add common i18n keys
   - File: `apps/shaliah-next/messages/pt-BR.json`
   - Add: Keys for "Connect to Ezer Bot", "Or you might use this", "Expires in", "Linked", "Generate new link"
   - File: `apps/shaliah-next/messages/en.json`
   - Add: Same keys with English translations
   - **MUST BE COMPLETE** before PR
 
-- [ ] **T054** [P] Add feature-specific i18n keys
+- [x] **T054** [P] Add feature-specific i18n keys
   - File: `apps/shaliah-next/src/modules/ezer-auth/messages/pt-BR.json`
   - Add: Domain-specific terms if any (likely covered by common keys)
   - File: `apps/shaliah-next/src/modules/ezer-auth/messages/en.json`
   - Add: Same keys with English translations
   - Reference: plan.md Architecture Review (i18n organization)
 
-- [ ] **T055** Configure message loader for feature-based i18n (if first feature)
+- [x] **T055** Configure message loader for feature-based i18n (if first feature)
   - File: `apps/shaliah-next/src/i18n/load-messages.ts` (modify if exists)
   - Merge: Common translations from `messages/` + feature translations from `modules/*/messages/`
   - Skip if already configured
