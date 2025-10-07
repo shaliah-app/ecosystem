@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useAuth } from '@/lib/auth/store'
+import { useAuth } from '@/lib/auth'
 import { useTranslations } from 'next-intl'
 import { getUserProfile } from '@/lib/supabase/database'
 import { Database } from '@/lib/supabase/types'

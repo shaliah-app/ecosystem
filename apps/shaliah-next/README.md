@@ -131,7 +131,11 @@ shaliah-next/
 - `pnpm run start` - Start production server
 - `pnpm run lint` - Run ESLint
 - `pnpm test` - Run Jest tests
+- `pnpm run test:local` - Run tests with local PostgreSQL database
+- `pnpm run test:local:stop` - Stop local test database
 - `pnpm run test:watch` - Run tests in watch mode
+- `pnpm run db:test:migrate` - Apply database migrations to test database
+- `pnpm run db:test:generate` - Generate new database migrations
 
 ## 🧪 Testing
 
@@ -148,11 +152,26 @@ pnpm run test:watch
 pnpm test -- --coverage
 ```
 
+### Local Testing Setup
+
+For faster, more reliable testing, you can run tests against a local PostgreSQL database:
+
+```bash
+# Start local test database
+pnpm run test:local
+
+# Stop local test database
+pnpm run test:local:stop
+```
+
+The local setup uses Docker to run PostgreSQL and automatically applies your database migrations.
+
 ### Test Structure
 
 - **Unit Tests**: Component and utility function tests
-- **Integration Tests**: Page-level tests
-- **Mocking**: Supabase, next-intl, and other external dependencies
+- **Integration Tests**: Database and API integration tests
+- **Contract Tests**: API contract validation
+- **Mocking**: External dependencies are mocked where appropriate
 
 ## 🌐 Internationalization (i18n)
 

@@ -1,14 +1,38 @@
 import '@testing-library/jest-dom'
 import { TextEncoder, TextDecoder } from 'util'
-import { fetch, Request, Response, Headers } from 'cross-fetch'
 
 // Polyfills for MSW
 global.TextEncoder = TextEncoder
 global.TextDecoder = TextDecoder
-global.fetch = fetch
-global.Request = Request
-global.Response = Response
-global.Headers = Headers
+
+// Polyfill Web Streams for undici in Node test env
+const { ReadableStream, WritableStream, TransformStream } = require('web-streams-polyfill/ponyfill')
+if (!global.ReadableStream) global.ReadableStream = ReadableStream
+if (!global.WritableStream) global.WritableStream = WritableStream
+if (!global.TransformStream) global.TransformStream = TransformStream
+
+// Polyfill MessagePort for undici (must be defined before requiring undici)
+if (!global.MessagePort) {
+  global.MessagePort = class MockMessagePort {
+    postMessage() {}
+    start() {}
+    close() {}
+    addEventListener() {}
+    removeEventListener() {}
+    dispatchEvent() { return true }
+  }
+}
+
+// Use undici to provide Web Fetch API (fetch/Request/Response/Headers)
+const { fetch: undiciFetch, Request: UndiciRequest, Response: UndiciResponse, Headers: UndiciHeaders } = require('undici')
+if (!global.fetch) global.fetch = undiciFetch
+if (!global.Request) global.Request = UndiciRequest
+if (!global.Response) global.Response = UndiciResponse
+if (!global.Headers) global.Headers = UndiciHeaders
+
+// Polyfills for Node.js setImmediate/clearImmediate (needed by postgres package)
+global.setImmediate = global.setImmediate || ((fn, ...args) => setTimeout(fn, 0, ...args))
+global.clearImmediate = global.clearImmediate || clearTimeout
 
 // Mock next-intl
 const translations = {
@@ -201,5 +225,59 @@ jest.mock('next/navigation', () => ({
     push: jest.fn(),
     replace: jest.fn(),
     back: jest.fn(),
+  })),
+}))
+
+// Mock database for contract tests
+const mockDb = {
+  update: jest.fn(() => ({
+    set: jest.fn(() => ({
+      where: jest.fn(() => Promise.resolve()),
+    })),
+  })),
+  insert: jest.fn(() => ({
+    values: jest.fn(() => Promise.resolve()),
+  })),
+  select: jest.fn(() => ({
+    from: jest.fn(() => ({
+      where: jest.fn(() => Promise.resolve([])),
+    })),
+  })),
+}
+
+jest.mock('@/lib/db', () => ({
+  db: mockDb,
+}))
+
+jest.mock('@/lib/database-injection', () => ({
+  getDatabaseInstance: jest.fn(() => mockDb),
+  setDatabaseInstance: jest.fn(),
+  resetDatabaseInstance: jest.fn(),
+  resetAllDatabaseInstances: jest.fn(),
+}))
+
+// Mock logger for contract tests
+jest.mock('@/lib/logger', () => ({
+  logger: {
+    info: jest.fn(),
+    warn: jest.fn(),
+    error: jest.fn((msg, meta) => {
+      console.error(`Logger error: ${msg}`, meta)
+    }),
+    debug: jest.fn(),
+  },
+}))
+
+// Mock Supabase server client (needed for getAuthenticatedUserId)
+jest.mock('@/lib/supabase/server', () => ({
+  createClient: jest.fn(async () => ({
+    auth: {
+      getUser: jest.fn(async () => ({
+        data: {
+          user: { id: '550e8400-e29b-41d4-a716-446655440000' },
+        },
+        error: null,
+      })),
+    },
   })),
 }))

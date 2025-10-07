@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { getUserProfile, createUserProfile } from '@/lib/supabase/database'
+import { checkAndCreateProfile } from './actions'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -53,29 +53,16 @@ export default function AuthCallbackPage() {
       const user = data.session.user
 
       // Check if profile exists (trigger should have created it)
-      let profile = await getUserProfile(user.id)
+      // Use server action to avoid importing server-only code
+      const result = await checkAndCreateProfile(user.id, user.user_metadata || {})
 
-      if (!profile) {
-        console.warn('Profile not found for user, creating one:', user.id)
-        // Create profile if it doesn't exist (fallback for when trigger fails)
-        const userMetadata = user.user_metadata || {}
-        
-        const profileData = {
-          id: user.id,
-          full_name: userMetadata.full_name || null,
-          avatar_url: userMetadata.avatar_url || null,
-          language: 'pt-BR', // Default language
-        }
-
-        profile = await createUserProfile(profileData)
-        
-        if (!profile) {
-          console.error('Failed to create profile for user:', user.id)
-          setError('Account setup incomplete. Please contact support or try signing in again.')
-          setLoading(false)
-          return
-        }
+      if (result.error) {
+        setError(result.error)
+        setLoading(false)
+        return
       }
+
+      const profile = result.profile
 
       // Redirect logic: if full_name is null, go to onboarding, else profile
       if (!profile.full_name) {

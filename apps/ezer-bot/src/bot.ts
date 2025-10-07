@@ -1,10 +1,10 @@
 import { Bot, session } from 'grammy'
 import { run, sequentialize } from '@grammyjs/runner'
-import { createClient } from '@supabase/supabase-js'
 import { config } from 'dotenv'
 import { I18n } from '@grammyjs/i18n'
 import type { Context, SessionData } from './types/context.js'
 import welcomeComposer from './modules/welcome.js'
+import authLinkComposer, { unlinkedDetectionComposer } from './modules/auth-link.js'
 import { logger, logBotError } from './logger.js'
 
 // Load environment variables
@@ -45,7 +45,9 @@ bot.use(i18n)
 // Sequentialize middleware to ensure updates from the same chat are processed in order
 bot.use(sequentialize((ctx) => ctx.chat?.id.toString()))
 
-// Register modules
+// Register modules in order: sequentialize → session → i18n → auth-link → others
+bot.use(authLinkComposer)
+bot.use(unlinkedDetectionComposer)
 bot.use(welcomeComposer)
 
 // Global error handler

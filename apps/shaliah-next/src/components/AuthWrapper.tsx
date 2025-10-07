@@ -2,7 +2,7 @@
 
 import { AuthForm } from "@/components/AuthForm";
 import { UserProfile } from "@/components/UserProfile";
-import { useAuth } from "@/lib/auth/store";
+import { useAuth } from "@/lib/auth";
 
 export function AuthWrapper() {
   const { user, loading } = useAuth();

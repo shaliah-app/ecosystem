@@ -22,6 +22,18 @@
   "profile": {
     "changeLanguage": "Change Language"
   },
+  "ezer-auth": {
+    "generate-token": "Connect to Ezer Bot",
+    "generating": "Generating...",
+    "error": "Failed to generate authentication link",
+    "or-use-link": "Or you might use this",
+    "link": "link",
+    "expires-in": "Expires in",
+    "minutes": "minutes",
+    "seconds": "seconds",
+    "linked": "Linked",
+    "generate-new-link": "Generate new link"
+  },
   "AuthForm": {
     "signIn": "Sign In",
     "signUp": "Create Account",

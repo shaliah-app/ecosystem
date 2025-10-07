@@ -166,7 +166,7 @@ App Router** applications, using `next-intl`, Zustand, Supabase, Drizzle ORM, an
         Navbar.tsx
 
       lib/
-        env.ts                     # Environment variables (if needed)
+        env.ts                     
         di.ts                      # Composition root (DI wiring, if needed)
         supabase/                  # Supabase clients
           server.ts                # Server-side client (service role)

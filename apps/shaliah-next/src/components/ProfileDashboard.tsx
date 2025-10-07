@@ -10,10 +10,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { useAuth } from '@/hooks/useAuth'
+import { useAuth } from '@/lib/auth'
 import { getUserProfile } from '@/lib/supabase/database'
 import { Database } from '@/lib/supabase/types'
 import { User } from '@supabase/supabase-js'
+import { EzerAuthSection } from '@/modules/ezer-auth/ui/components/EzerAuthSection'
 
 type UserProfile = Database['public']['Tables']['user_profiles']['Row']
 
@@ -226,6 +227,9 @@ export function ProfileDashboard({ user: propUser }: ProfileDashboardProps = {})
             </div>
           )}
         </div>
+
+        {/* Ezer Bot Authentication */}
+        <EzerAuthSection />
 
         {/* Sign Out */}
         <Button
