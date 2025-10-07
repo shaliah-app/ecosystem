@@ -43,19 +43,19 @@
 - **Packages**: `packages/<name>/src/`
 
 ## Phase 1: Setup
-- [ ] T001 Create dependency middleware module structure in apps/ezer-bot/src/modules/dependency.ts
-- [ ] T002 Initialize environment configuration for NODE_ENV, SHALIAH_HEALTH_URL, DEPENDENCY_CHECK_TIMEOUT
-- [ ] T005 [P] Setup HTTP client configuration for health checks
+- [x] T001 Create dependency middleware module structure in apps/ezer-bot/src/modules/dependency.ts
+- [x] T002 Initialize environment configuration for NODE_ENV, SHALIAH_HEALTH_URL, DEPENDENCY_CHECK_TIMEOUT
+- [x] T005 [P] Setup HTTP client configuration for health checks
 
 ## Phase 2: Tests First (TDD) ⚠️ MUST COMPLETE BEFORE 3
 **IMPORTANT GUIDELINE:**
 - These tests MUST be written and MUST FAIL before ANY implementation
 
-- [ ] T006 [P] Contract test for Shaliah health check in apps/ezer-bot/__tests__/contract/shaliah-health-check.test.ts (Vitest)
-- [ ] T007 [P] Integration test for dependency middleware in apps/ezer-bot/__tests__/integration/dependency.test.ts (Vitest)
-- [ ] T008 [P] Unit test for dependency check logic in apps/ezer-bot/__tests__/modules/dependency.test.ts (Vitest)
-- [ ] T009 [P] Integration test for development mode bypass in apps/ezer-bot/__tests__/integration/development-mode.test.ts (Vitest)
-- [ ] T010 [P] Integration test for offline scenario in apps/ezer-bot/__tests__/integration/offline-scenario.test.ts (Vitest)
+- [x] T006 [P] Contract test for Shaliah health check in apps/ezer-bot/__tests__/contract/shaliah-health-check.test.ts (Vitest)
+- [x] T007 [P] Integration test for dependency middleware in apps/ezer-bot/__tests__/integration/dependency.test.ts (Vitest)
+- [x] T008 [P] Unit test for dependency check logic in apps/ezer-bot/__tests__/modules/dependency.test.ts (Vitest)
+- [x] T009 [P] Integration test for development mode bypass in apps/ezer-bot/__tests__/integration/development-mode.test.ts (Vitest)
+- [x] T010 [P] Integration test for offline scenario in apps/ezer-bot/__tests__/integration/offline-scenario.test.ts (Vitest)
 
 ## Phase 3: Core Implementation + Testing (ONLY after tests are failing)
 **IMPORTANT GUIDELINES:**
@@ -100,9 +100,9 @@
 - [ ] T034 Verify no console.log statements remain (use logger package instead)
 
 ## Phase 6: i18n & Polishing
-- [ ] T035 [P] i18n (bot): Add translation keys for offline error message in both pt-BR.ftl and en.ftl in apps/ezer-bot/src/locales/ (MUST be complete before PR)
-- [ ] T036 [P] i18n (bot): Add translation keys for development mode logging in both pt-BR.ftl and en.ftl in apps/ezer-bot/src/locales/
-- [ ] T037 [P] i18n (bot): Add translation keys for health check logging in both pt-BR.ftl and en.ftl in apps/ezer-bot/src/locales/
+- [x] T035 [P] i18n (bot): Add translation keys for offline error message in both pt-BR.ftl and en.ftl in apps/ezer-bot/src/locales/ (MUST be complete before PR)
+- [x] T036 [P] i18n (bot): Add translation keys for development mode logging in both pt-BR.ftl and en.ftl in apps/ezer-bot/src/locales/
+- [x] T037 [P] i18n (bot): Add translation keys for health check logging in both pt-BR.ftl and en.ftl in apps/ezer-bot/src/locales/
 - [ ] T038 Remove code duplication
 - [ ] T039 Update README with dependency configuration instructions
 

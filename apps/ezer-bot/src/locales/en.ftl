@@ -72,3 +72,22 @@ auth-link-error-generic = ❌ Processing error
 account-unlinked = ⚠️ Your Shaliah account is no longer linked
 
     Please visit your Shaliah profile and generate a new QR code to connect.
+
+# Dependency check messages (from 007-ezer-fix)
+shaliah-offline-message = 
+    🔧 *Shaliah is currently offline*
+    
+    I need Shaliah to be running to help you. Please try again later.
+    
+    If you're a developer, make sure Shaliah is running locally.
+
+# Development mode logging messages
+dev-mode-bypass-log = 🔧 Development mode: Bypassing Shaliah dependency check
+dev-mode-config-log = 🔧 Development mode: NODE_ENV={ $node_env } detected, dependency checks disabled
+
+# Health check logging messages
+health-check-start-log = 🔍 Starting Shaliah health check at { $url }
+health-check-success-log = ✅ Shaliah health check successful (response time: { $response_time }ms)
+health-check-failure-log = ❌ Shaliah health check failed: { $error }
+health-check-timeout-log = ⏰ Shaliah health check timed out after { $timeout }ms
+health-check-config-error-log = ⚠️ Health check configuration error: { $error }
