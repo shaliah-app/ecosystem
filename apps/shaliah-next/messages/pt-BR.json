@@ -21,6 +21,16 @@
   "profile": {
     "changeLanguage": "Alterar Idioma"
   },
+  "ezer-auth": {
+    "generate-token": "Conectar ao Bot Ezer",
+    "generating": "Gerando...",
+    "error": "Falha ao gerar link de autenticação",
+    "or-use-link": "Ou você pode usar este",
+    "link": "link",
+    "expires-in": "Expira em",
+    "minutes": "minutos",
+    "seconds": "segundos"
+  },
   "AuthForm": {
     "signIn": "Entrar",
     "signUp": "Criar Conta",

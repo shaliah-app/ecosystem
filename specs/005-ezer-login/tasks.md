@@ -235,13 +235,13 @@ This feature implements cross-application authentication linking between Shaliah
 
 ### Shaliah: Profile Page Integration
 
-- [ ] **T030** Extend ProfileDashboard component
+- [x] **T030** Extend ProfileDashboard component
   - File: `apps/shaliah-next/src/components/ProfileDashboard.tsx` (modify existing)
   - Add: Import and render EzerAuthSection component
   - Placement: Below profile info, above sign-out button
   - Reference: plan.md Component Reuse Analysis
 
-- [ ] **T031** Test profile page integration
+- [x] **T031** Test profile page integration
   - Manual: Navigate to `/[locale]/profile`, verify QR code and link displayed
   - Use Chrome DevTools MCP to test QR code scanning
   - Verify: Performance <2s page load (use Network tab)
