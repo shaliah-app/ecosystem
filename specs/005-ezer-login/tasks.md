@@ -442,18 +442,18 @@ This feature implements cross-application authentication linking between Shaliah
 
 ### Ezer Bot i18n
 
-- [ ] **T056** [P] Add Fluent translation keys for pt-BR
+- [x] **T056** [P] Add Fluent translation keys for pt-BR
   - File: `apps/ezer-bot/src/locales/pt-BR.ftl`
   - Add: All keys from contracts/bot-start-command.md Fluent section
   - Keys: auth-link-success, auth-link-error-invalid, auth-link-error-expired, etc.
   - **MUST BE COMPLETE** before PR
 
-- [ ] **T057** [P] Add Fluent translation keys for en
+- [x] **T057** [P] Add Fluent translation keys for en
   - File: `apps/ezer-bot/src/locales/en.ftl`
   - Add: All keys from contracts/bot-start-command.md Fluent section (English versions)
   - **MUST BE COMPLETE** before PR
 
-- [ ] **T058** Test i18n in both apps
+- [x] **T058** Test i18n in both apps
   - Shaliah: Switch language in profile, verify all text changes
   - Ezer: Test bot with pt-BR and en-US users
   - Expected: All text properly translated, no missing keys
