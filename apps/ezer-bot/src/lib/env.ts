@@ -1,187 +1,129 @@
-import { logger } from "../logger";
-import { z } from "zod";
+import { z } from 'zod'
+import { logger } from '../logger'
 
-/**
- * Zod schema for environment variable validation
- */
-const EnvironmentSchema = z.object({
+// Environment variables schema
+const envSchema = z.object({
+  // Bot Configuration
+  BOT_TOKEN: z.string().min(1, 'BOT_TOKEN is required'),
+  
+  // Supabase Configuration
+  SUPABASE_URL: z.string().url('SUPABASE_URL must be a valid URL'),
+  SUPABASE_ANON_KEY: z.string().min(1, 'SUPABASE_ANON_KEY is required'),
+  SUPABASE_SERVICE_ROLE_KEY: z.string().min(1, 'SUPABASE_SERVICE_ROLE_KEY is required'),
+  
+  // Shaliah Configuration
   SHALIAH_BASE_URL: z
-    .url("SHALIAH_BASE_URL must be a valid URL")
+    .url('SHALIAH_BASE_URL must be a valid URL')
     .optional(),
+  
+  // Dependency Check Configuration
   DEPENDENCY_CHECK_TIMEOUT: z
     .string()
-    .regex(/^\d+$/, "DEPENDENCY_CHECK_TIMEOUT must be a number")
+    .regex(/^\d+$/, 'DEPENDENCY_CHECK_TIMEOUT must be a number')
     .optional(),
-  NODE_ENV: z.enum(["production", "development", "test"]).optional(),
+  
+  // Environment
+  NODE_ENV: z.enum(['production', 'development', 'test']).default('development'),
+  
+  // Optional: Sentry Configuration
+  SENTRY_DSN: z.string().url().optional(),
 }).refine(
   (data) => {
     // SHALIAH_BASE_URL is required in production mode
-    if (data.NODE_ENV === "production") {
-      return data.SHALIAH_BASE_URL && data.SHALIAH_BASE_URL.trim() !== "";
+    if (data.NODE_ENV === 'production') {
+      return data.SHALIAH_BASE_URL && data.SHALIAH_BASE_URL.trim() !== ''
     }
-    return true;
+    return true
   },
   {
-    message: "SHALIAH_BASE_URL environment variable is required in production mode",
-    path: ["SHALIAH_BASE_URL"],
+    message: 'SHALIAH_BASE_URL environment variable is required in production mode',
+    path: ['SHALIAH_BASE_URL'],
   }
-);
+)
 
-/**
- * Zod schema for dependency configuration validation
- */
-const DependencyConfigSchema = z.object({
-  shaliahHealthUrl: z
-    .string()
-    .refine((val) => val === "" || z.string().url().safeParse(val).success, {
-      message: "Health URL must be a valid URL or empty string",
-    }),
-  dependencyCheckTimeout: z
-    .number()
-    .int()
-    .min(1000, "Timeout must be at least 1000ms")
-    .max(30000, "Timeout must be at most 30000ms"),
-  nodeEnv: z.enum(["production", "development", "test"]),
-  dependencyChecksEnabled: z.boolean(),
-});
+// Environment configuration getter
+function getEnv() {
+  const parsed = envSchema.safeParse(process.env)
 
-/**
- * Environment configuration for Ezer bot dependency checking
- */
-export interface DependencyConfig {
-  /** Shaliah health check URL */
-  shaliahHealthUrl: string;
-  /** Dependency check timeout in milliseconds */
-  dependencyCheckTimeout: number;
-  /** Node environment (development/test bypasses dependency checks) */
-  nodeEnv: string;
-  /** Whether dependency checks are enabled */
-  dependencyChecksEnabled: boolean;
-}
+  if (!parsed.success) {
+    logger.error('❌ Invalid environment variables:', {
+      errors: parsed.error.format(),
+    })
+    throw new Error('Invalid environment configuration')
+  }
 
-/**
- * Load and validate environment configuration
- */
-export function loadDependencyConfig(): DependencyConfig {
-  try {
-    // Validate environment variables with zod
-    const envResult = EnvironmentSchema.safeParse({
-      SHALIAH_BASE_URL: process.env.SHALIAH_BASE_URL,
-      DEPENDENCY_CHECK_TIMEOUT: process.env.DEPENDENCY_CHECK_TIMEOUT,
-      NODE_ENV: process.env.NODE_ENV,
-    });
+  const data = parsed.data
 
-    if (!envResult.success) {
-      logger.error("Environment variable validation failed", {
-        errors: envResult.error.issues,
-      });
-      throw new Error(
-        `Environment validation failed: ${envResult.error.issues.map((e) => e.message).join(", ")}`,
-      );
-    }
+  // Construct health URL from base URL
+  const shaliahHealthUrl = data.SHALIAH_BASE_URL ? `${data.SHALIAH_BASE_URL}/api/health` : ''
 
-    const env = envResult.data;
-    const shaliahBaseUrl = env.SHALIAH_BASE_URL;
-    const dependencyCheckTimeout = env.DEPENDENCY_CHECK_TIMEOUT
-      ? parseInt(env.DEPENDENCY_CHECK_TIMEOUT, 10)
-      : 2000;
-    const nodeEnv = env.NODE_ENV || "production";
+  // Parse timeout with fallback
+  const dependencyCheckTimeout = data.DEPENDENCY_CHECK_TIMEOUT
+    ? parseInt(data.DEPENDENCY_CHECK_TIMEOUT, 10)
+    : 2000
 
-    // Construct health URL from base URL
-    const shaliahHealthUrl = shaliahBaseUrl ? `${shaliahBaseUrl}/api/health` : "";
+  // Validate timeout
+  if (
+    isNaN(dependencyCheckTimeout) ||
+    dependencyCheckTimeout < 1000 ||
+    dependencyCheckTimeout > 30000
+  ) {
+    logger.warn('Invalid DEPENDENCY_CHECK_TIMEOUT, using default 2000ms', {
+      provided: data.DEPENDENCY_CHECK_TIMEOUT,
+      default: 2000,
+    })
+  }
 
-    // Validate required configuration (handled by Zod refinement)
-    if (!shaliahBaseUrl || shaliahBaseUrl.trim() === "") {
-      if (nodeEnv !== "production") {
-        logger.warn(
-          "SHALIAH_BASE_URL not configured - dependency checks will be disabled",
-          { nodeEnv }
-        );
-      }
-    }
+  // Determine if dependency checks are enabled
+  const dependencyChecksEnabled = data.NODE_ENV === 'production' && !!data.SHALIAH_BASE_URL
 
-    // Validate timeout
-    if (
-      isNaN(dependencyCheckTimeout) ||
-      dependencyCheckTimeout < 1000 ||
-      dependencyCheckTimeout > 30000
-    ) {
-      logger.warn("Invalid DEPENDENCY_CHECK_TIMEOUT, using default 2000ms", {
-        provided: process.env.DEPENDENCY_CHECK_TIMEOUT,
-        default: 2000,
-      });
-    }
+  // Log configuration warnings for non-production
+  if (!data.SHALIAH_BASE_URL && data.NODE_ENV !== 'production') {
+    logger.warn('SHALIAH_BASE_URL not configured - dependency checks will be disabled', {
+      nodeEnv: data.NODE_ENV,
+    })
+  }
 
-    // Determine if dependency checks are enabled
-    const dependencyChecksEnabled =
-      nodeEnv === "production" && !!shaliahHealthUrl;
-
-    const config: DependencyConfig = {
-      shaliahHealthUrl: shaliahHealthUrl || "",
-      dependencyCheckTimeout:
-        isNaN(dependencyCheckTimeout) ||
-        dependencyCheckTimeout < 1000 ||
-        dependencyCheckTimeout > 30000
-          ? 2000
-          : dependencyCheckTimeout,
-      nodeEnv,
-      dependencyChecksEnabled,
-    };
-
-    // Validate final configuration with zod
-    const configResult = DependencyConfigSchema.safeParse(config);
-    if (!configResult.success) {
-      logger.error("Configuration validation failed", {
-        errors: configResult.error.issues,
-        config,
-      });
-      throw new Error(
-        `Configuration validation failed: ${configResult.error.issues.map((e) => e.message).join(", ")}`,
-      );
-    }
-
-    logger.info("Dependency configuration loaded and validated", {
-      nodeEnv: config.nodeEnv,
-      dependencyChecksEnabled: config.dependencyChecksEnabled,
-      timeout: config.dependencyCheckTimeout,
-      hasHealthUrl: !!config.shaliahHealthUrl,
-    });
-
-    return config;
-  } catch (error) {
-    logger.error("Failed to load dependency configuration", {
-      error: error instanceof Error ? error.message : String(error),
-    });
-
-    // Return safe defaults
-    return {
-      shaliahHealthUrl: "",
-      dependencyCheckTimeout: 2000,
-      nodeEnv: "production",
-      dependencyChecksEnabled: false,
-    };
+  return {
+    bot: {
+      token: data.BOT_TOKEN,
+    },
+    supabase: {
+      url: data.SUPABASE_URL,
+      anonKey: data.SUPABASE_ANON_KEY,
+      serviceRoleKey: data.SUPABASE_SERVICE_ROLE_KEY,
+    },
+    shaliah: {
+      baseUrl: data.SHALIAH_BASE_URL || '',
+      healthUrl: shaliahHealthUrl,
+    },
+    dependency: {
+      checkTimeout: dependencyCheckTimeout,
+      checksEnabled: dependencyChecksEnabled,
+    },
+    app: {
+      environment: data.NODE_ENV,
+      isDevelopment: data.NODE_ENV === 'development',
+      isProduction: data.NODE_ENV === 'production',
+      isTest: data.NODE_ENV === 'test',
+    },
+    sentry: {
+      dsn: data.SENTRY_DSN,
+    },
   }
 }
 
-/**
- * Get the current dependency configuration
- * This is loaded once at module import time
- */
-export const dependencyConfig = loadDependencyConfig();
+// Export environment configuration
+export const env = getEnv()
 
-/**
- * Reload dependency configuration (for testing)
- * This function allows tests to reload configuration when environment changes
- */
-export function reloadDependencyConfig(): DependencyConfig {
-  return loadDependencyConfig();
-}
+// Export getter for dynamic reloading (useful for tests)
+export const getEnvConfig = getEnv
 
-/**
- * Check if the application is in development mode
- * This function is used by tests
- */
-export function isDevelopmentMode(): boolean {
-  const nodeEnv = process.env.NODE_ENV || "production";
-  return nodeEnv === "development" || nodeEnv === "test";
-}
+// Type exports
+export type Env = ReturnType<typeof getEnv>
+export type BotConfig = Env['bot']
+export type SupabaseConfig = Env['supabase']
+export type ShaliahConfig = Env['shaliah']
+export type DependencyConfig = Env['dependency']
+export type AppConfig = Env['app']
+export type SentryConfig = Env['sentry']

@@ -1,5 +1,5 @@
 import { logger } from "../logger";
-import { reloadDependencyConfig } from "./env";
+import { getEnvConfig } from "./env";
 import { z } from "zod";
 
 /**
@@ -254,11 +254,11 @@ export class HealthCheckClient {
  */
 export function createHealthCheckClient(): HealthCheckClient {
   // Always reload configuration to support dynamic environment changes in tests
-  const config = reloadDependencyConfig();
+  const config = getEnvConfig();
 
   return new HealthCheckClient(
-    config.shaliahHealthUrl,
-    config.dependencyCheckTimeout,
+    config.shaliah.healthUrl,
+    config.dependency.checkTimeout,
   );
 }
 

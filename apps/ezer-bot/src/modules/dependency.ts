@@ -1,7 +1,7 @@
 import { Composer } from "grammy";
 import { Context } from "../types/context";
 import { logger } from "../logger";
-import { reloadDependencyConfig } from "../lib/env";
+import { getEnvConfig } from "../lib/env";
 import { createHealthCheckClient } from "../lib/health-check";
 
 /**
@@ -27,13 +27,13 @@ export const dependencyMiddleware = async (
 
   try {
     // Load current configuration (always reload to support dynamic environment changes in tests)
-    const config = reloadDependencyConfig();
+    const config = getEnvConfig();
 
     // Skip dependency check if disabled or in development/test mode
-    if (!config.dependencyChecksEnabled) {
+    if (!config.dependency.checksEnabled) {
       logger.info("Dependency checks disabled, bypassing check", {
-        nodeEnv: config.nodeEnv,
-        dependencyChecksEnabled: config.dependencyChecksEnabled,
+        nodeEnv: config.app.environment,
+        dependencyChecksEnabled: config.dependency.checksEnabled,
         userId,
         username,
         messageId,
@@ -45,8 +45,8 @@ export const dependencyMiddleware = async (
       userId,
       username,
       messageId,
-      healthUrl: config.shaliahHealthUrl,
-      timeout: config.dependencyCheckTimeout,
+      healthUrl: config.shaliah.healthUrl,
+      timeout: config.dependency.checkTimeout,
     });
 
     // Check if Shaliah is online
@@ -62,7 +62,7 @@ export const dependencyMiddleware = async (
         error: healthResult.error,
         responseTime: healthResult.responseTime,
         checkDuration,
-        healthUrl: config.shaliahHealthUrl,
+        healthUrl: config.shaliah.healthUrl,
       });
 
       try {
@@ -105,7 +105,7 @@ export const dependencyMiddleware = async (
     const errorMessage = error instanceof Error ? error.message : String(error);
 
     // Reload config in case it was not loaded before the error
-    const config = reloadDependencyConfig();
+    const config = getEnvConfig();
 
     logger.error("Dependency check failed with unexpected error", {
       userId,
@@ -113,7 +113,7 @@ export const dependencyMiddleware = async (
       messageId,
       error: errorMessage,
       checkDuration,
-      healthUrl: config.shaliahHealthUrl,
+      healthUrl: config.shaliah.healthUrl,
     });
 
     try {

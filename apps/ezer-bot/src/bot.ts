@@ -1,25 +1,22 @@
+// Load environment variables FIRST - before any other imports
+import { config } from 'dotenv'
+config()
+
 import { Bot, session } from 'grammy'
 import { run, sequentialize } from '@grammyjs/runner'
-import { config } from 'dotenv'
 import { I18n } from '@grammyjs/i18n'
 import type { Context, SessionData } from './types/context.js'
 import welcomeComposer from './modules/welcome.js'
 import authLinkComposer, { unlinkedDetectionComposer } from './modules/auth-link.js'
 import { dependencyComposer } from './modules/dependency.js'
 import { logger, logBotError } from './logger.js'
+import { env } from './lib/env.js'
 
-// Load environment variables
-config()
-
-// Validate required environment variables
-const botToken = process.env.BOT_TOKEN
-
-if (!botToken) {
-  throw new Error('BOT_TOKEN environment variable is required')
-}
+// Environment configuration is validated and loaded in env.ts
+// All environment variables are validated at import time
 
 // Create the bot instance
-const bot = new Bot<Context>(botToken)
+const bot = new Bot<Context>(env.bot.token)
 
 // Configure session management (using memory storage for now)
 bot.use(
