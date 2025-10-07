@@ -310,17 +310,19 @@ This feature implements cross-application authentication linking between Shaliah
 
 ### Rate Limiting
 
-- [ ] **T040** Implement rate limiting for token generation
+- [x] **T040** Implement rate limiting for token generation
   - Strategy: In-memory cache with user ID as key, count + timestamp
   - Alternative: Use Supabase Edge Functions rate limiting
   - Limit: 5 requests per minute per user
   - Response: 429 Too Many Requests with retry-after header
   - Location: `apps/shaliah-next/src/app/api/ezer-auth/token/route.ts` or middleware
+  - **Status**: ✅ Complete - Rate limiter implemented with in-memory Map, 5 req/min limit, proper 429 responses
 
-- [ ] **T041** Test rate limiting
+- [x] **T041** Test rate limiting
   - Run contract test T005 section "Error Response (429)"
   - Manual: Make 6 rapid requests, verify 6th returns 429
   - Expected: Rate limiting works correctly
+  - **Status**: ✅ Complete - Contract test passing, verified 6th request returns 429
 
 ### Logging & Observability
 
