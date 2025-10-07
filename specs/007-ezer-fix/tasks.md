@@ -80,16 +80,16 @@
 - [x] T021 Verify all Phase 3 implementation complete before proceeding to integration
 
 ## Phase 4: Integration
-- [ ] T022 Connect dependency middleware to grammY bot instance
-- [ ] T023 Request/response logging (consistent fields) via packages/logger
-- [ ] T024 HTTP client integration with timeout handling
-- [ ] T025 Environment variable validation and error handling
+- [x] T022 Connect dependency middleware to grammY bot instance
+- [x] T023 Request/response logging (consistent fields) via packages/logger
+- [x] T024 HTTP client integration with timeout handling
+- [x] T025 Environment variable validation and error handling
 
 **Integration Testing & Validation:**
-- [ ] T026 Run integration tests for dependency middleware and health checks
-- [ ] T027 Test development mode bypass end-to-end
-- [ ] T028 Test offline scenario end-to-end
-- [ ] T029 Iterate on failures: analyze → fix → retest until all integration tests pass
+- [x] T026 Run integration tests for dependency middleware and health checks
+- [x] T027 Test development mode bypass end-to-end
+- [x] T028 Test offline scenario end-to-end
+- [x] T029 Iterate on failures: analyze → fix → retest until all integration tests pass
 
 ## Phase 5: Code Quality Validation
 **CRITICAL: Run after all implementation + testing complete**
