@@ -244,6 +244,11 @@ unlinkedDetectionComposer.use(async (ctx, next) => {
     if (!isLinked) {
       const alreadyWarned = Boolean((ctx.session as any)?.unlinkedPromptShown)
       if (!alreadyWarned) {
+        // Log unlinked access attempt
+        logger.info('ezer.auth.unlinked_access', {
+          telegram_user_id: telegramId,
+        })
+
         const text = `⚠️ Sua conta Shaliah não está vinculada. Abra seu perfil no Shaliah e gere um QR para conectar.
 
 ⚠️ Your Shaliah account is not linked. Open your Shaliah profile and generate a QR to connect.`

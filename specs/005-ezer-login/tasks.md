@@ -324,26 +324,29 @@ This feature implements cross-application authentication linking between Shaliah
 
 ### Logging & Observability
 
-- [ ] **T042** [P] Add structured logging for token generation
+- [x] **T042** [P] Add structured logging for token generation
   - File: `apps/shaliah-next/src/modules/ezer-auth/use-cases/generate-token.ts`
   - Events: `ezer.auth.token_generated` (INFO) with user_id, token_id, expiration
   - Events: Token generation failure (ERROR) with error details
   - Use: `@yesod/logger` package
   - Reference: spec.md NFR-005
+  - **Status**: ✅ Complete - Logging implemented in previous tasks
 
-- [ ] **T043** [P] Add structured logging for token validation
+- [x] **T043** [P] Add structured logging for token validation
   - File: `apps/ezer-bot/src/modules/auth-link.ts`
   - Events: `ezer.auth.token_used_success` (INFO) with user_id, telegram_user_id, token_id
   - Events: `ezer.auth.token_used_failure` (WARN) with token_id, failure_reason
   - Events: `ezer.auth.unlinked_access` (INFO) with telegram_user_id
   - Use: `@yesod/logger` package
   - Reference: spec.md NFR-005
+  - **Status**: ✅ Complete - All logging events implemented including unlinked_access
 
-- [ ] **T044** [P] Add structured logging for sign-out propagation
+- [x] **T044** [P] Add structured logging for sign-out propagation
   - File: `apps/shaliah-next/src/lib/auth/actions.ts`
   - Events: `ezer.auth.signout_propagated` (INFO) with user_id, telegram_user_id_removed
   - Use: `@yesod/logger` package
   - Reference: spec.md NFR-005
+  - **Status**: ✅ Complete - Logging implemented in previous tasks
 
 ### End-to-End Integration Testing
 
