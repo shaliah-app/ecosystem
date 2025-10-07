@@ -122,29 +122,30 @@
 - [ ] T041 Run integration tests for database connections and Supabase operations
 - [ ] T042 Use Supabase MCP to validate schema, migrations, and RLS policies
 - [ ] T043 Test auth flows end-to-end (login, session, permissions)
-- [ ] T044 Iterate on failures: analyze → fix → retest until all integration tests pass
+- [ ] T044 [P] Validate RLS policies for new tables and CRUD operations (if applicable)
+- [ ] T045 Iterate on failures: analyze → fix → retest until all integration tests pass
 
 ## Phase 6: Code Quality Validation & Polish
 **CRITICAL: Run after all implementation + testing complete**
 
 **Code Quality:**
-- [ ] T045 Run ESLint across all modified files and fix violations
-- [ ] T046 Run TypeScript type check (tsc --noEmit) and resolve type errors
-- [ ] T047 For unavoidable ESLint/TS errors: add suppression comments (@ts-expect-error, eslint-disable-next-line) with detailed justification
-- [ ] T048 Run Prettier to ensure consistent formatting
-- [ ] T049 Verify no console.log statements remain (use logger package instead)
+- [ ] T046 Run ESLint across all modified files and fix violations
+- [ ] T047 Run TypeScript type check (tsc --noEmit) and resolve type errors
+- [ ] T048 For unavoidable ESLint/TS errors: add suppression comments (@ts-expect-error, eslint-disable-next-line) with detailed justification
+- [ ] T049 Run Prettier to ensure consistent formatting
+- [ ] T050 Verify no console.log statements remain (use logger package instead)
 
 **Polish & Final Cleanup:**
-- [ ] T050 Remove code duplication
-- [ ] T051 Review and optimize performance where applicable
-- [ ] T052 Final code review and documentation updates
+- [ ] T051 Remove code duplication
+- [ ] T052 Review and optimize performance where applicable
+- [ ] T053 Final code review and documentation updates
 
 ## Dependencies
 - Setup (Phase 1: T001-T005) before i18n (Phase 2: T006-T012, optional)
 - i18n (Phase 2: T006-T012, optional) before Tests (Phase 3: T013-T017)
 - Tests (Phase 3: T013-T017) MUST complete before Implementation (Phase 4: T018-T032)
-- Implementation (Phase 4: T018-T032) before Integration (Phase 5: T033-T044)
-- Integration (Phase 5: T033-T044) before Code Quality & Polish (Phase 6: T045-T052)
+- Implementation (Phase 4: T018-T032) before Integration (Phase 5: T033-T045)
+- Integration (Phase 5: T033-T045) before Code Quality & Polish (Phase 6: T046-T053)
 - Within phases: Tasks marked [P] can run in parallel; sequential tasks must complete in order
 
 ## Parallel Example
@@ -210,5 +211,5 @@ Task: "Web UI component test in apps/shaliah-next/__tests__/components/UserProfi
 
 ---
 
-*Based on Constitution v4.3.0 — see `.specify/memory/constitution.md`*
+*Based on Constitution v4.4.0 — see `.specify/memory/constitution.md`*
 ````

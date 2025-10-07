@@ -1,21 +1,19 @@
 <!--
 Sync Impact Report:
-- Version change: 4.2.0 → 4.3.0 (MINOR: i18n phase separation and polish consolidation)
+- Version change: 4.3.0 → 4.4.0 (MINOR: RLS policies requirement added)
 - Modified Sections:
-    - **Development Workflow - Planning & Specification**: Updated phase structure to include optional i18n phase
-    - **Development Workflow - Testing Strategy**: Updated phase numbering to reflect new structure
+    - **Development Workflow - Database & Schema Management**: Added RLS policies requirement for new tables and API-dependent CRUD features
 - Templates requiring updates:
-    - .specify/templates/plan-template.md (✅ updated - new i18n phase structure)
-    - .specify/templates/spec-template.md (✅ updated - no changes needed)
-    - .specify/templates/tasks-template.md (✅ updated - separated i18n as optional phase, merged polish into phase 6)
+    - .specify/templates/plan-template.md (✅ updated - RLS policies check added to Constitution Check)
+    - .specify/templates/spec-template.md (✅ updated - RLS policies check added to Constitution Alignment)
+    - .specify/templates/tasks-template.md (✅ updated - RLS policies validation task added to Integration phase)
 - Rationale:
-    - i18n phase separated as independent optional phase that can go between setup and TDD phases
-    - LLM can decide if i18n is relevant for the given implementation
-    - Remaining polish details merged into phase 6 (Code Quality & Polish)
-    - MINOR version bump: structural change to development workflow phases
+    - RLS policies are critical for data security in Supabase
+    - New tables and CRUD features must have proper access controls
+    - MINOR version bump: new security requirement added to development workflow
 -->
 
-# Yesod Ecosystem Constitution v4.3.0
+# Yesod Ecosystem Constitution v4.4.0
 
 This document outlines the core principles, architectural constraints, and development workflows for the Yesod project, which includes the Shaliah Next.js full-stack application, the Ezer Telegram bot, and the poel-worker background job processor.
 
@@ -244,6 +242,7 @@ These guides provide detailed patterns for module structure, testing strategies,
 
 **Security:**
 - Enable Row-Level Security (RLS) on all tables
+- **RLS Policies Requirement:** RLS policies MUST be checked if new tables are going to be created or any API-dependent CRUD feature will be added
 - All auth flows via Supabase Auth (no custom logic)
 
 ### Internationalization (i18n)
@@ -292,4 +291,4 @@ This constitution is the supreme source of truth for the project's architecture 
 - All Pull Requests and code reviews must verify compliance with the principles and constraints outlined in this document.
 - Any proposal to amend this constitution must be documented, reviewed, and approved. A clear migration plan must be provided if the change affects existing architecture.
 
-**Version**: 4.3.0 | **Ratified**: 2025-01-15 | **Last Amended**: 2025-01-15
+**Version**: 4.4.0 | **Ratified**: 2025-01-15 | **Last Amended**: 2025-01-15

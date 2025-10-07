@@ -108,6 +108,7 @@ When creating this spec from a user prompt:
 - [ ] **Principle V (Async via poel-worker)**: Long-running operations identified for background processing via poel-worker (Deno + Supabase Queues)
 - [ ] **Principle VI (TypeScript-First Monorepo)**: New code written in TypeScript within monorepo; shared packages properly utilized
 - [ ] **Principle VII (i18n)**: User-facing text identified for translation in both mandatory languages (pt-BR and en-US); additional languages deferred to roadmap.md; feature-based organization with common translations in messages/ and feature-specific translations in modules/<feature>/messages/
+- [ ] **Database Security (RLS Policies)**: If feature involves new tables or API-dependent CRUD operations, RLS policies validation and implementation included; proper access controls defined for all new database operations
 
 ---
 
@@ -124,7 +125,7 @@ When creating this spec from a user prompt:
 
 ---
 
-*Based on Constitution v4.3.0 - See `.specify/memory/constitution.md`*
+*Based on Constitution v4.4.0 - See `.specify/memory/constitution.md`*
 
 ````
 

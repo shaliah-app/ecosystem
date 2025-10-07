@@ -2,7 +2,7 @@
 # Implementation Plan: [FEATURE]
 
 **Branch**: `[###-feature-name]` | **Date**: [DATE] | **Spec**: [link]
-**Constitution Version**: 4.3.0
+**Constitution Version**: 4.4.0
 **Input**: Feature specification from `/specs/[###-feature-name]/spec.md`
 **Application(s):** [shaliah-next | ezer-bot | poel-worker]
 
@@ -81,6 +81,7 @@
 - **Principle V: Decoupled, Asynchronous Processing**: Are time-consuming tasks (>1s, >1MB files, external APIs, CPU-intensive) offloaded to poel-worker via job queue rather than executed in the API request-response cycle?
 - **Principle VI: TypeScript-First Monorepo**: Is all new code planned to be written in TypeScript within the monorepo structure? Are shared packages and workspace references properly utilized?
 - **Principle VII (i18n)**: If the feature is user-facing (shaliah-next or ezer-bot), does it include plans for translation in both mandatory languages (pt-BR and en-US) using the appropriate tooling (next-intl or @grammyjs/i18n)? For shaliah-next: Does the plan account for feature-based translation organization (common translations in `messages/{locale}.json` + feature translations in `modules/<feature>/messages/{locale}.json`)? Are additional languages properly deferred to roadmap.md?
+- **Database Security (RLS Policies)**: If the feature involves new tables or API-dependent CRUD operations, does the plan include RLS policies validation and implementation? Are proper access controls defined for all new database operations?
 
 ## Project Structure
 
@@ -286,4 +287,4 @@ packages/
 - [ ] Complexity deviations documented
 
 ---
-*Based on Constitution v4.3.0 - See `.specify/memory/constitution.md`*
+*Based on Constitution v4.4.0 - See `.specify/memory/constitution.md`*
