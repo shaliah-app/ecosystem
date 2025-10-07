@@ -13,13 +13,10 @@ import { createHealthCheckClient } from "../lib/health-check";
  */
 export const dependencyComposer = new Composer<Context>();
 
-// Create health check client
-const healthCheckClient = createHealthCheckClient();
-
 /**
- * Dependency middleware that checks Shaliah availability before processing messages
+ * Export the middleware function for testing
  */
-dependencyComposer.use(async (ctx, next) => {
+export const dependencyMiddleware = async (ctx: Context, next: () => Promise<void>) => {
   // Skip dependency check if disabled or in development/test mode
   if (!dependencyConfig.dependencyChecksEnabled) {
     logger.info("Dependency checks disabled, bypassing check", { 
@@ -53,4 +50,12 @@ dependencyComposer.use(async (ctx, next) => {
   });
   
   return next();
-});
+};
+
+// Create health check client
+const healthCheckClient = createHealthCheckClient();
+
+/**
+ * Dependency middleware that checks Shaliah availability before processing messages
+ */
+dependencyComposer.use(dependencyMiddleware);

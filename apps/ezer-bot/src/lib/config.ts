@@ -61,3 +61,12 @@ export function loadDependencyConfig(): DependencyConfig {
  * Get the current dependency configuration
  */
 export const dependencyConfig = loadDependencyConfig();
+
+/**
+ * Check if the application is in development mode
+ * This function is used by tests
+ */
+export function isDevelopmentMode(): boolean {
+  const nodeEnv = process.env.NODE_ENV || 'production';
+  return nodeEnv === 'development' || nodeEnv === 'test';
+}

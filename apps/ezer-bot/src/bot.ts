@@ -5,6 +5,7 @@ import { I18n } from '@grammyjs/i18n'
 import type { Context, SessionData } from './types/context.js'
 import welcomeComposer from './modules/welcome.js'
 import authLinkComposer, { unlinkedDetectionComposer } from './modules/auth-link.js'
+import { dependencyComposer } from './modules/dependency.js'
 import { logger, logBotError } from './logger.js'
 
 // Load environment variables
@@ -45,13 +46,45 @@ bot.use(i18n)
 // Sequentialize middleware to ensure updates from the same chat are processed in order
 bot.use(sequentialize((ctx) => ctx.chat?.id.toString()))
 
-// Register modules in order: sequentialize → session → i18n → auth-link → others
+// Register modules in order: sequentialize → session → i18n → dependency → auth-link → others
+bot.use(dependencyComposer)
 bot.use(authLinkComposer)
 bot.use(unlinkedDetectionComposer)
 bot.use(welcomeComposer)
 
 // Global error handler
 bot.catch(logBotError)
+
+// Setup graceful shutdown handlers
+const shutdown = async (signal: string) => {
+  logger.info(`🛑 Received ${signal}, shutting down gracefully...`)
+  
+  try {
+    // Stop the bot runner
+    await bot.stop()
+    logger.info('✅ Bot stopped successfully')
+  } catch (error) {
+    logger.error('❌ Error during bot shutdown', { error })
+  }
+  
+  process.exit(0)
+}
+
+// Register shutdown handlers
+process.on('SIGTERM', () => shutdown('SIGTERM'))
+process.on('SIGINT', () => shutdown('SIGINT'))
+
+// Handle uncaught exceptions
+process.on('uncaughtException', (error) => {
+  logger.error('💥 Uncaught exception', { error })
+  shutdown('uncaughtException')
+})
+
+// Handle unhandled promise rejections
+process.on('unhandledRejection', (reason, promise) => {
+  logger.error('💥 Unhandled promise rejection', { reason, promise })
+  shutdown('unhandledRejection')
+})
 
 // Start the bot with the high-performance runner
 logger.info('🤖 Starting Ezer Bot...')

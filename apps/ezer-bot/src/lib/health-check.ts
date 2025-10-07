@@ -118,3 +118,13 @@ export function createHealthCheckClient(): HealthCheckClient {
     dependencyConfig.dependencyCheckTimeout
   );
 }
+
+/**
+ * Simple health check function for testing
+ * This function is used by tests and provides a simple boolean result
+ */
+export async function checkShaliahHealth(): Promise<boolean> {
+  const client = createHealthCheckClient();
+  const result = await client.checkHealth();
+  return result.isOnline;
+}

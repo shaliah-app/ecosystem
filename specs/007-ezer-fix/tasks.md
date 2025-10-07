@@ -63,12 +63,12 @@
 - Each implementation task includes testing iteration until tests pass
 
 **For ezer-bot (composer-based):**
-- [ ] T011 [P] Dependency middleware composer in apps/ezer-bot/src/modules/dependency.ts
-- [ ] T012 [P] Health check service in apps/ezer-bot/src/lib/health-check.ts
-- [ ] T013 [P] Environment configuration service in apps/ezer-bot/src/lib/config.ts
-- [ ] T014 [P] i18n keys in apps/ezer-bot/src/locales/*.ftl (pt-BR and en required)
-- [ ] T015 Mount dependency middleware in apps/ezer-bot/src/bot.ts
-- [ ] T016 Setup graceful shutdown (SIGTERM/SIGINT handlers)
+- [x] T011 [P] Dependency middleware composer in apps/ezer-bot/src/modules/dependency.ts
+- [x] T012 [P] Health check service in apps/ezer-bot/src/lib/health-check.ts
+- [x] T013 [P] Environment configuration service in apps/ezer-bot/src/lib/config.ts
+- [x] T014 [P] i18n keys in apps/ezer-bot/src/locales/*.ftl (pt-BR and en required)
+- [x] T015 Mount dependency middleware in apps/ezer-bot/src/bot.ts
+- [x] T016 Setup graceful shutdown (SIGTERM/SIGINT handlers)
 
 **Common to all:**
 - [ ] T017 Input validation with zod in dependency middleware
