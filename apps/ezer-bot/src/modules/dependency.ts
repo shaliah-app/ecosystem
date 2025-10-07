@@ -69,8 +69,8 @@ export const dependencyMiddleware = async (
         // Send offline message to user
         const offlineMessage = ctx.t
           ? ctx.t("shaliah-offline-message")
-          : "🔧 Shaliah is currently offline. Please try again later.";
-        await ctx.reply(offlineMessage);
+          : "🔧 *Shaliah is currently offline*\n\nI need Shaliah to be running to help you. Please try again later.";
+        await ctx.reply(offlineMessage, { parse_mode: "Markdown" });
         logger.info("Offline message sent to user", {
           userId,
           username,
@@ -120,8 +120,8 @@ export const dependencyMiddleware = async (
       // Send error message to user
       const offlineMessage = ctx.t
         ? ctx.t("shaliah-offline-message")
-        : "🔧 Shaliah is currently offline. Please try again later.";
-      await ctx.reply(offlineMessage);
+        : "🔧 *Shaliah is currently offline*\n\nI need Shaliah to be running to help you. Please try again later.";
+      await ctx.reply(offlineMessage, { parse_mode: "Markdown" });
       logger.info("Error fallback message sent to user", {
         userId,
         username,

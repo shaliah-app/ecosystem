@@ -78,8 +78,6 @@ shaliah-offline-message =
     🔧 *Shaliah está offline no momento*
     
     Preciso que o Shaliah esteja funcionando para te ajudar. Tente novamente mais tarde.
-    
-    Se você é um desenvolvedor, certifique-se de que o Shaliah está rodando localmente.
 
 # Development mode logging messages
 dev-mode-bypass-log = 🔧 Modo desenvolvimento: Ignorando verificação de dependência do Shaliah

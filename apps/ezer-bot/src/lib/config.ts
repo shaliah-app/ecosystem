@@ -73,7 +73,7 @@ export function loadDependencyConfig(): DependencyConfig {
     const shaliahHealthUrl = env.SHALIAH_HEALTH_URL;
     const dependencyCheckTimeout = env.DEPENDENCY_CHECK_TIMEOUT
       ? parseInt(env.DEPENDENCY_CHECK_TIMEOUT, 10)
-      : 5000;
+      : 2000;
     const nodeEnv = env.NODE_ENV || "production";
 
     // Validate required configuration
@@ -89,9 +89,9 @@ export function loadDependencyConfig(): DependencyConfig {
       dependencyCheckTimeout < 1000 ||
       dependencyCheckTimeout > 30000
     ) {
-      logger.warn("Invalid DEPENDENCY_CHECK_TIMEOUT, using default 5000ms", {
+      logger.warn("Invalid DEPENDENCY_CHECK_TIMEOUT, using default 2000ms", {
         provided: process.env.DEPENDENCY_CHECK_TIMEOUT,
-        default: 5000,
+        default: 2000,
       });
     }
 
@@ -105,7 +105,7 @@ export function loadDependencyConfig(): DependencyConfig {
         isNaN(dependencyCheckTimeout) ||
         dependencyCheckTimeout < 1000 ||
         dependencyCheckTimeout > 30000
-          ? 5000
+          ? 2000
           : dependencyCheckTimeout,
       nodeEnv,
       dependencyChecksEnabled,
@@ -139,7 +139,7 @@ export function loadDependencyConfig(): DependencyConfig {
     // Return safe defaults
     return {
       shaliahHealthUrl: "",
-      dependencyCheckTimeout: 5000,
+      dependencyCheckTimeout: 2000,
       nodeEnv: "production",
       dependencyChecksEnabled: false,
     };

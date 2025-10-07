@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "tsx watch --import ./instrument.ts src/bot.ts",
+    "dev": "tsx watch --import ./src/instrument.ts src/bot.ts",
     "build": "tsc",
-    "start": "node --import ./instrument.ts dist/bot.js",
+    "start": "node --import ./dist/instrument.js dist/bot.js",
     "lint": "eslint src/**/*.ts",
     "lint:fix": "eslint src/**/*.ts --fix",
     "test": "vitest run",
