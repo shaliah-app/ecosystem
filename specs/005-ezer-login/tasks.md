@@ -249,7 +249,7 @@ This feature implements cross-application authentication linking between Shaliah
 
 ### Ezer Bot: Auth Link Composer
 
-- [ ] **T032** Create auth-link composer module
+- [x] **T032** Create auth-link composer module
   - File: `apps/ezer-bot/src/modules/auth-link.ts`
   - Implement: `/start` command handler with token extraction
   - Implement: `validateAndLinkAccount()` function
@@ -257,34 +257,34 @@ This feature implements cross-application authentication linking between Shaliah
   - Error handling: All error scenarios from contracts/bot-start-command.md
   - Reference: contracts/bot-start-command.md, research.md Section 3
 
-- [ ] **T033** Implement token validation logic
+- [x] **T033** Implement token validation logic
   - Within: `apps/ezer-bot/src/modules/auth-link.ts`
   - Implement: Query auth_tokens table via Supabase client
   - Validate: is_active, used_at IS NULL, expires_at > now()
   - Return: AuthToken object or error code
 
-- [ ] **T034** Implement account linking logic
+- [x] **T034** Implement account linking logic
   - Within: `apps/ezer-bot/src/modules/auth-link.ts`
   - Implement: Check for Telegram account collision
   - Implement: Database transaction updating user_profiles + auth_tokens
   - Atomic: Both updates must succeed or both fail
   - Reference: data-model.md state transitions
 
-- [ ] **T035** Implement language synchronization
+- [x] **T035** Implement language synchronization
   - Within: `apps/ezer-bot/src/modules/auth-link.ts`
   - Implement: Fetch user_profiles.language after linking
   - Implement: Map Shaliah locale to Telegram locale (pt-BR → pt, en-US → en)
   - Call: `ctx.i18n.locale(mappedLocale)`
   - Reference: research.md Section 6
 
-- [ ] **T036** Mount auth-link composer in bot
+- [x] **T036** Mount auth-link composer in bot
   - File: `apps/ezer-bot/src/bot.ts` (modify existing)
   - Add: Import authLinkComposer
   - Mount: `bot.use(authLinkComposer)` after session middleware
   - Order: sequentialize → session → i18n → auth-link → other composers
   - Reference: plan.md Architecture Review (Ezer Bot)
 
-- [ ] **T037** Test bot auth-link functionality
+- [x] **T037** Test bot auth-link functionality
   - Run contract test T006 (auth-link.contract.test.ts)
   - Run integration tests T009-T010
   - Manual: Use quickstart.md scenarios 2, 3, 6, 7
