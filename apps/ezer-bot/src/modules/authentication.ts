@@ -8,6 +8,7 @@ import {
   linkTelegramUser,
   markTokenAsUsed,
 } from "../lib/auth.js";
+import { getTelegramUserId } from "../lib/session.js";
 
 export const authComposer = new Composer<Context>();
 
@@ -45,7 +46,7 @@ async function handleWithToken(ctx: Context, tokenStr: string): Promise<void> {
 
     const { token } = validation;
 
-    const telegramUserId = ctx.from?.id;
+    const telegramUserId = getTelegramUserId(ctx);
     if (!telegramUserId) {
       await ctx.reply(ctx.t("auth-link-error"));
       return;

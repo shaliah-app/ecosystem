@@ -7,6 +7,7 @@ export interface SessionData {
   // Authentication state
   isLinked?: boolean
   shaliahUserId?: string
+  telegramUserId?: number
   unlinkedPromptShown?: boolean
   
   // User interaction state

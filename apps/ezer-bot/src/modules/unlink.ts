@@ -3,8 +3,13 @@ import type { Context } from '../types/context.js'
 import { logger } from '../logger.js'
 import { env } from '../lib/env.js'
 import { unlinkTelegramUser } from '../lib/auth.js'
+import { getTelegramUserId } from '../lib/session.js'
 
 const composer = new Composer<Context>()
+
+// ============================================================================
+// CORE UNLINK LOGIC
+// ============================================================================
 
 async function handleUnlink(ctx: Context, telegramId: number): Promise<void> {
   try {
@@ -47,35 +52,28 @@ async function handleUnlink(ctx: Context, telegramId: number): Promise<void> {
   }
 }
 
-// Command handler for /unlink
+// ============================================================================
+// COMMAND HANDLERS
+// ============================================================================
+
 composer.command('unlink', async (ctx) => {
-  const telegramId = ctx.from?.id;
-  if (!telegramId) {
+  const telegramUserId = getTelegramUserId(ctx);
+  if (!telegramUserId) {
     await ctx.reply(ctx.t('unlink-error-no-user'));
     return;
   }
 
-  await handleUnlink(ctx, telegramId);
+  await handleUnlink(ctx, telegramUserId);
 });
 
-// Callback handler for unlink confirmation
-composer.callbackQuery('confirm-unlink', async (ctx) => {
-  await ctx.answerCallbackQuery();
-  
-  const telegramId = ctx.from?.id;
-  if (!telegramId) {
-    await ctx.reply(ctx.t('unlink-error-no-user'));
-    return;
-  }
+// ============================================================================
+// CALLBACK QUERY HANDLERS
+// ============================================================================
 
-  await handleUnlink(ctx, telegramId);
-});
-
-// Callback handler for unlink confirmation dialog
+// Show unlink confirmation dialog
 composer.callbackQuery('unlink', async (ctx) => {
   await ctx.answerCallbackQuery();
   
-  // Show confirmation dialog
   await ctx.editMessageText(ctx.t('unlink-confirmation'), {
     parse_mode: 'MarkdownV2',
     reply_markup: {
@@ -89,7 +87,20 @@ composer.callbackQuery('unlink', async (ctx) => {
   });
 });
 
-// Callback handler for unlink cancellation
+// Confirm unlink action
+composer.callbackQuery('confirm-unlink', async (ctx) => {
+  await ctx.answerCallbackQuery();
+  
+  const telegramUserId = getTelegramUserId(ctx);
+  if (!telegramUserId) {
+    await ctx.editMessageText(ctx.t('unlink-error-no-user'));
+    return;
+  }
+
+  await handleUnlink(ctx, telegramUserId);
+});
+
+// Cancel unlink action
 composer.callbackQuery('cancel-unlink', async (ctx) => {
   await ctx.answerCallbackQuery();
   await ctx.editMessageText(ctx.t('unlink-cancelled'));
