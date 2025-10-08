@@ -27,6 +27,7 @@ auth-link-error = ❌ Error processing your request. Try again.
 auth-link-already-linked = ✅ Your account is already linked! You can use the Ezer bot normally.
 auth-link-different-user = ⚠️ This Telegram account is already linked to another user. Unlink your account first, then try again.
 auth-link-unlinked = ℹ️ Your Shaliah account is not linked. Open your Shaliah profile and generate a QR to connect.
+auth-link-generate-new = Don't worry! You can generate a new authentication link in your Shaliah profile.
 
 # Callback replies
 search-reply = 🎵 *Song Search*
@@ -121,6 +122,8 @@ unlink-error-generic = ❌ Unlink failed
     An error occurred while unlinking your account. Please try again later.
 
 link-account-button = 🔗 Link Account
+
+open-shaliah-button = Open Shaliah
 
 # Unlink confirmation flow
 unlink-button = 🔗 Unlink Account

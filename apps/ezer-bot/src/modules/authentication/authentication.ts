@@ -11,7 +11,7 @@ import {
   getTelegramUserId,
   setAuthenticated,
 } from "../../lib/session.js";
-import { noTokenMessage } from "./authentication-messages.js";
+import { noTokenMessage, generateNewTokenMessage } from "./authentication-messages.js";
 import { authMiddleware } from "./authentication-middleware.js";
 
 export const authComposer = new Composer<Context>();
@@ -35,6 +35,7 @@ async function handleWithToken(ctx: Context, tokenStr: string): Promise<void> {
           await ctx.reply(ctx.t("auth-link-cancelled"));
           break;
       }
+      await generateNewTokenMessage(ctx);
       return;
     }
 
