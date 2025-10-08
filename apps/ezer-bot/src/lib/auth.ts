@@ -127,6 +127,41 @@ export async function markTokenAsUsed(tokenId: string): Promise<boolean> {
 }
 
 /**
+ * Unlinks a Telegram user from their user profile.
+ * 
+ * @param telegramUserId - The Telegram user ID to unlink.
+ * @returns A promise that resolves to the user profile that was unlinked, or null if not found.
+ */
+export async function unlinkTelegramUser(telegramUserId: number): Promise<UserProfile | null> {
+  // First, get the current profile to return it
+  const { data: profile, error: fetchError } = await supabase
+    .from("user_profiles")
+    .select("*")
+    .eq("telegram_user_id", telegramUserId)
+    .maybeSingle();
+
+  if (fetchError) {
+    throw fetchError;
+  }
+
+  if (!profile) {
+    return null;
+  }
+
+  // Perform the unlink operation
+  const { error: unlinkError } = await supabase
+    .from("user_profiles")
+    .update({ telegram_user_id: null })
+    .eq("telegram_user_id", telegramUserId);
+
+  if (unlinkError) {
+    throw unlinkError;
+  }
+
+  return profile as UserProfile;
+}
+
+/**
  * Finds a user profile by the associated Telegram user ID.
  *
  * @param {number} telegramUserId - The Telegram user ID to search for.

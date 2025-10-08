@@ -50,42 +50,25 @@ composer.command("start", async (ctx) => {
 // Handle callback queries from the welcome menu
 composer.callbackQuery("search", async (ctx) => {
   await ctx.answerCallbackQuery();
-  await ctx.reply(ctx.t("search-reply"), {
+  await ctx.editMessageText(ctx.t("search-reply"), {
     parse_mode: "Markdown",
   });
 });
 
 composer.callbackQuery("playlists", async (ctx) => {
   await ctx.answerCallbackQuery();
-  await ctx.reply(ctx.t("playlists-reply"), {
+  await ctx.editMessageText(ctx.t("playlists-reply"), {
     parse_mode: "Markdown",
   });
 });
 
 composer.callbackQuery("help", async (ctx) => {
   await ctx.answerCallbackQuery();
-  await ctx.reply(ctx.t("help-reply"), {
+  await ctx.editMessageText(ctx.t("help-reply"), {
     parse_mode: "Markdown",
   });
 });
 
-// Handle unlink callback with confirmation
-composer.callbackQuery("unlink", async (ctx) => {
-  await ctx.answerCallbackQuery();
-  
-  // Show confirmation dialog
-  await ctx.reply(ctx.t("unlink-confirmation"), {
-    parse_mode: "Markdown",
-    reply_markup: {
-      inline_keyboard: [
-        [
-          { text: ctx.t("confirm-unlink-button"), callback_data: "confirm-unlink" },
-          { text: ctx.t("cancel-button"), callback_data: "cancel-unlink" }
-        ]
-      ]
-    }
-  });
-});
 
 // Fallback handler for unrecognized messages
 composer.on("message", async (ctx) => {
