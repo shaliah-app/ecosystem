@@ -4,7 +4,7 @@ import { run, sequentialize } from "@grammyjs/runner";
 import { I18n } from "@grammyjs/i18n";
 import type { Context, SessionData } from "./types/context.js";
 import welcomeComposer from "./modules/welcome.js";
-import { authComposer } from "./modules/auth-link.js";
+import { authComposer } from "./modules/authentication.js";
 import unlinkComposer from "./modules/unlink.js";
 import { dependencyComposer } from "./modules/dependency.js";
 import { logger, logBotError } from "./logger.js";
