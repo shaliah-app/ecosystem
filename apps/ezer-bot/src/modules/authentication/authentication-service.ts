@@ -1,6 +1,6 @@
 import { AuthToken, UserProfile } from "@yesod/database-types";
-import { supabase } from "./supabase";
-import { logger } from "../logger";
+import { supabase } from "../../lib/supabase";
+import { logger } from "../../logger";
 
 /**
  * The result of validating an authentication token.

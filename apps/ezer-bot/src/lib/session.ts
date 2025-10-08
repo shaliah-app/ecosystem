@@ -1,5 +1,5 @@
 import type { Context } from "../types/context.js";
-import { findUserProfileByTelegramUserId } from "./auth.js";
+import { findUserProfileByTelegramUserId } from "../modules/authentication/authentication-service.js";
 
 /**
  * Gets the Telegram user ID from session or context, storing it in session for future use.

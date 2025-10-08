@@ -1,26 +1,20 @@
-import type { Context } from "../types/context.js";
+import type { Context } from "../../types/context.js";
 import { Composer } from "grammy";
-import { logger } from "../logger.js";
-import { env } from "../lib/env.js";
+import { logger } from "../../logger.js";
 import {
   findUserProfileByTelegramUserId,
   validateToken,
   linkTelegramUser,
   markTokenAsUsed,
-} from "../lib/auth.js";
-import { getTelegramUserId, setAuthenticated } from "../lib/session.js";
+} from "./authentication-service.js";
+import {
+  getTelegramUserId,
+  setAuthenticated,
+} from "../../lib/session.js";
+import { noTokenMessage } from "./authentication-messages.js";
+import { authMiddleware } from "./authentication-middleware.js";
 
 export const authComposer = new Composer<Context>();
-
-async function handleNoToken(ctx: Context): Promise<void> {
-  await ctx.reply(ctx.t("auth-link-unlinked"), {
-    reply_markup: {
-      inline_keyboard: [
-        [{ text: "Open Shaliah", url: `${env.shaliah.baseUrl}/profile` }],
-      ],
-    },
-  });
-}
 
 async function handleWithToken(ctx: Context, tokenStr: string): Promise<void> {
   try {
@@ -92,17 +86,18 @@ async function handleWithToken(ctx: Context, tokenStr: string): Promise<void> {
   }
 }
 
-export async function handleAuthentication(ctx: Context): Promise<void> {
+export async function authenticate(ctx: Context): Promise<void> {
   const tokenStr = ctx.match;
 
   if (!tokenStr || tokenStr.trim().length === 0) {
-    await handleNoToken(ctx);
+    await noTokenMessage(ctx);
     return;
   }
 
   await handleWithToken(ctx, tokenStr);
 }
 
-authComposer.command("start", handleAuthentication);
+authComposer.use(authMiddleware);
+authComposer.command("start", authenticate);
 
 export default authComposer;
