@@ -19,6 +19,7 @@
     "@sentry/profiling-node": "^8.40.0",
     "@supabase/supabase-js": "^2.39.0",
     "@yesod/logger": "workspace:*",
+    "@yesod/database-types": "workspace:*",
     "dotenv": "^16.3.0",
     "grammy": "^1.21.0",
     "zod": "^4.1.11"

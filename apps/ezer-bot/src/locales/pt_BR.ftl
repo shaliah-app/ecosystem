@@ -17,6 +17,17 @@ search-button = 🎵 Buscar Músicas
 playlists-button = 📋 Minhas Playlists
 help-button = ❓ Ajuda
 
+# Auth link messages
+auth-link-success = ✅ Conta vinculada com sucesso! Seu Telegram agora está conectado.
+auth-link-invalid = ❌ Link inválido. Gere um novo no seu perfil Shaliah.
+auth-link-expired = ⏰ Link expirado. O link é válido por 15 minutos. Gere um novo.
+auth-link-used = 🔒 Link já utilizado. Faça logout e gere um novo link.
+auth-link-cancelled = ⚠️ Este link foi cancelado. Gere um novo no seu perfil.
+auth-link-error = ❌ Erro ao processar sua solicitação. Tente novamente.
+auth-link-already-linked = ✅ Sua conta já está vinculada! Você pode usar o Ezer bot normalmente.
+auth-link-different-user = ⚠️ Esta conta do Telegram já está vinculada a outro usuário. Desvincule esta conta primeiro, e tente novamente.
+auth-link-unlinked = ⚠️ Sua conta Shaliah não está vinculada. Abra seu perfil no Shaliah e gere um QR para conectar.
+
 # Callback replies
 search-reply = 🎵 *Busca de Músicas*
 
