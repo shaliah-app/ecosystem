@@ -18,7 +18,7 @@ export const dependencyComposer = new Composer<Context>();
  */
 export const dependencyMiddleware = async (
   ctx: Context,
-  next: () => Promise<void>,
+  next: () => Promise<void>
 ) => {
   const startTime = Date.now();
   const userId = ctx.from?.id;
@@ -34,17 +34,11 @@ export const dependencyMiddleware = async (
       logger.info("Dependency checks disabled, bypassing check", {
         nodeEnv: config.app.environment,
         dependencyChecksEnabled: config.dependency.checksEnabled,
-        userId,
-        username,
-        messageId,
       });
       return next();
     }
 
     logger.info("Starting dependency check", {
-      userId,
-      username,
-      messageId,
       healthUrl: config.shaliah.healthUrl,
       timeout: config.dependency.checkTimeout,
     });
@@ -57,8 +51,6 @@ export const dependencyMiddleware = async (
     if (!healthResult.isOnline) {
       logger.warn("Shaliah is offline, blocking user interaction", {
         userId,
-        username,
-        messageId,
         error: healthResult.error,
         responseTime: healthResult.responseTime,
         checkDuration,
@@ -67,10 +59,9 @@ export const dependencyMiddleware = async (
 
       try {
         // Send offline message to user
-        const offlineMessage = ctx.t
-          ? ctx.t("shaliah-offline-message")
-          : "🔧 *Shaliah is currently offline*\n\nI need Shaliah to be running to help you. Please try again later.";
-        await ctx.reply(offlineMessage, { parse_mode: "Markdown" });
+        const offlineMessage = ctx.t("shaliah-offline-message");
+
+        await ctx.reply(offlineMessage, { parse_mode: "MarkdownV2" });
         logger.info("Offline message sent to user", {
           userId,
           username,
@@ -92,9 +83,6 @@ export const dependencyMiddleware = async (
 
     // Shaliah is online, continue processing
     logger.info("Shaliah is online, processing message", {
-      userId,
-      username,
-      messageId,
       responseTime: healthResult.responseTime,
       checkDuration,
     });
@@ -118,10 +106,8 @@ export const dependencyMiddleware = async (
 
     try {
       // Send error message to user
-      const offlineMessage = ctx.t
-        ? ctx.t("shaliah-offline-message")
-        : "🔧 *Shaliah is currently offline*\n\nI need Shaliah to be running to help you. Please try again later.";
-      await ctx.reply(offlineMessage, { parse_mode: "Markdown" });
+      const offlineMessage = ctx.t("shaliah-offline-message");
+      await ctx.reply(offlineMessage, { parse_mode: "MarkdownV2" });
       logger.info("Error fallback message sent to user", {
         userId,
         username,

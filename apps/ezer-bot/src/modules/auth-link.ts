@@ -326,8 +326,8 @@ export async function handleStart(ctx: Context): Promise<void> {
 
     // Optionally set session flags
     if (ctx.session) {
-      (ctx.session as any).isLinked = true;
-      (ctx.session as any).shaliahUserId = authToken.user_id;
+      ctx.session.isLinked = true;
+      ctx.session.shaliahUserId = authToken.user_id;
     }
 
     logger.info("ezer.auth.token_used_success", {
@@ -372,11 +372,11 @@ unlinkedDetectionComposer.use(async (ctx, next) => {
 
     // Persist lightweight session flags if session is available
     if (ctx.session) {
-      (ctx.session as any).isLinked = isLinked;
+      ctx.session.isLinked = isLinked;
     }
 
     if (!isLinked) {
-      const alreadyWarned = Boolean((ctx.session as any)?.unlinkedPromptShown);
+      const alreadyWarned = Boolean(ctx.session?.unlinkedPromptShown);
       if (!alreadyWarned) {
         // Log unlinked access attempt
         logger.info("ezer.auth.unlinked_access", {
@@ -394,13 +394,13 @@ unlinkedDetectionComposer.use(async (ctx, next) => {
           },
         });
         if (ctx.session) {
-          (ctx.session as any).unlinkedPromptShown = true;
+          ctx.session.unlinkedPromptShown = true;
         }
       }
     } else {
       // Reset the one-time prompt flag after successful link
-      if (ctx.session && (ctx.session as any).unlinkedPromptShown) {
-        (ctx.session as any).unlinkedPromptShown = false;
+      if (ctx.session && ctx.session.unlinkedPromptShown) {
+        ctx.session.unlinkedPromptShown = false;
       }
     }
   } catch (err) {
