@@ -1,4 +1,5 @@
 import type { Context } from "../types/context.js";
+import { findUserProfileByTelegramUserId } from "./auth.js";
 
 /**
  * Gets the Telegram user ID from session or context, storing it in session for future use.
@@ -37,4 +38,50 @@ export function requireTelegramUserId(ctx: Context): number {
   }
 
   return telegramUserId;
+}
+
+/**
+ * Checks if the user is authenticated (linked in database).
+ * 
+ * @param ctx - The Telegram context
+ * @returns True if user is authenticated, false otherwise
+ */
+export async function isAuthenticated(ctx: Context): Promise<boolean> {
+  const telegramUserId = getTelegramUserId(ctx);
+  
+  if (!telegramUserId) {
+    return false;
+  }
+
+  try {
+    const profile = await findUserProfileByTelegramUserId(telegramUserId);
+    return !!profile?.telegram_user_id;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Sets the user as authenticated in the session.
+ * 
+ * @param ctx - The Telegram context
+ * @param shaliahUserId - The Shaliah user ID to store
+ */
+export function setAuthenticated(ctx: Context, shaliahUserId: string): void {
+  if (ctx.session) {
+    ctx.session.isLinked = true;
+    ctx.session.shaliahUserId = shaliahUserId;
+  }
+}
+
+/**
+ * Sets the user as unauthenticated in the session.
+ * 
+ * @param ctx - The Telegram context
+ */
+export function setUnauthenticated(ctx: Context): void {
+  if (ctx.session) {
+    ctx.session.isLinked = false;
+    delete ctx.session.shaliahUserId;
+  }
 }

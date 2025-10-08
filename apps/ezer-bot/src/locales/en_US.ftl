@@ -26,7 +26,7 @@ auth-link-cancelled = ⚠️ This link was cancelled. Generate a new one in your
 auth-link-error = ❌ Error processing your request. Try again.
 auth-link-already-linked = ✅ Your account is already linked! You can use the Ezer bot normally.
 auth-link-different-user = ⚠️ This Telegram account is already linked to another user. Unlink your account first, then try again.
-auth-link-unlinked = ⚠️ Your Shaliah account is not linked. Open your Shaliah profile and generate a QR to connect.
+auth-link-unlinked = ℹ️ Your Shaliah account is not linked. Open your Shaliah profile and generate a QR to connect.
 
 # Callback replies
 search-reply = 🎵 *Song Search*

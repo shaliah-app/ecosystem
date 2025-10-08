@@ -8,7 +8,7 @@ import {
   linkTelegramUser,
   markTokenAsUsed,
 } from "../lib/auth.js";
-import { getTelegramUserId } from "../lib/session.js";
+import { getTelegramUserId, setAuthenticated } from "../lib/session.js";
 
 export const authComposer = new Composer<Context>();
 
@@ -75,6 +75,9 @@ async function handleWithToken(ctx: Context, tokenStr: string): Promise<void> {
     }
 
     await markTokenAsUsed(token.id);
+
+    // Automatically authenticate the user in session
+    setAuthenticated(ctx, token.user_id);
 
     await ctx.reply(ctx.t("auth-link-success"));
   } catch (err) {

@@ -75,7 +75,7 @@ composer.callbackQuery('unlink', async (ctx) => {
   await ctx.answerCallbackQuery();
   
   await ctx.editMessageText(ctx.t('unlink-confirmation'), {
-    parse_mode: 'MarkdownV2',
+    parse_mode: 'Markdown',
     reply_markup: {
       inline_keyboard: [
         [

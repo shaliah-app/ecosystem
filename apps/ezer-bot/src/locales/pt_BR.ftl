@@ -26,7 +26,7 @@ auth-link-cancelled = ⚠️ Este link foi cancelado. Gere um novo no seu perfil
 auth-link-error = ❌ Erro ao processar sua solicitação. Tente novamente.
 auth-link-already-linked = ✅ Sua conta já está vinculada! Você pode usar o Ezer bot normalmente.
 auth-link-different-user = ⚠️ Esta conta do Telegram já está vinculada a outro usuário. Desvincule esta conta primeiro, e tente novamente.
-auth-link-unlinked = ⚠️ Sua conta Shaliah não está vinculada. Abra seu perfil no Shaliah e gere um QR para conectar.
+auth-link-unlinked = ℹ️ Sua conta Shaliah não está vinculada. Abra seu perfil no Shaliah e gere um QR para conectar.
 
 # Callback replies
 search-reply = 🎵 *Busca de Músicas*
@@ -80,7 +80,7 @@ auth-link-error-generic = ❌ Erro ao processar
 
     Se o problema persistir, entre em contato com o suporte.
 
-account-unlinked = ⚠️ Sua conta Shaliah não está mais vinculada
+account-unlinked = 🟢 Sua conta Shaliah não está mais vinculada
 
     Por favor, visite seu perfil no Shaliah e gere um novo código QR para conectar.
 

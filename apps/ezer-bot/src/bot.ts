@@ -3,11 +3,12 @@ import { Bot, session } from "grammy";
 import { run, sequentialize } from "@grammyjs/runner";
 import { I18n } from "@grammyjs/i18n";
 import type { Context, SessionData } from "./types/context.js";
-import welcomeComposer from "./modules/welcome.js";
+import welcomeComposer from "./modules/menu.js";
 import { authComposer } from "./modules/authentication.js";
 import unlinkComposer from "./modules/unlink.js";
 import { dependencyComposer } from "./modules/dependency.js";
 import { logger, logBotError } from "./logger.js";
+import { authMiddleware } from "./middleware/auth.js";
 
 // Environment configuration is validated and loaded in env.ts
 // All environment variables are validated at import time
@@ -45,10 +46,13 @@ const constraint = (ctx: Context) => [
 // Sequentialize middleware to ensure updates from the same chat are processed in order
 bot.use(sequentialize(constraint));
 
+// Global authentication middleware
+bot.use(authMiddleware);
+
 // Register modules in order: sequentialize → session → i18n → dependency → auth-link → others
 bot.use(dependencyComposer);
 bot.use(authComposer);
-// bot.use(unlinkComposer)
+bot.use(unlinkComposer)
 bot.use(welcomeComposer);
 
 // Global error handler
