@@ -3,7 +3,7 @@ import type { Context } from '../types/context.js'
 import { logger } from '../logger.js'
 import { env } from '../lib/env.js'
 import { unlinkTelegramUser } from './authentication/authentication-service.js'
-import { getTelegramUserId } from '../lib/session.js'
+import { getTelegramUserId } from './session/session-service.js'
 
 const composer = new Composer<Context>()
 

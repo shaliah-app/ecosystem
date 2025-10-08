@@ -1,39 +1,19 @@
 import { env } from "./lib/env.js";
-import { Bot, session } from "grammy";
+import { Bot } from "grammy";
 import { run, sequentialize } from "@grammyjs/runner";
-import { I18n } from "@grammyjs/i18n";
-import type { Context, SessionData } from "./types/context.js";
+import type { Context } from "./types/context.js";
 import welcomeComposer from "./modules/menu.js";
 import { authComposer } from "./modules/authentication/authentication.js";
 import unlinkComposer from "./modules/unlink.js";
 import { dependencyComposer } from "./modules/dependency.js";
 import { logger, logBotError } from "./logger.js";
-
-// Environment configuration is validated and loaded in env.ts
-// All environment variables are validated at import time
+import { session } from "./modules/session";
+import { i18n } from "./modules/i18n.js";
 
 // Create the bot instance
-const bot = new Bot<Context>(env.bot.token);
+export const bot = new Bot<Context>(env.bot.token);
 
-// Configure session management (using memory storage for now)
-bot.use(
-  session({
-    initial: (): SessionData => ({
-      // Initialize session data here
-    }),
-  })
-);
-
-// Configure internationalization
-const i18n = new I18n<Context>({
-  defaultLocale: "pt_BR",
-  directory: "src/locales", // relative to the bot.ts file
-  globalTranslationContext(ctx) {
-    return {
-      first_name: ctx.from?.first_name ?? "there",
-    };
-  },
-});
+bot.use(session);
 
 bot.use(i18n);
 
@@ -48,7 +28,7 @@ bot.use(sequentialize(constraint));
 // Register modules in order: sequentialize → session → i18n → dependency → auth-link → others
 bot.use(dependencyComposer);
 bot.use(authComposer);
-bot.use(unlinkComposer)
+bot.use(unlinkComposer);
 bot.use(welcomeComposer);
 
 // Global error handler

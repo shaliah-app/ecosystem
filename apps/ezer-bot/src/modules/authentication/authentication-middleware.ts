@@ -1,5 +1,5 @@
 import type { Context } from "../../types/context";
-import { isAuthenticated } from "../../lib/session";
+import { isAuthenticated } from "../session/session-service";
 import { noTokenMessage } from "./authentication-messages";
 
 export async function authMiddleware(

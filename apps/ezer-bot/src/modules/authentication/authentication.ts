@@ -10,7 +10,7 @@ import {
 import {
   getTelegramUserId,
   setAuthenticated,
-} from "../../lib/session.js";
+} from "../session/session-service.js";
 import { noTokenMessage, generateNewTokenMessage } from "./authentication-messages.js";
 import { authMiddleware } from "./authentication-middleware.js";
 
